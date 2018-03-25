@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"About\"\ndate: 2015-07-23T21:13:14-05:00\n---\n\nThis is the personal blog of James Riley, largely as a place to share my adventures in Free/Open Operations Resrach and/or Data Science. There'll also be Statistics, bad Programming, random musings. \n\nAll data processed is available for free, for some value of free. It is my intention that anyone be able to reproduce the outputs of this site.\n\nI am an Operational Resarcher for the UK [*Department of Health and Social Care*](https://www.gov.uk/government/organisations/department-of-health-and-social-care). All opinions are my own and not those of my employer. I have not used any restricted/official data or code in this site.\n\n[**blogdown**](https://github.com/rstudio/blogdown) package. The theme was forked from [@jrutheiser/hugo-lithium-theme](https://github.com/jrutheiser/hugo-lithium-theme) and modified by [Yihui Xie](https://github.com/yihui/hugo-lithium-theme).\n",
+    "created" : 1522005615822.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "856757449",
+    "id" : "2FA84522",
+    "lastKnownWriteTime" : 1522010478,
+    "last_content_update" : 1522010478527,
+    "path" : "~/bin/R/Open Operational Research/content/about.md",
+    "project_path" : "content/about.md",
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "markdown"
+}
