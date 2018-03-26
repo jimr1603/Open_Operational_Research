@@ -1,0 +1,70 @@
+---
+title: "Open Organograms"
+author: "James Riley"
+date: '2018-03-26'
+slug: open-organograms-1
+tags:
+- data.gov.uk
+- tidyverse
+- data.table
+categories: R
+--- 
+
+
+
+<div id="background" class="section level2">
+<h2>Background</h2>
+<p>One of the reasons I’ve founded this site is because I’ve discovered <a href="https://data.gov.uk/" class="uri">https://data.gov.uk/</a> and I have ideas. In particular, I won’t discuss outside of work anything I only know through work, so it was nice to see pay data in the public sphere.</p>
+<p>Full background is at <a href="http://guidance.data.gov.uk/organogram-data.html" class="uri">http://guidance.data.gov.uk/organogram-data.html</a> but basically, the Prime Minister decided that the public deserve the structure and hierarchy of the Government Departments, and a few agencies.</p>
+<p>All data used in this post was released under the <a href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence</a>.</p>
+<p>For reference, there’s a good table on <a href="https://en.wikipedia.org/wiki/Civil_Service_(United_Kingdom)#Grading_schemes">Wikipedia</a> explaining what our grading structure is, including some infor the MOD have given comparing grades in Civil and Military Service.</p>
+</div>
+<div id="processing" class="section level2">
+<h2>Processing</h2>
+<p>I have decided that not all of these posts will be final finished polished pieces but will include some work in progress.</p>
+<p>Naturally, the first dataset I grabbed was that for the Department of Health and Social Care. Immediately there is a problem - the background above says that the PM wanted everyone to release the data 2ce a year, but our last drop was in 2016. Very often in messing around with data you find that it’s out of date. The other thing you find is that there are data standards which get widely ignored.</p>
+<p>For now I’m interested in finding median salary, and what a department costs per minute/hour. I need the ggplot practise, so I’m doing some column charts of the distributions too.</p>
+</div>
+<div id="dhsc" class="section level2">
+<h2>DHSC</h2>
+<p>This went reasonably smoothly, possibly given that I know the grading scheme. Someone along the line had decided that we wanted info on removed Senior Civil Servants, so I had to filter them out. This processing was done on a data.table framework.</p>
+<pre class="r"><code>c &lt;- read.csv(here(&quot;static&quot;, &quot;data&quot;, &quot;department-of-health__31-03-2016__dh_010416-DH-Organogram-junior.csv&quot;), stringsAsFactors = FALSE)
+d &lt;-read.csv(here(&quot;static&quot;, &quot;data&quot;, &quot;department-of-health__31-03-2016__dh_010416-DH-Organogram-senior.csv&quot;), stringsAsFactors = FALSE)
+
+c &lt;- as.data.table(c)
+d&lt;- as.data.table(d)</code></pre>
+<pre class="r"><code>juniors = c[,.(N=sum(Number.of.Posts.in.FTE),min=min(Payscale.Minimum....),max=max(Payscale.Maximum....)),by=Grade]
+seniors = d[!(Name %in% c(&quot;N/D&quot;,&quot;ELIMINIATED&quot;, &quot;VACANT&quot;)),.(N=sum(FTE),min=max(Actual.Pay.Floor....),max=max(Actual.Pay.Ceiling....)),by=Grade..or.equivalent.]</code></pre>
+<p>Then I wanted to append one table to the other. For that they need column names that match. Since I want to find a median I need a cumalitive sum, and to find the middle person.</p>
+<pre class="r"><code>combined &lt;- rbindlist(list(juniors,seniors))
+
+combined &lt;- combined[order(min)] 
+
+combined[,cumulative:=cumsum(N)]
+
+total_staff &lt;- combined[,sum(N)]
+median_record &lt;- combined[cumulative&gt;total_staff/2][1]
+median_salary = median_record[,min]</code></pre>
+<p>Then total bill over an estimate at total hours worked in a year gives me the total bill for the department per hour and per minute.</p>
+<pre class="r"><code>total_bill_min &lt;- combined[,sum(N*min)]
+total_hours &lt;- (365.25 / 7 * 5 - 25 -9) * (37/5)
+
+avg_hourly &lt;- median_salary/total_hours 
+avg_minutely &lt;- avg_hourly/60</code></pre>
+<p>And so I get my outputs, which I’ve not nicely formatted yet.</p>
+<pre class="r"><code>total_staff
+## [1] 1500.51
+
+median_salary
+## [1] 33675
+
+total_bill_min
+## [1] 57656342
+
+avg_hourly
+## [1] 20.0565
+
+ggplot(data=combined, aes(Grade, N)) + geom_col()</code></pre>
+<p><img src="/post/2018-03-26-open-organograms_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>In fact, that’s a totally wrong plot! ggplot has decided it knows my labels better than me and thinks it can do better. I could manually set it, but I’m already past bed time on a work night.</p>
+</div>
