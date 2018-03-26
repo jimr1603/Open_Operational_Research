@@ -15,7 +15,7 @@ author = "James Riley"
     url = "/about/"
 [[menu.main]]
     name = "GitHub"
-    url = "https://github.com/jimrr1603/Open_Operational_Research"
+    url = "https://github.com/jimr1603/Open_Operational_Research"
 
 [params]
     description = "A blog for Free Analysis with Open Data."
