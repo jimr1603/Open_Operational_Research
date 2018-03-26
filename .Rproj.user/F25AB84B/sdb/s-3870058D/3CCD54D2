@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"About\"\ndate: 2018-03-25\n---\n\nThis is the personal blog of James Riley, largely as a place to share my adventures in Free/Open Operations Resrach and/or Data Science. There'll also be Statistics, some Economics, maybe some Social Research, and definitely some bad programming.\n\nAll data processed is available for free, for some value of free. It is my intention that anyone be able to reproduce the outputs of this site. I'm using R markdown with hosting on GitHub so you can have the source for free as well.\n\nI am an Operational Resarcher for the UK [*Department of Health and Social Care*](https://www.gov.uk/government/organisations/department-of-health-and-social-care). All opinions are my own and not those of my employer. I have not used any restricted/official data or code in this site.\n\nWebsite built with the [**blogdown**](https://github.com/rstudio/blogdown) package. The theme was forked from [@jrutheiser/hugo-lithium-theme](https://github.com/jrutheiser/hugo-lithium-theme) and modified by [Yihui Xie](https://github.com/yihui/hugo-lithium-theme).\n\nKindly hosted by GitHub and Netlify.\n",
+    "created" : 1522043061834.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2021514482",
+    "id" : "3CCD54D2",
+    "lastKnownWriteTime" : 1522043120,
+    "last_content_update" : 1522043120127,
+    "path" : "~/bin/R/Open Operational Research/Open_Operational_Research/content/about.md",
+    "project_path" : "Open_Operational_Research/content/about.md",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "markdown"
+}

@@ -17,9 +17,8 @@
       <pubDate>Sun, 25 Mar 2018 00:00:00 +0000</pubDate>
       
       <guid>/about/</guid>
-      <description>This is the personal blog of James Riley, largely as a place to share my adventures in Free/Open Operations Resrach and/or Data Science. There&amp;rsquo;ll also be Statistics, bad Programming, random musings.
-All data processed is available for free, for some value of free. It is my intention that anyone be able to reproduce the outputs of this site.
-I am an Operational Resarcher for the UK Department of Health and Social Care.</description>
+      <description>This is the personal blog of James Riley, largely as a place to share my adventures in Free/Open Operations Resrach and/or Data Science. There&amp;rsquo;ll also be Statistics, some Economics, maybe some Social Research, and definitely some bad programming.
+All data processed is available for free, for some value of free. It is my intention that anyone be able to reproduce the outputs of this site. I&amp;rsquo;m using R markdown with hosting on GitHub so you can have the source for free as well.</description>
     </item>
     
     <item>
