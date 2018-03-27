@@ -38,8 +38,8 @@ For now I'm interested in finding median salary, and what a department costs per
 This went reasonably smoothly, possibly given that I know the grading scheme. Someone along the line had decided that we wanted info on removed Senior Civil Servants, so I had to filter them out. This processing was done on a data.table framework.
 
 ```{r}
-c <- read.csv(here("static", "data", "department-of-health__31-03-2016__dh_010416-DH-Organogram-junior.csv"), stringsAsFactors = FALSE)
-d <-read.csv(here("static", "data", "department-of-health__31-03-2016__dh_010416-DH-Organogram-senior.csv"), stringsAsFactors = FALSE)
+c <- read.csv(here("static", "data", "Open Government Licence","department-of-health__31-03-2016__dh_010416-DH-Organogram-junior.csv"), stringsAsFactors = FALSE)
+d <-read.csv(here("static", "data","Open Government Licence", "department-of-health__31-03-2016__dh_010416-DH-Organogram-senior.csv"), stringsAsFactors = FALSE)
 
 c <- as.data.table(c)
 d<- as.data.table(d)

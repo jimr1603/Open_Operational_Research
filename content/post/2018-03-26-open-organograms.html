@@ -28,8 +28,8 @@ categories: R
 <div id="dhsc" class="section level2">
 <h2>DHSC</h2>
 <p>This went reasonably smoothly, possibly given that I know the grading scheme. Someone along the line had decided that we wanted info on removed Senior Civil Servants, so I had to filter them out. This processing was done on a data.table framework.</p>
-<pre class="r"><code>c &lt;- read.csv(here(&quot;static&quot;, &quot;data&quot;, &quot;department-of-health__31-03-2016__dh_010416-DH-Organogram-junior.csv&quot;), stringsAsFactors = FALSE)
-d &lt;-read.csv(here(&quot;static&quot;, &quot;data&quot;, &quot;department-of-health__31-03-2016__dh_010416-DH-Organogram-senior.csv&quot;), stringsAsFactors = FALSE)
+<pre class="r"><code>c &lt;- read.csv(here(&quot;static&quot;, &quot;data&quot;, &quot;Open Government Licence&quot;,&quot;department-of-health__31-03-2016__dh_010416-DH-Organogram-junior.csv&quot;), stringsAsFactors = FALSE)
+d &lt;-read.csv(here(&quot;static&quot;, &quot;data&quot;,&quot;Open Government Licence&quot;, &quot;department-of-health__31-03-2016__dh_010416-DH-Organogram-senior.csv&quot;), stringsAsFactors = FALSE)
 
 c &lt;- as.data.table(c)
 d&lt;- as.data.table(d)</code></pre>

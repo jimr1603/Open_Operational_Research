@@ -9,6 +9,6 @@ All data processed is available for free, for some value of free. It is my inten
 
 I am an Operational Resarcher for the UK [*Department of Health and Social Care*](https://www.gov.uk/government/organisations/department-of-health-and-social-care). All opinions are my own and not those of my employer. I have not used any restricted/official data or code in this site.
 
-Website built with the [**blogdown**](https://github.com/rstudio/blogdown) package. The theme was forked from [@jrutheiser/hugo-lithium-theme](https://github.com/jrutheiser/hugo-lithium-theme) and modified by [Yihui Xie](https://github.com/yihui/hugo-lithium-theme).
+Website built with the [blogdown](https://github.com/rstudio/blogdown) package. The theme was forked from [@jrutheiser/hugo-lithium-theme](https://github.com/jrutheiser/hugo-lithium-theme) and modified by [Yihui Xie](https://github.com/yihui/hugo-lithium-theme).
 
 Kindly hosted by GitHub and Netlify.
