@@ -1,0 +1,4 @@
+"0","c <- read.csv(here(""static"", ""data"", ""Open Government Licence"",""department-of-health__31-03-2016__dh_010416-DH-Organogram-junior.csv""), stringsAsFactors = FALSE)"
+"0","d <-read.csv(here(""static"", ""data"",""Open Government Licence"", ""department-of-health__31-03-2016__dh_010416-DH-Organogram-senior.csv""), stringsAsFactors = FALSE)"
+"0","c <- as.data.table(c)"
+"0","d<- as.data.table(d)"

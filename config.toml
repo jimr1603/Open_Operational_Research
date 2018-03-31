@@ -30,7 +30,7 @@ copyright = "© This post is licensed under a Creative Commons Attribution-NonCo
  
 [[menu.main]]
   name = "Tags"
-  weight = 30
+  weight = 30 
   identifier = "tags"
   url = "/tags/"
 

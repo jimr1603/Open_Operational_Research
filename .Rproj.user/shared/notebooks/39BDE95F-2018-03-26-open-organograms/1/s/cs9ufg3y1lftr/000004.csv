@@ -1,0 +1,2 @@
+"0","juniors = c[,.(N=sum(Number.of.Posts.in.FTE),min=min(Payscale.Minimum....),max=max(Payscale.Maximum....)),by=Grade]"
+"0","seniors = d[!(Name %in% c(""N/D"",""ELIMINIATED"", ""VACANT"")),.(N=sum(FTE),min=max(Actual.Pay.Floor....),max=max(Actual.Pay.Ceiling....)),by=Grade..or.equivalent.]"

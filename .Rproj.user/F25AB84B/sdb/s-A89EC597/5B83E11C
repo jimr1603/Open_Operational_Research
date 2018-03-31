@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "baseURL = \"/\"\nlanguageCode = \"en\"\ntitle = \"Open Operational Research\"\nenableRobotsTXT = true\nPygmentsCodeFences = true\ncanonifyurls = true\nignoreFiles = [\"\\\\.Rmd$\", \"\\\\.Rmarkdown$\", \"_files$\", \"_cache$\"]\n\n# Disqus Username\ndisqusShortname = \"openor-blog\"\n\n# Google Analytics UA number\n#googleAnalytics = \"UA-XXXXXXXX-X\"\n\n# Copyright of your post\ncopyright = \"© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you wish to quote or reproduce. Source code available under GPL at the linked GitHub.\"\n\n# Initial site menu, you can extend menu with content.\n[[menu.main]]\n  name = \"Home\"\n  weight = 10\n  identifier = \"home\"\n  url = \"/\"\n\n[[menu.main]]\n  name = \"GitHub\"\n  weight = 20\n  identifier = \"GitHub\"\n  url = \"https://github.com/jimr1603\"\n \n[[menu.main]]\n  name = \"Tags\"\n  weight = 30 \n  identifier = \"tags\"\n  url = \"/tags/\"\n\n[[menu.main]]\n  name = \"Workflow\"\n  weight = 60\n  identifier = \"workflow\"\n  url = \"/workflow/\"\n  \n# Add your own params here\n[params]\n  author = \"James Riley\"\n  avatar = \"/img/avatar.jpg\"\n  seotitle = \"Open Operational Research\"\n  subtitle = \"Open code and open data!\"\n  description = \"My noodling around with open data in my spare time, and what I've found\"\n  paginate = 10\n\n  # Choose your social networks\n  email = \"jimr1603@gmail.com\"\n  github = \"jimr1603\"\n  #twitter = \"twitter_username\"\n  #linkedin = \"linkedin_username\"\n  #weibo = \"weibo_username\"\n  #wechat= \"/img/qrcode.jpg\" # Replace with your wechat qrcode image\n  # facebook = \"facebook_username\"\n  # google = \"googlplus_id_number\"\n  # instagram = \"instagram_username\"\n  # youtube = \"youtube_username\"\n  # vimeo = \"vimeo_username\"\n  # medium = \"medium_username\"\n  # quora = \"quora_username\"\n  # pinterest = \"pinterest_username\"\n  # dribbble = \"dribbble_username\"\n  # behance = \"behance_username\"\n  # jsfiddle = \"jsfiddle_username\"\n  # codepen = \"codepen_username\"\n  # zhihu = \"zhihu_username\"\n  # douban = \"douban_username\"\n  # bilibili = \"bilibili_id_number\"\n\n  # Changyan Comments (China Only)\n  #changyan = false\n  #changyanId = \"cyt3toRiB\"\n  #changyanConf = \"prod_0908b1cb9a581501753cce1ed074dbe3\"\n\n  # Google Webmaster\n  # https://www.google.com/webmasters/\n  #googleSiteVerification = \"_moDmnnBNVLBN1rzNxyGUGdPHE20YgbmrtzLIbxaWFc\"\n\n  # Bing Webmaster\n  # https://www.bing.com/toolbox/webmaster/\n  #msValidate = \"22596E34341DD1D17D6022C44647E587\"\n\n  # Baidu Webmaster (China Only)\n  # https://zhanzhang.baidu.com/\n  # baiduSiteVerification = \"MZ23SPxxfa\"\n\n  # Sogou Webmaster (China Only)\n  # http://zhanzhang.sogou.com/\n  # sogouSiteVerification = \"m2jktMQTZm\"\n\n  # 360 Webmaster (China Only)\n  # http://zhanzhang.so.com/\n  # soSiteVerification = \"b7ab3b4c2edbc856642004d1b8c27a91\"\n\n  # Baidu Tongji (China Only)\n  # https://tongji.baidu.com/\n  # baiduTongji = \"e21dc1e8a592188271b615159dc88af7\"\n\n  # ICP Number (China Only)\n  # ICP = \"苏ICP备16005986号-2\"\n",
+    "created" : 1522474966233.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2521595837",
+    "id" : "5B83E11C",
+    "lastKnownWriteTime" : 1522478752,
+    "last_content_update" : 1522478752156,
+    "path" : "~/bin/R/Open_Operational_Research/config.toml",
+    "project_path" : "config.toml",
+    "properties" : {
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "text"
+}
