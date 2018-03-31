@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>GORS-Techniques on Open Operational Research</title>
+    <link>/gors-techniques/</link>
+    <description>Recent content in GORS-Techniques on Open Operational Research</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you wish to quote or reproduce. Source code available under GPL at the linked GitHub.</copyright>
+    
+	<atom:link href="/gors-techniques/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+  </channel>
+</rss>
