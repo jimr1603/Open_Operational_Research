@@ -14,6 +14,10 @@ categories: Python
 ```{r setup, echo=FALSE, 	message = FALSE,warning = FALSE}
 library(knitr)
 library(tidyverse)
+knitr::opts_chunk$set(
+
+	engine.path = "/usr/bin/python3"
+)
 ```
 
 ```{python, echo=FALSE}
