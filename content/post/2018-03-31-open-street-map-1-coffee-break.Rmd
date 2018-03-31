@@ -11,14 +11,12 @@ tags:
 - Graph theory
 categories: Python
 ---
-```{r setup, include=FALSE}
+```{r setup, echo=FALSE, 	message = FALSE,warning = FALSE}
 library(knitr)
 library(tidyverse)
-knitr::opts_chunk$set(collapse = TRUE)
-
 ```
 
-```{python, include=FALSE}
+```{python, echo=FALSE}
 import osmnx as ox
 import xml.etree.ElementTree as xml
 import csv
