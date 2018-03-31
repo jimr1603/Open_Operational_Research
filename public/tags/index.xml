@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you wish to quote or reproduce. Source code available under GPL at the linked GitHub.</copyright>
-    <lastBuildDate>Wed, 28 Mar 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 30 Mar 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -15,7 +15,7 @@
     <item>
       <title>Data.gov.uk</title>
       <link>/tags/data.gov.uk/</link>
-      <pubDate>Wed, 28 Mar 2018 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
       
       <guid>/tags/data.gov.uk/</guid>
       <description></description>
@@ -40,9 +40,18 @@
     </item>
     
     <item>
+      <title>Htmlwidgets</title>
+      <link>/tags/htmlwidgets/</link>
+      <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/htmlwidgets/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Open Organograms</title>
       <link>/tags/open-organograms/</link>
-      <pubDate>Wed, 28 Mar 2018 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
       
       <guid>/tags/open-organograms/</guid>
       <description></description>

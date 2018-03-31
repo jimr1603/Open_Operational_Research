@@ -15,7 +15,7 @@
 
 
   
-  <meta name="author" content="" />
+  <meta name="author" content="James Riley" />
   <meta name="description" content="Background I learned data.table before tidyverse. It can be hard to read, and I’m always forgetting commas. I’m making an effort to learn the tidyverse, and I am already impressed with dplyr and tibble. (I’ve been impressed with ggplot2 for a while now.)
 I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. It’s also the case that the code run time is a tiny fraction of my overall project." />
 
@@ -232,22 +232,22 @@ I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. 
   <section class="main post-detail">
     <header class="post-header">
       <h1 class="post-title">Open Organograms 2 - the rise of the tibble</h1>
-      <p class="post-meta">@ · Mar 28, 2018 · 6 min read</p>
+      <p class="post-meta">@James Riley · Mar 28, 2018 · 6 min read</p>
     </header>
     <article class="post-content"><div id="background" class="section level2">
 <h2>Background</h2>
 <p>I learned data.table before tidyverse. It can be hard to read, and I’m always forgetting commas. I’m making an effort to learn the tidyverse, and I am already impressed with dplyr and tibble. (I’ve been impressed with ggplot2 for a while now.)</p>
 <p>I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. It’s also the case that the code run time is a tiny fraction of my overall project. (Either at home or work.) In either case I make things that run once for an answer, maybe 1ce a year, and we spend way longer QAing the thing than actually running it.</p>
 <p>The pipe works really well for anyone who things “I want to do this, then that, and maybe this”. It works a lot like how you’re taught to use Excel, but you get to throw away the intermediate cells.</p>
-<p>Personal bugbear is that ggplot doesn’t recognise that my tibble is ordered by Grade, so I had to mtatee thhe</p>
+<p>Personal bugbear is that ggplot doesn’t recognise that my tibble is ordered by Grade, so I had to mutate the</p>
 </div>
 <div id="dwp" class="section level2">
 <h2>DWP</h2>
-<p>I wanted a department that I knew had a very different structure to DHSC, so the overall graphs would look different. I also know that they use both an intenernal and the external grading system, so it would be a good test of what people were actually putting in the “Grade” field. They have a large string that includes way too much info about grade, and I just want the national pay grades. I’ve tidied up the field a bit, but I’ve been overzealous and turned all their Fast Streamers into HEOs or SEOs.</p>
+<p>I wanted a department that I knew had a very different structure to DHSC, so the overall graphs would look different. I also know that they use both an internal and the external grading system, so it would be a good test of what people were actually putting in the “Grade” field. They have a large string that includes way too much info about grade, and I just want the national pay grades. I’ve tidied up the field a bit, but I’ve been overzealous and turned all their Fast Streamers into HEOs or SEOs.</p>
 </div>
 <div id="other-stuff" class="section level2">
 <h2>Other stuff</h2>
-<p>I found the API for data.gov, and have managed to get all the latest Organograms. I’m going to have to do much, much filtering, as I’ve grabbed the last by date, even if it’s a department that no longer exists. I had to grad old ones, because some departments like DHSC haven’t updated in over a year! Script needs tweaking, but when it’s good, it’s going on this blog. In particuar, I want to get some of my Python on here.</p>
+<p>I found the API for data.gov, and have managed to get all the latest Organograms. I’m going to have to do much, much filtering, as I’ve grabbed the last by date, even if it’s a department that no longer exists. I had to grad old ones, because some departments like DHSC haven’t updated in over a year! Script needs tweaking, but when it’s good, it’s going on this blog. In particular, I want to get some of my Python on here.</p>
 </div>
 <div id="code" class="section level2">
 <h2>Code</h2>
@@ -269,7 +269,7 @@ seniors &lt;- seniors %&gt;%
   rename(minimum =  `Actual Pay Floor (£)`) %&gt;%
   filter(minimum &gt; 0) %&gt;%
   rename(Grade = `Grade (or equivalent)`) </code></pre>
-<p>For a start, this is many less lines than the equivalent in data.table. read_csv mostly works at pulling a csv into a tibble, and I can start running it through the pipe. To put into plain English, the juniors pipe goes: * take tibble juniors * only keep the columns that have “Grade”, “FTE” or “minimum” in the title * go through the grade column, and extract one of these values in this list * rename the column “payscale minimum (£)” to the more managable “minimum” * rename another column</p>
+<p>For a start, this is many less lines than the equivalent in data.table. read_csv mostly works at pulling a csv into a tibble, and I can start running it through the pipe. To put into plain English, the juniors pipe goes: * take tibble juniors * only keep the columns that have “Grade”, “FTE” or “minimum” in the title * go through the grade column, and extract one of these values in this list * rename the column “payscale minimum (£)” to the more manageable “minimum” * rename another column</p>
 <p>Seniors is similar, but filter drops records according to values. Again I have seniors with no pay or no name. Both have slightly different original names that I’m forcing into the new names, so I can’t run them through the same pipe. Maybe in the future when I’m better with this stuff.</p>
 <p>I get a warning about what turns out to be a blank column, but I drop it immediately, so I’m not worried.</p>
 <p>I’m already ready to merge my tables.</p>
@@ -289,7 +289,7 @@ median_record &lt;- combined %&gt;%
 median_salary &lt;- median_record$minimum
 print(median_salary)
 ## [1] 24476</code></pre>
-<p>Relatively straightforward. I create a running total column of all staff, find the halfway point, split the table at that point, and pick the least one (by salary). I’m not alltogether happy that top_n(-1) is a thing rather than bottom_n(1), and I might just define the latter in projects.</p>
+<p>Relatively straightforward. I create a running total column of all staff, find the halfway point, split the table at that point, and pick the least one (by salary). I’m not altogether happy that top_n(-1) is a thing rather than bottom_n(1), and I might just define the latter in projects.</p>
 <p>Turns out the median person in DWP is an EO on 24476. I’m aware that I also should format these as financial numbers for the ease of my reader. There’s probably a good library for this.</p>
 <pre class="r"><code>combined &lt;- combined %&gt;%
   group_by(Grade) %&gt;%
@@ -388,7 +388,7 @@ ggplot(combined, aes(y=FTE,x=Grade)) + geom_col()</code></pre>
 <p>The rest is as before, so outputs are given, but not the code. If you really want, it’s in the GitHub.</p>
 <pre><code>## [1] &quot;total staff: 73754.25&quot;
 ## [1] &quot;median salary: 24476&quot;
-## [1] &quot;Cost of salary in DWP per minute: 1048942.81177567&quot;</code></pre>
+## [1] &quot;Cost of salary in DWP per minute: 209788.562355133&quot;</code></pre>
 <p>Finally, running the same code with the DHSC data gives the correct graph! (For 2016)</p>
 <pre><code>## Warning: Missing column names filled in: &#39;X16&#39; [16]</code></pre>
 <p><img src="/post/2018-03-28-open-organograms-2-the-rise-of-the-tibble_files/figure-html/unnamed-chunk-7-1.png" width="672" /> Always read the Y axis on these things. The peak on the DHSC graph is about 350 FTE. That’s less than almost every bar in DWP. I’m going to think about this sort of thing when I mess with arrays of plots.</p>
@@ -424,7 +424,7 @@ ggplot(combined, aes(y=FTE,x=Grade)) + geom_col()</code></pre>
             return;
         }
         var d = document, s = d.createElement('script'); s.async = true;
-        s.src = '//' + "jimr1603" + '.disqus.com/embed.js';
+        s.src = '//' + "openor-blog" + '.disqus.com/embed.js';
         s.setAttribute('data-timestamp', +new Date());
         (d.head || d.body).appendChild(s);
     })();

@@ -28,8 +28,18 @@ All data processed is available for free, for some value of free. It is my inten
       <pubDate>Mon, 26 Mar 2018 00:00:00 +0000</pubDate>
       
       <guid>/workflow/</guid>
-      <description>This is an ongoing scratchpad of what I have ideas for, what I’m working on, and what I just need to make presetnable. There’s a massive difference between code I’m happy gives me an answer, and code I’m happy for someone else to see.
-  Ideas Working Prettify Housekeeping    training neural nets Making table of workflow graph theory on road and train networks buy a domain name  wikidata querires Open Organograms  Add CV/publications  importing Google charts   Include bibliography  filesize to book equivalent       This was originally going to be a Trello.</description>
+      <description>This is an ongoing scratchpad of what I have ideas for, what I’m working on, and what I just need to make presentable. There’s a massive difference between code I’m happy gives me an answer, and code I’m happy for someone else to see.
+  Ideas Working Prettify Housekeeping    training neural nets Making table of workflow graph theory on road and train networks Add CV/publications  wikidata querires Open Organograms  Include bibliography  importing Google charts   Shortcodes  filesize to book equivalent   Tag posts with GORS compitencies    This was originally going to be a Trello.</description>
+    </item>
+    
+    <item>
+      <title>Open Organograms 3 - the meeting calculator</title>
+      <link>/post/open-organograms-3-the-meeting-calculator/</link>
+      <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/open-organograms-3-the-meeting-calculator/</guid>
+      <description>I have data, I have a website. It’s hardly fair to ask you to take the numbers I’m spitting out of the Open Organograms series and put them in a calculator to do something useful with them. Thankfully, R markdown has a nice interface between the markdown and Javascript, called htmlwidgets.
+Having generated a median salary for (so far 2) departments, I think it might be interesting to see a meeting calculator.</description>
     </item>
     
     <item>

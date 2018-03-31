@@ -1,6 +1,6 @@
 ---
 title: Open Organograms 2 - the rise of the tibble
-author: ~
+author: James Riley
 date: '2018-03-28'
 slug: open-organograms-2-the-rise-of-the-tibble
 categories: ["R", "Organogram"]
@@ -24,13 +24,13 @@ I've seen benchmarks that suggests data.table is about 2ce as fast as tibble. It
 
 The pipe works really well for anyone who things "I want to do this, then that, and maybe this". It works a lot like how you're taught to use Excel, but you get to throw away the intermediate cells. 
 
-Personal bugbear is that ggplot doesn't recognise that my tibble is ordered by Grade, so I had to mtatee thhe 
+Personal bugbear is that ggplot doesn't recognise that my tibble is ordered by Grade, so I had to mutate the 
 
 ##DWP
-I wanted a department that I knew had a very different structure to DHSC, so the overall graphs would look different. I also know that they use both an intenernal and the external grading system, so it would be a good test of what people were actually putting in the "Grade" field. They have a large string that includes way too much info about grade, and I just want the national pay grades. I've tidied up the field a bit, but I've been overzealous and turned all their Fast Streamers into HEOs or SEOs. 
+I wanted a department that I knew had a very different structure to DHSC, so the overall graphs would look different. I also know that they use both an internal and the external grading system, so it would be a good test of what people were actually putting in the "Grade" field. They have a large string that includes way too much info about grade, and I just want the national pay grades. I've tidied up the field a bit, but I've been overzealous and turned all their Fast Streamers into HEOs or SEOs. 
 
 ##Other stuff
-I found the API for data.gov, and have managed to get all the latest Organograms. I'm going to have to do much, much filtering, as I've grabbed the last by date, even if it's a department that no longer exists. I had to grad old ones, because some departments like DHSC haven't updated in over a year! Script needs tweaking, but when it's good, it's going on this blog. In particuar, I want to get some of my Python on here.
+I found the API for data.gov, and have managed to get all the latest Organograms. I'm going to have to do much, much filtering, as I've grabbed the last by date, even if it's a department that no longer exists. I had to grad old ones, because some departments like DHSC haven't updated in over a year! Script needs tweaking, but when it's good, it's going on this blog. In particular, I want to get some of my Python on here.
 
 ##Code
 
@@ -58,7 +58,7 @@ For a start, this is many less lines than the equivalent in data.table. read_csv
 * take tibble juniors
 * only keep the columns that have "Grade", "FTE" or "minimum" in the title
 * go through the grade column, and extract one of these values in this list 
-* rename the column "payscale minimum (£)" to the more managable "minimum"
+* rename the column "payscale minimum (£)" to the more manageable "minimum"
 * rename another column
 
 Seniors is similar, but filter drops records according to values. Again I have seniors with no pay or no name. Both have slightly different original names that I'm forcing into the new names, so I can't run them through the same pipe. Maybe in the future when I'm better with this stuff.
@@ -86,7 +86,7 @@ median_record <- combined %>%
 median_salary <- median_record$minimum
 print(median_salary)
 ```
-Relatively straightforward. I create a running total column of all staff, find the halfway point, split the table at that point, and pick the least one (by salary). I'm not alltogether happy that top_n(-1) is a thing rather than bottom_n(1), and I might just define the latter in projects.
+Relatively straightforward. I create a running total column of all staff, find the halfway point, split the table at that point, and pick the least one (by salary). I'm not altogether happy that top_n(-1) is a thing rather than bottom_n(1), and I might just define the latter in projects.
 
 Turns out the median person in DWP is an EO on `r paste(median_salary)`. I'm aware that I also should format these as financial numbers for the ease of my reader. There's probably a good library for this.
 
@@ -122,7 +122,7 @@ The rest is as before, so outputs are given, but not the code. If you really wan
 ```{r, echo=FALSE}
 
 
-total_hours <- (365.25 / 7 * 5 - 25 -9) * (37/5)
+total_hours <- (365.25 / 7 * 5 - 25 -9) * (37)
 
 avg_hourly <- median_salary/total_hours 
 avg_minutely <- avg_hourly/60

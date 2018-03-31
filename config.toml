@@ -7,7 +7,7 @@ canonifyurls = true
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 # Disqus Username
-disqusShortname = "jimr1603"
+disqusShortname = "openor-blog"
 
 # Google Analytics UA number
 #googleAnalytics = "UA-XXXXXXXX-X"

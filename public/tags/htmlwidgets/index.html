@@ -5,7 +5,11 @@
   <meta charset="utf-8" />
 
   
-  <title>Open Operational Research</title>
+  <title>
+  Tag → htmlwidgets
+  
+   | Open Operational Research
+</title>
 
   
   
@@ -29,7 +33,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Open Operational Research" />
   <meta property="og:description" content="My noodling around with open data in my spare time, and what I&#39;ve found" />
-  <meta property="og:url" content="/" />
+  <meta property="og:url" content="/tags/htmlwidgets/" />
   <meta property="og:image" content="/img/avatar.jpg" />
 
 
@@ -38,7 +42,7 @@
 <meta name="generator" content="Hugo 0.37.1" />
 
 
-<link rel="canonical" href="/" />
+<link rel="canonical" href="/tags/htmlwidgets/" />
 <link rel="alternative" href="/index.xml" title="Open Operational Research" type="application/atom+xml" />
 
 
@@ -73,6 +77,8 @@
 
 
 
+<link rel="stylesheet" href="//cdn.bootcss.com/video.js/6.2.8/alt/video-js-cdn.min.css" />
+
 <link rel="stylesheet" href="/css/bundle.css" />
 
 
@@ -106,7 +112,7 @@
   <header class="site-header">
   <img class="avatar" src="/img/avatar.jpg" alt="Avatar">
   
-  <h1 class="title">Open Operational Research</h1>
+  <h2 class="title">Open Operational Research</h2>
   
   <p class="subtitle">Open code and open data!</p>
   <button class="menu-toggle" type="button">
@@ -120,8 +126,6 @@
       
       
         <li class="menu-item
-            
-              is-active
             
             
             ">
@@ -220,7 +224,7 @@
 
   <section class="main post-list">
     <header class="list-header offscreen">
-      <h2 class="list-label">All Posts</h2>
+      <h2 class="list-label">Posts List</h2>
     </header>
     
     
@@ -239,49 +243,6 @@ Having generated a median salary for (so far 2) departments, I think it might be
 </article>
 
       
-        <article class="post-entry">
-  <header class="post-header">
-    <h3 class="post-title"><a href="/post/open-organograms-2-the-rise-of-the-tibble/" class="post-link">Open Organograms 2 - the rise of the tibble</a></h3>
-    <p class="post-meta">@James Riley · Mar 28, 2018 · 6 min read</p>
-  </header>
-  
-  <p class="post-summary">Background I learned data.table before tidyverse. It can be hard to read, and I’m always forgetting commas. I’m making an effort to learn the tidyverse, and I am already impressed with dplyr and tibble. (I’ve been impressed with ggplot2 for a while now.)
-I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. It’s also the case that the code run time is a tiny fraction of my overall project.</p>
-  <footer class="post-footer">
-    <a class="read-more" href="/post/open-organograms-2-the-rise-of-the-tibble/">Read More →</a>
-  </footer>
-</article>
-
-      
-        <article class="post-entry">
-  <header class="post-header">
-    <h3 class="post-title"><a href="/post/2018-03-26-open-organograms/" class="post-link">Open Organograms</a></h3>
-    <p class="post-meta">@James Riley · Mar 26, 2018 · 3 min read</p>
-  </header>
-  
-  <p class="post-summary">Background One of the reasons I’ve founded this site is because I’ve discovered https://data.gov.uk/ and I have ideas. In particular, I won’t discuss outside of work anything I only know through work, so it was nice to see pay data in the public sphere.
-Full background is at http://guidance.data.gov.uk/organogram-data.html but basically, the Prime Minister decided that the public deserve the structure and hierarchy of the Government Departments, and a few agencies.</p>
-  <footer class="post-footer">
-    <a class="read-more" href="/post/2018-03-26-open-organograms/">Read More →</a>
-  </footer>
-</article>
-
-      
-        <article class="post-entry">
-  <header class="post-header">
-    <h3 class="post-title"><a href="/post/2018-03-25-hello-world/" class="post-link">Hello World</a></h3>
-    <p class="post-meta">@James Riley · Mar 25, 2018 · 1 min read</p>
-  </header>
-  
-  <p class="post-summary">This is my first post on not-my-first blog. I’ll be honest, at this stage I’m seeing if I can compile the site and push it to the net.
-Expect changes coming soon. I’d put up a Construction in Process gif, but I’m told that Geocities has been down for some years now.
-Built with R: 3.3.3</p>
-  <footer class="post-footer">
-    <a class="read-more" href="/post/2018-03-25-hello-world/">Read More →</a>
-  </footer>
-</article>
-
-      
     
     
   </section>
@@ -292,6 +253,30 @@ Built with R: 3.3.3</p>
 </footer>
 
 
+
+<script async src="//cdn.bootcss.com/video.js/6.2.8/alt/video.novtt.min.js"></script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      displayMath: [['$$','$$'], ['\\[','\\]']],
+      processEscapes: true,
+      processEnvironments: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      TeX: { equationNumbers: { autoNumber: "AMS" },
+      extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    }
+  });
+</script>
+<script type="text/x-mathjax-config">
+  // Fix <code> tags after MathJax finishes running. This is a
+  // hack to overcome a shortcoming of Markdown. Discussion at
+  // https://github.com/mojombo/jekyll/issues/199
+  MathJax.Hub.Queue(() => {
+    MathJax.Hub.getAllJax().map(v => v.SourceElement().parentNode.className += ' has-jax');
+  });
+</script>
 
 <script src="/js/bundle.js"></script>
 

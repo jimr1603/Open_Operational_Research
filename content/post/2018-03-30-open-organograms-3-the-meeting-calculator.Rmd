@@ -1,0 +1,68 @@
+---
+title: Open Organograms 3 - the meeting calculator
+author: James Riley
+date: '2018-03-30'
+slug: open-organograms-3-the-meeting-calculator
+categories:
+  - R
+  - javascript
+tags:
+  - data.gov.uk
+  - Open-Organograms
+  - htmlwidgets
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+library("here")
+library("tidyverse")
+library("knitr")
+library("mywidget")
+
+```
+
+
+I have data, I have a website. It's hardly fair to ask you to take the numbers I'm spitting out of the Open Organograms series and put them in a calculator to do something useful with them. Thankfully, R markdown has a nice interface between the markdown and Javascript, called htmlwidgets. 
+
+Having generated a median salary for (so far 2) departments, I think it might be interesting to see a meeting calculator. If a number of people are in a meeting for a number of hours, what is the cost in payroll? (Again, building costs and employer contributions to pensions and NI not considered.) It doesn't just have to be meetings. What if the technology is so old that it takes about 5 minutes (or 1/12 of an hour) for everyone's PC to boot up and down in a day. 
+
+When I've processed DExEU's Organogram, I might try turning the IAs that weren't IAs that were so many man-hours of work into a £ cost.
+
+There *is* R shiny, which throws computations back to the server, but I'm using a free server that doesn't want me giving it more workload. Also, the hard computation is being done in R when the site is generated, the rest is taking the number of people times the number of hours times the median hourly salary.
+
+```{r}
+DWP_median = 24476
+total_hours =(365.25 / 7 * 5 - 25 -9) * (37/5)
+DWP_hourly = round(DWP_median/total_hours,2)
+```
+
+##DWP meeting calculator
+
+```{r}
+mywidget(DWP_hourly)
+```
+
+```{r}
+DHSC_median = 33675
+total_hours =(365.25 / 7 * 5 - 25 -9) * (37/5)
+DHSC_hourly = round(DWP_median/total_hours,2)
+```
+
+##DHSC meeting calculator
+
+```{r}
+mywidget(DHSC_hourly)
+```
+
+##Caveats
+
+However, I've never properly played with HTML or Javascript. It could certainly be made more pretty, and eventually I'll want a dropdown or something with the available departments/agencies. But, I've got an idea for something I can do when I've  processed a lot of Organogram data. The main algorithms are fine, I just need to:
+
+1. Get all the latest Org data.
+2. Filter out departments that no longer exist.
+3. Standardise the grading systems.
+4. Optional: Filter out executive agencies.
+
+2 and 3 are going to be the tricky parts. There's going to be a few runs of "assume the data looks like this, and if it doesn't alert me" until I've found every format someone has used. 2 should be relatively easy once I have a list of active departments, but there's no guarantee that it'll match any of the metadata in the data.gov.uk entry. 
+
+However, it's probably time to develop some of the other projects a little. In particular, I started with my graph theory/GIS, but haven't got it to writeup stage yet. 
