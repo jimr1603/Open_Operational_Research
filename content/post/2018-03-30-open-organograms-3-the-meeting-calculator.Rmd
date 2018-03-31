@@ -45,7 +45,7 @@ mywidget(DWP_hourly)
 ```{r}
 DHSC_median = 33675
 total_hours =(365.25 / 7 * 5 - 25 -9) * (37/5)
-DHSC_hourly = round(DWP_median/total_hours,2)
+DHSC_hourly = round(DHSC_median/total_hours,2)
 ```
 
 ##DHSC meeting calculator
