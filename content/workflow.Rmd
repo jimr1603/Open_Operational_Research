@@ -11,7 +11,7 @@ library("knitr")
 ```
 This is an ongoing scratchpad of what I have ideas for, what I'm working on, and what I just need to make presentable. There's a massive difference between code I'm happy gives me an answer, and code I'm happy for someone else to see. 
 ```{r  echo=FALSE}
-Ideas = c("training neural nets", "wikidata querires", "importing Google charts", "filesize to book equivalent")
+Ideas = c("training neural nets", "wikidata querires", "importing Google charts", "filesize to book equivalent", "background: graph theory", "background:spherical coordinates", "background:xml")
 Working = c("Making table of workflow", "Open Organograms")
 Pretty = c("graph theory on road and train networks")
 Housekeeping = c("Add CV/publications", "Include bibliography", "Shortcodes", "Tag posts with GORS compitencies")
@@ -28,7 +28,6 @@ Housekeeping=pad_column(Housekeeping,n_max)
 t<-tibble(Ideas,Working, Prettify, Housekeeping)
 kable(t)
 ```
-
 
 This was originally going to be a Trello. I'm probably going to need something that needs less maintenance than a raw markup file, probably something with vectors.
 

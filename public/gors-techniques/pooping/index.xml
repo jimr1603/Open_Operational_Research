@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pooping on Open Operational Research</title>
+    <link>/gors-techniques/pooping/</link>
+    <description>Recent content in Pooping on Open Operational Research</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you wish to quote or reproduce. Source code available under GPL at the linked GitHub.</copyright>
+    <lastBuildDate>Fri, 30 Mar 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/gors-techniques/pooping/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Open Organograms 3 - the meeting calculator</title>
+      <link>/post/open-organograms-3-the-meeting-calculator/</link>
+      <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/open-organograms-3-the-meeting-calculator/</guid>
+      <description>I have data, I have a website. It’s hardly fair to ask you to take the numbers I’m spitting out of the Open Organograms series and put them in a calculator to do something useful with them. Thankfully, R markdown has a nice interface between the markdown and Javascript, called htmlwidgets.
+Having generated a median salary for (so far 2) departments, I think it might be interesting to see a meeting calculator.</description>
+    </item>
+    
+  </channel>
+</rss>
