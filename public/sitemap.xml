@@ -8,11 +8,6 @@
   </url>
   
   <url>
-    <loc>/workflow/</loc>
-    <lastmod>2018-03-26T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/post/open-organograms-3-the-meeting-calculator/</loc>
     <lastmod>2018-03-30T00:00:00+00:00</lastmod>
   </url>
@@ -24,6 +19,11 @@
   
   <url>
     <loc>/post/2018-03-26-open-organograms/</loc>
+    <lastmod>2018-03-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/workflow/</loc>
     <lastmod>2018-03-26T00:00:00+00:00</lastmod>
   </url>
   

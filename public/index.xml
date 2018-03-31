@@ -23,16 +23,6 @@ All data processed is available for free, for some value of free. It is my inten
     </item>
     
     <item>
-      <title>Workflow</title>
-      <link>/workflow/</link>
-      <pubDate>Mon, 26 Mar 2018 00:00:00 +0000</pubDate>
-      
-      <guid>/workflow/</guid>
-      <description>This is an ongoing scratchpad of what I have ideas for, what I’m working on, and what I just need to make presentable. There’s a massive difference between code I’m happy gives me an answer, and code I’m happy for someone else to see.
-  Ideas Working Prettify Housekeeping    training neural nets Making table of workflow graph theory on road and train networks Add CV/publications  wikidata querires Open Organograms  Include bibliography  importing Google charts   Shortcodes  filesize to book equivalent   Tag posts with GORS compitencies    This was originally going to be a Trello.</description>
-    </item>
-    
-    <item>
       <title>Open Organograms 3 - the meeting calculator</title>
       <link>/post/open-organograms-3-the-meeting-calculator/</link>
       <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
@@ -60,6 +50,16 @@ I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. 
       <guid>/post/2018-03-26-open-organograms/</guid>
       <description>Background One of the reasons I’ve founded this site is because I’ve discovered https://data.gov.uk/ and I have ideas. In particular, I won’t discuss outside of work anything I only know through work, so it was nice to see pay data in the public sphere.
 Full background is at http://guidance.data.gov.uk/organogram-data.html but basically, the Prime Minister decided that the public deserve the structure and hierarchy of the Government Departments, and a few agencies.</description>
+    </item>
+    
+    <item>
+      <title>Workflow</title>
+      <link>/workflow/</link>
+      <pubDate>Mon, 26 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/workflow/</guid>
+      <description>This is an ongoing scratchpad of what I have ideas for, what I’m working on, and what I just need to make presentable. There’s a massive difference between code I’m happy gives me an answer, and code I’m happy for someone else to see.
+  Ideas Working Prettify Housekeeping    training neural nets Making table of workflow graph theory on road and train networks Add CV/publications  wikidata querires Open Organograms  Include bibliography  importing Google charts   Shortcodes  filesize to book equivalent   Tag posts with GORS compitencies    This was originally going to be a Trello.</description>
     </item>
     
     <item>
