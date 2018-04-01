@@ -1,5 +1,0 @@
-"0","knitr::opts_chunk$set(collapse = TRUE)"
-"0","library(""here"")"
-"0","library(""tidyverse"")"
-"0","library(""knitr"")"
-"0","library(""mywidget"")"

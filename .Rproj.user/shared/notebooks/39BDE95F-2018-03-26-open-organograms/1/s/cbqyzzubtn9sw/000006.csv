@@ -1,6 +1,0 @@
-"0","combined <- rbindlist(list(juniors,seniors))"
-"0","combined <- combined[order(min)] "
-"0","combined[,cumulative:=cumsum(N)]"
-"0","total_staff <- combined[,sum(N)]"
-"0","median_record <- combined[cumulative>total_staff/2][1]"
-"0","median_salary = median_record[,min]"

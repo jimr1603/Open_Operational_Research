@@ -1,3 +1,0 @@
-"0","DWP_median = 2447"
-"0","total_hours =(365.25 / 7 * 5 - 25 -9) * (37/5)"
-"0","DWP_hourly = round(DWP_median/total_hours,2)"
