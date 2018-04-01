@@ -340,6 +340,6 @@ I've got Tasker for Android, which lets me do practically any action on the phon
 With a tiny bit of Javascript, I can switch between static images on the server. I might pick some points of interest and go through different visualisations of what is near.
 
 I've many project ideas just with nodes and edges in OSM. 
-![caption](../media/img/lonelycafe.svg) 
+![caption](../static/img/lonelycafe.svg) 
 
 Yes, there is exactly one cafe near my partner's work. I was going to search for ice cream shops or anything she's more interested in than coffee, but there's nothing in the OSM tags that's actually near her work. 
