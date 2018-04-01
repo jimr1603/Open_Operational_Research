@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>InsightMakers on Open Operational Research</title>
+    <link>/insightmaker/</link>
+    <description>Recent content in InsightMakers on Open Operational Research</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you wish to quote or reproduce. Source code available under GPL at the linked GitHub.</copyright>
+    
+	<atom:link href="/insightmaker/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title></title>
+      <link>/insightmaker/examples/engine/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/insightmaker/examples/engine/</guid>
+      <description>Insight Maker	  Illustrates the use of the Insight Maker simulation engine. No dependencies on MxGraph or ExtJS are needed to run this. Try running the Insight Maker unit tests with the runTests() command in the console.
+Simulated time series for the Users stock from the blank model demo:</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>/insightmaker/examples/flight_simulator/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/insightmaker/examples/flight_simulator/</guid>
+      <description>Insight Maker	  Illustrates the use of the Insight Maker simulation engine to creative a simple interactive flight simulator. No dependencies on MxGraph or ExtJS are needed to run this.
+Simulated time series for the Users stock from the blank model demo.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>/insightmaker/examples/full/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/insightmaker/examples/full/</guid>
+      <description>Insight Maker/*CSS rules to use for styling the overlay:.chromeFrameOverlayContent.chromeFrameOverlayContent iframe.chromeFrameOverlayCloseBar.chromeFrameOverlayUnderlay*/alert(&#34;You are using an old version of Internet Explorer that does not support Insight Maker.\n\nTo run Insight Maker either:\n\n* Update your copy of Internet Explorer to version 9 or newer.\n* Use a different web browser (we recommend Google Chrome).\n* Install the Chrome Frame browser plug-in for Internet Explorer (you will be prompted to do this after closing this message).</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>/insightmaker/insightmaker/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/insightmaker/insightmaker/</guid>
+      <description>Insight Maker   /* CSS rules to use for styling the overlay: .chromeFrameOverlayContent .chromeFrameOverlayContent iframe .chromeFrameOverlayCloseBar .chromeFrameOverlayUnderlay */  alert(&#34;You are using an old version of Internet Explorer that does not support Insight Maker.\n\nTo run Insight Maker either:\n\n* Update your copy of Internet Explorer to version 9 or newer.\n* Use a different web browser (we recommend Google Chrome).\n* Install the Chrome Frame browser plug-in for Internet Explorer (you will be prompted to do this after closing this message).</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>/insightmaker/resources/ace/readme/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/insightmaker/resources/ace/readme/</guid>
+      <description>Ace (Ajax.org Cloud9 Editor) Ace is a code editor written in JavaScript.
+This repository has only generated files. If you want to work on ace please go to https://github.com/ajaxorg/ace instead.
+here you can find pre-built files for convenience of embedding. it contains 4 versions * src concatenated but not minified * src-min concatenated and minified with uglify.js * src-noconflict uses ace.require instead of require * src-min-noconflict -
+For a simple way of embedding ace into webpage see https://github.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>/insightmaker/resources/ace/editor/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/insightmaker/resources/ace/editor/</guid>
+      <description>Editorbody {overflow: hidden;}#editor { margin: 0;position: absolute;top: 0;bottom: 0;left: 0;right: 0;}function foo(items) {var i;for (i = 0; i &amp;lt; items.length; i++) {alert(&#34;Ace Rocks &#34; + items[i]);}}var editor = ace.edit(&#34;editor&#34;);editor.setTheme(&#34;ace/theme/twilight&#34;);editor.getSession().setMode(&#34;ace/mode/javascript&#34;);</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>/insightmaker/resources/ace/kitchen-sink/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/insightmaker/resources/ace/kitchen-sink/</guid>
+      <description>Ace Kitchen SinkDocumentModeSplitNoneBelowBesideThemeFont Size10px11px12px13px14px16px18px20px24pxCode Foldingmanualmark beginmark begin and endKey BindingAceVimEmacsCustomSoft WrapOff40 Chars80 CharsFreeFull Line SelectionHighlight Active LineShow InvisiblesShow Indent GuidesPersistent HScrollVScrollAnimate scrollingShow GutterShow Print MarginUse Soft TabHighlight selected wordEnable BehavioursFade Fold WidgetsEnable Elastic TabstopsIncremental SearchShow token infoRead-onlyScroll Past Endrequire(&#34;</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>/insightmaker/resources/ext/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/insightmaker/resources/ext/</guid>
+      <description>Welcome to Ext JS 5.1try{Typekit.load();}catch(e){}SenchaWelcome to Ext JS 5.1!Ext JS 5.1 is a pure JavaScript application framework that works everywhere from IE8 to the latest Chrome. It enables you to create the best cross-platform applications using nothing but a browser, and has a phenomenal API.
+View the Examples Discuss Ext JS on the forum
+What&amp;rsquo;s NewCheck out our new features and changes in the What&#39;s New Guide:</description>
+    </item>
+    
+  </channel>
+</rss>
