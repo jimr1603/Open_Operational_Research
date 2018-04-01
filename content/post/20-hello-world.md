@@ -1,7 +1,8 @@
 ---
-title: "Hello World"
-author: "James Riley"
-date: 2018-03-25
+title: hello world
+author: James Riley
+date: '2018-13-25'
+slug: 20-hello-world
 categories: ["R"]
 tags: ["getting started"]
 ---
