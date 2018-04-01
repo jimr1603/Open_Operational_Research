@@ -37,10 +37,10 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
   url = "/tags/"
 
 [[menu.main]]
-  name = "insightmaker"
+  name = "insightmaker with only local save"
   weight = 60
   identifier = "insightmaker"
-  url = "/insightmaker/insightmaker/"
+  url = "/insightmaker/examples/full.html"
 [params]
   author = "James Riley"
   avatar = "/img/avatar.jpg"
