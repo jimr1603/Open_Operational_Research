@@ -1,3 +1,0 @@
-networkx==2.1
-osmnx==0.7.3
-
