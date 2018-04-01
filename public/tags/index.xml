@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Open Operational Research</title>
+    <link>https://openor.blog/tags/</link>
+    <description>Recent content in Tags on Open Operational Research</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you wish to quote or reproduce. Source code available under GPL at the linked GitHub.</copyright>
+    <lastBuildDate>Fri, 30 Mar 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://openor.blog/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Data.gov.uk</title>
+      <link>https://openor.blog/tags/data.gov.uk/</link>
+      <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://openor.blog/tags/data.gov.uk/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Data.table</title>
+      <link>https://openor.blog/tags/data.table/</link>
+      <pubDate>Mon, 26 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://openor.blog/tags/data.table/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Getting Started</title>
+      <link>https://openor.blog/tags/getting-started/</link>
+      <pubDate>Sun, 25 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://openor.blog/tags/getting-started/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Gis</title>
+      <link>https://openor.blog/tags/gis/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://openor.blog/tags/gis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Graph Theory</title>
+      <link>https://openor.blog/tags/graph-theory/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://openor.blog/tags/graph-theory/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Htmlwidgets</title>
+      <link>https://openor.blog/tags/htmlwidgets/</link>
+      <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://openor.blog/tags/htmlwidgets/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Networkx</title>
+      <link>https://openor.blog/tags/networkx/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://openor.blog/tags/networkx/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Open Organograms</title>
+      <link>https://openor.blog/tags/open-organograms/</link>
+      <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://openor.blog/tags/open-organograms/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Openstreetmap</title>
+      <link>https://openor.blog/tags/openstreetmap/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://openor.blog/tags/openstreetmap/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Tidyverse</title>
+      <link>https://openor.blog/tags/tidyverse/</link>
+      <pubDate>Wed, 28 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://openor.blog/tags/tidyverse/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Web Programming</title>
+      <link>https://openor.blog/tags/web-programming/</link>
+      <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://openor.blog/tags/web-programming/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Xml</title>
+      <link>https://openor.blog/tags/xml/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://openor.blog/tags/xml/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
