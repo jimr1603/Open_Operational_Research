@@ -1,1 +1,1 @@
-blogdown::build_dir('/')
+blogdown::build_dir('content')
