@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Python on Open Operational Research</title>
-    <link>https://openor.blog/categories/python/</link>
+    <link>/categories/python/</link>
     <description>Recent content in Python on Open Operational Research</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you wish to quote or reproduce. Source code available under GPL at the linked GitHub.</copyright>
     <lastBuildDate>Sat, 31 Mar 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://openor.blog/categories/python/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/categories/python/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Open Street Map - 1 Coffee Break</title>
-      <link>https://openor.blog/post/open-street-map-1-coffee-break/</link>
+      <link>/post/open-street-map-1-coffee-break/</link>
       <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://openor.blog/post/open-street-map-1-coffee-break/</guid>
+      <guid>/post/open-street-map-1-coffee-break/</guid>
       <description>Motivation I am a professional mathematician - coffee is essential to my wellbeing. Lunch is just about the right time of the day to want a 2nd coffee of the day, and get some fresh air and time not looking at the screen. Especially now that it’s not raining or snowing 100% of the time. Given a 60 minute lunch, what are my options? Does it become a massive pain if I decide I want a 30 minute lunch instead?</description>
     </item>
     

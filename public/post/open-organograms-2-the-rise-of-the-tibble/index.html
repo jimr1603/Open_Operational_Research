@@ -26,7 +26,7 @@ I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. 
     <meta name="twitter:title" content="Open Organograms 2 - the rise of the tibble" />
     <meta name="twitter:description" content="Background I learned data.table before tidyverse. It can be hard to read, and I’m always forgetting commas. I’m making an effort to learn the tidyverse, and I am already impressed with dplyr and tibble. (I’ve been impressed with ggplot2 for a while now.)
 I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. It’s also the case that the code run time is a tiny fraction of my overall project." />
-    <meta name="twitter:image" content="https://openor.blog/img/avatar.jpg" />
+    <meta name="twitter:image" content="/img/avatar.jpg" />
   
 
   
@@ -34,8 +34,8 @@ I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. 
   <meta property="og:title" content="Open Organograms 2 - the rise of the tibble" />
   <meta property="og:description" content="Background I learned data.table before tidyverse. It can be hard to read, and I’m always forgetting commas. I’m making an effort to learn the tidyverse, and I am already impressed with dplyr and tibble. (I’ve been impressed with ggplot2 for a while now.)
 I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. It’s also the case that the code run time is a tiny fraction of my overall project." />
-  <meta property="og:url" content="https://openor.blog/post/open-organograms-2-the-rise-of-the-tibble/" />
-  <meta property="og:image" content="https://openor.blog/img/avatar.jpg" />
+  <meta property="og:url" content="/post/open-organograms-2-the-rise-of-the-tibble/" />
+  <meta property="og:image" content="/img/avatar.jpg" />
 
 
 
@@ -43,8 +43,8 @@ I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. 
 <meta name="generator" content="Hugo 0.37.1" />
 
 
-<link rel="canonical" href="https://openor.blog/post/open-organograms-2-the-rise-of-the-tibble/" />
-<link rel="alternative" href="https://openor.blog/index.xml" title="Open Operational Research" type="application/atom+xml" />
+<link rel="canonical" href="/post/open-organograms-2-the-rise-of-the-tibble/" />
+<link rel="alternative" href="/index.xml" title="Open Operational Research" type="application/atom+xml" />
 
 
 <meta name="renderer" content="webkit" />
@@ -69,18 +69,18 @@ I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. 
 <meta name='msapplication-navbutton-color' content="#5fbf5e" />
 <meta name="msapplication-TileColor" content="#5fbf5e" />
 <meta name="msapplication-TileImage" content="/img/tile-image-windows.png" />
-<link rel="icon" href="https://openor.blog/img/favicon.ico" />
-<link rel="icon" type="image/png" sizes="16x16" href="https://openor.blog/img/favicon-16x16.png" />
-<link rel="icon" type="image/png" sizes="32x32" href="https://openor.blog/img/favicon-32x32.png" />
-<link rel="icon" sizes="192x192" href="https://openor.blog/img/touch-icon-android.png" />
-<link rel="apple-touch-icon" href="https://openor.blog/img/touch-icon-apple.png" />
-<link rel="mask-icon" href="https://openor.blog/img/safari-pinned-tab.svg" color="#5fbf5e" />
+<link rel="icon" href="/img/favicon.ico" />
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png" />
+<link rel="icon" sizes="192x192" href="/img/touch-icon-android.png" />
+<link rel="apple-touch-icon" href="/img/touch-icon-apple.png" />
+<link rel="mask-icon" href="/img/safari-pinned-tab.svg" color="#5fbf5e" />
 
 
 
 <link rel="stylesheet" href="//cdn.bootcss.com/video.js/6.2.8/alt/video-js-cdn.min.css" />
 
-<link rel="stylesheet" href="https://openor.blog/css/bundle.css" />
+<link rel="stylesheet" href="/css/bundle.css" />
 
 
   
@@ -115,7 +115,7 @@ I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. 
     
     
   <header class="site-header">
-  <img class="avatar" src="https://openor.blog/img/avatar.jpg" alt="Avatar">
+  <img class="avatar" src="/img/avatar.jpg" alt="Avatar">
   
   <h2 class="title">Open Operational Research</h2>
   
@@ -136,7 +136,7 @@ I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. 
             
               is-active
             ">
-            <a href="https://openor.blog/">Home</a>
+            <a href="/">Home</a>
           </li>
       
         <li class="menu-item
@@ -150,14 +150,14 @@ I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. 
             
             
             ">
-            <a href="https://openor.blog/tags/">Tags</a>
+            <a href="/tags/">Tags</a>
           </li>
       
         <li class="menu-item
             
             
             ">
-            <a href="https://openor.blog/about/">About</a>
+            <a href="/about/">About</a>
           </li>
       
     </ul>
@@ -215,7 +215,7 @@ I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. 
       
 
       <li class="social-item">
-        <a href="https://openor.blog/index.xml"><span class="icon icon-rss" title="RSS"></span></a>
+        <a href="/index.xml"><span class="icon icon-rss" title="RSS"></span></a>
       </li>
 
     </ul>
@@ -377,25 +377,25 @@ kable(combined)</code></pre>
 <pre class="r"><code>Grades = combined$Grade
 combined &lt;- mutate(combined, Grade = factor(Grade, levels = Grades, ordered=TRUE))
 ggplot(combined, aes(y=FTE,x=Grade)) + geom_col()</code></pre>
-<p><img src="https://openor.blog/post/2018-03-28-open-organograms-2-the-rise-of-the-tibble_files/figure-html/unnamed-chunk-5-1.png" width="672" /> Three lines that do what I wanted. I extract the values of Grade (remembering that I’ve collapsed every record to their grade, so no repeated values). Also, it’s in order. Then I tell the combined table that it’s not storing Grade as a string, but as a factor, which in this case just tells ggplot that there’s a different order than “alphabetical” to it.</p>
+<p><img src="/post/2018-03-28-open-organograms-2-the-rise-of-the-tibble_files/figure-html/unnamed-chunk-5-1.png" width="672" /> Three lines that do what I wanted. I extract the values of Grade (remembering that I’ve collapsed every record to their grade, so no repeated values). Also, it’s in order. Then I tell the combined table that it’s not storing Grade as a string, but as a factor, which in this case just tells ggplot that there’s a different order than “alphabetical” to it.</p>
 <p>The rest is as before, so outputs are given, but not the code. If you really want, it’s in the GitHub.</p>
 <pre><code>## [1] &quot;total staff: 73754.25&quot;
 ## [1] &quot;median salary: 24476&quot;
 ## [1] &quot;Cost of salary in DWP per minute: 209788.562355133&quot;</code></pre>
 <p>Finally, running the same code with the DHSC data gives the correct graph! (For 2016)</p>
 <pre><code>## Warning: Missing column names filled in: &#39;X16&#39; [16]</code></pre>
-<p><img src="https://openor.blog/post/2018-03-28-open-organograms-2-the-rise-of-the-tibble_files/figure-html/unnamed-chunk-7-1.png" width="672" /> Always read the Y axis on these things. The peak on the DHSC graph is about 350 FTE. That’s less than almost every bar in DWP. I’m going to think about this sort of thing when I mess with arrays of plots.</p>
+<p><img src="/post/2018-03-28-open-organograms-2-the-rise-of-the-tibble_files/figure-html/unnamed-chunk-7-1.png" width="672" /> Always read the Y axis on these things. The peak on the DHSC graph is about 350 FTE. That’s less than almost every bar in DWP. I’m going to think about this sort of thing when I mess with arrays of plots.</p>
 </div>
 </article>
     <footer class="post-footer">
       
       <ul class="post-tags">
         
-          <li><a href="https://openor.blog/tags/data.gov.uk"><span class="tag">Data.gov.uk</span></a></li>
+          <li><a href="/tags/data.gov.uk"><span class="tag">Data.gov.uk</span></a></li>
         
-          <li><a href="https://openor.blog/tags/tidyverse"><span class="tag">Tidyverse</span></a></li>
+          <li><a href="/tags/tidyverse"><span class="tag">Tidyverse</span></a></li>
         
-          <li><a href="https://openor.blog/tags/open-organograms"><span class="tag">Open-Organograms</span></a></li>
+          <li><a href="/tags/open-organograms"><span class="tag">Open-Organograms</span></a></li>
         
       </ul>
       
@@ -459,7 +459,7 @@ ggplot(combined, aes(y=FTE,x=Grade)) + geom_col()</code></pre>
   });
 </script>
 
-<script src="https://openor.blog/js/bundle.js"></script>
+<script src="/js/bundle.js"></script>
 
 
 

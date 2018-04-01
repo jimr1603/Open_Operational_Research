@@ -24,15 +24,15 @@
     <meta name="twitter:site" content="@gohugoio" />
     <meta name="twitter:title" content="Open Street Map - 1 Coffee Break" />
     <meta name="twitter:description" content="Motivation I am a professional mathematician - coffee is essential to my wellbeing. Lunch is just about the right time of the day to want a 2nd coffee of the day, and get some fresh air and time not looking at the screen. Especially now that it’s not raining or snowing 100% of the time. Given a 60 minute lunch, what are my options? Does it become a massive pain if I decide I want a 30 minute lunch instead?" />
-    <meta name="twitter:image" content="https://openor.blog/img/avatar.jpg" />
+    <meta name="twitter:image" content="/img/avatar.jpg" />
   
 
   
   <meta property="og:type" content="article" />
   <meta property="og:title" content="Open Street Map - 1 Coffee Break" />
   <meta property="og:description" content="Motivation I am a professional mathematician - coffee is essential to my wellbeing. Lunch is just about the right time of the day to want a 2nd coffee of the day, and get some fresh air and time not looking at the screen. Especially now that it’s not raining or snowing 100% of the time. Given a 60 minute lunch, what are my options? Does it become a massive pain if I decide I want a 30 minute lunch instead?" />
-  <meta property="og:url" content="https://openor.blog/post/open-street-map-1-coffee-break/" />
-  <meta property="og:image" content="https://openor.blog/img/avatar.jpg" />
+  <meta property="og:url" content="/post/open-street-map-1-coffee-break/" />
+  <meta property="og:image" content="/img/avatar.jpg" />
 
 
 
@@ -40,8 +40,8 @@
 <meta name="generator" content="Hugo 0.37.1" />
 
 
-<link rel="canonical" href="https://openor.blog/post/open-street-map-1-coffee-break/" />
-<link rel="alternative" href="https://openor.blog/index.xml" title="Open Operational Research" type="application/atom+xml" />
+<link rel="canonical" href="/post/open-street-map-1-coffee-break/" />
+<link rel="alternative" href="/index.xml" title="Open Operational Research" type="application/atom+xml" />
 
 
 <meta name="renderer" content="webkit" />
@@ -66,18 +66,18 @@
 <meta name='msapplication-navbutton-color' content="#5fbf5e" />
 <meta name="msapplication-TileColor" content="#5fbf5e" />
 <meta name="msapplication-TileImage" content="/img/tile-image-windows.png" />
-<link rel="icon" href="https://openor.blog/img/favicon.ico" />
-<link rel="icon" type="image/png" sizes="16x16" href="https://openor.blog/img/favicon-16x16.png" />
-<link rel="icon" type="image/png" sizes="32x32" href="https://openor.blog/img/favicon-32x32.png" />
-<link rel="icon" sizes="192x192" href="https://openor.blog/img/touch-icon-android.png" />
-<link rel="apple-touch-icon" href="https://openor.blog/img/touch-icon-apple.png" />
-<link rel="mask-icon" href="https://openor.blog/img/safari-pinned-tab.svg" color="#5fbf5e" />
+<link rel="icon" href="/img/favicon.ico" />
+<link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png" />
+<link rel="icon" sizes="192x192" href="/img/touch-icon-android.png" />
+<link rel="apple-touch-icon" href="/img/touch-icon-apple.png" />
+<link rel="mask-icon" href="/img/safari-pinned-tab.svg" color="#5fbf5e" />
 
 
 
 <link rel="stylesheet" href="//cdn.bootcss.com/video.js/6.2.8/alt/video-js-cdn.min.css" />
 
-<link rel="stylesheet" href="https://openor.blog/css/bundle.css" />
+<link rel="stylesheet" href="/css/bundle.css" />
 
 
   
@@ -112,7 +112,7 @@
     
     
   <header class="site-header">
-  <img class="avatar" src="https://openor.blog/img/avatar.jpg" alt="Avatar">
+  <img class="avatar" src="/img/avatar.jpg" alt="Avatar">
   
   <h2 class="title">Open Operational Research</h2>
   
@@ -133,7 +133,7 @@
             
               is-active
             ">
-            <a href="https://openor.blog/">Home</a>
+            <a href="/">Home</a>
           </li>
       
         <li class="menu-item
@@ -147,14 +147,14 @@
             
             
             ">
-            <a href="https://openor.blog/tags/">Tags</a>
+            <a href="/tags/">Tags</a>
           </li>
       
         <li class="menu-item
             
             
             ">
-            <a href="https://openor.blog/about/">About</a>
+            <a href="/about/">About</a>
           </li>
       
     </ul>
@@ -212,7 +212,7 @@
       
 
       <li class="social-item">
-        <a href="https://openor.blog/index.xml"><span class="icon icon-rss" title="RSS"></span></a>
+        <a href="/index.xml"><span class="icon icon-rss" title="RSS"></span></a>
       </li>
 
     </ul>
@@ -271,7 +271,7 @@ nodes = Quarry_House_graph.nodes()
 QH_node = ox.get_nearest_node(Quarry_House_graph, (lat, lon))</code></pre>
 <p>A feature of osmnx is that it only graps nodes that lie on a way that it is importing. i.e. if you’re making a road map, it will only grab nodes that belong to roads. Offices do not belong to roads. Coffee shops do not belong to roads. So to work within the network, I want the nearest node to my office.</p>
 <pre class="python"><code>ox.plot_graph(Quarry_House_graph)</code></pre>
-<p><img src="https://openor.blog/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-5-1.png" /><!-- --> This is relatively useful already, but of more interest to pure mathematics than analysis. The nodes (labelled blue) are the junctions on the road network. Most of the rest of the project is: 1. Getting all coffee shops within the boundaries of this graph. 2. Plotting the coffee shops instead of the junctions.</p>
+<p><img src="/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-5-1.png" /><!-- --> This is relatively useful already, but of more interest to pure mathematics than analysis. The nodes (labelled blue) are the junctions on the road network. Most of the rest of the project is: 1. Getting all coffee shops within the boundaries of this graph. 2. Plotting the coffee shops instead of the junctions.</p>
 <p>Now, networkx and osmnx have the ability to set a node’s color attribute, but the plot commands don’t grab it, unlike when they grab the default weight/length attribute. I might dig into the networkx documentation (it’s a very, very big library) and if it has that feature port it to osmnx. For now I just slightly rewrote the plot command within osmnx.</p>
 <p>Since osmnx (and networkx, and every other library I’m using) are Free/Open Source, I’m free to make changes to the software as I need.</p>
 <p>Next I needed a bounding box for the graph so I can filter just the nodes that are near the office.</p>
@@ -402,7 +402,7 @@ coffee = osm_find_interesting_nodes(&quot;cafe_near_QH.osm&quot; )</code></pre>
    
     return fig, ax
 plot_graph_and_landmarks(G=Quarry_House_graph, landmark_nodes = coffee, central_node=nodes[QH_node], annotate=True)</code></pre>
-<p><img src="https://openor.blog/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-9-1.png" /><!-- --></p>
+<p><img src="/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-9-1.png" /><!-- --></p>
 <p>We are almost there! There’s a few outside the confines of the graph, and because it’s a city centre the names are overlapping massively.</p>
 <p>For demonstration purposes, I’m going to calculate the great circle distance (or distance as the crow flies) and the distance it takes to actually go through the road network. I’m calling the great circle distance “bird distance”, becuase I can. To filter by this, I need the circle boundary of the graph:</p>
 <pre class="python"><code>maximum = 0
@@ -424,11 +424,11 @@ for node in nodes:
 <p>Then I filter by bird distance, and plot again:</p>
 <pre class="python"><code>coffee = dict([(k, coffee[k]) for k in coffee.keys() if coffee[k][&quot;bird distance&quot;]&lt; maximum])
 plot_graph_and_landmarks(G=Quarry_House_graph, landmark_nodes = coffee, central_node=nodes[QH_node], annotate=False)</code></pre>
-<p><img src="https://openor.blog/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-13-1.png" /><!-- --></p>
+<p><img src="/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-13-1.png" /><!-- --></p>
 <p>And we see that just using the bird distance gives me false info - there’s a bunch of coffeee shops in the North West that it says I can reach, but I really can’t! We’ve calculated the walking distance, so let’s filter by that:</p>
 <pre class="python"><code>coffee = dict([(k, coffee[k]) for k in coffee.keys() if coffee[k][&quot;walking distance&quot;]&lt; maximum])
 plot_graph_and_landmarks(G=Quarry_House_graph, landmark_nodes = coffee, central_node=nodes[QH_node], annotate=False)</code></pre>
-<p><img src="https://openor.blog/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-14-1.png" /><!-- --></p>
+<p><img src="/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-14-1.png" /><!-- --></p>
 <p>That’s nice as a visualisation, but a table would also be useful.</p>
 <pre class="python"><code>coffee_distances = []
 for i in coffee:
@@ -718,11 +718,7 @@ kable(results)</code></pre>
 <p>There’s potentially some optimisations I can make to osmnx in terms of reading large osm files. I’d also like to give a bounding circle argument to osmosis rather than doing that part of preprocessing in Python.</p>
 <p>I’ve got Tasker for Android, which lets me do practically any action on the phone in response to practically any trigger. I’m going to log my walking speed over a day or so (possibly passively tracking the whole day, then filter everything that’s stationary or too fast). This is going to have to wait until I’m not nauseous enough to walk at full speed.</p>
 <p>With a tiny bit of Javascript, I can switch between static images on the server. I might pick some points of interest and go through different visualisations of what is near.</p>
-<p>I’ve many project ideas just with nodes and edges in OSM.</p>
-<div class="figure">
-<img src="img/lonelycafe.svg" alt="Cafe near partner’s work" />
-<p class="caption">Cafe near partner’s work</p>
-</div>
+<p>I’ve many project ideas just with nodes and edges in OSM. <img src="/static/img/lonelycafe.svg" alt="caption" /></p>
 <p>Yes, there is exactly one cafe near my partner’s work. I was going to search for ice cream shops or anything she’s more interested in than coffee, but there’s nothing in the OSM tags that’s actually near her work.</p>
 </div>
 </article>
@@ -730,15 +726,15 @@ kable(results)</code></pre>
       
       <ul class="post-tags">
         
-          <li><a href="https://openor.blog/tags/openstreetmap"><span class="tag">OpenStreetMap</span></a></li>
+          <li><a href="/tags/openstreetmap"><span class="tag">OpenStreetMap</span></a></li>
         
-          <li><a href="https://openor.blog/tags/gis"><span class="tag">GIS</span></a></li>
+          <li><a href="/tags/gis"><span class="tag">GIS</span></a></li>
         
-          <li><a href="https://openor.blog/tags/networkx"><span class="tag">Networkx</span></a></li>
+          <li><a href="/tags/networkx"><span class="tag">Networkx</span></a></li>
         
-          <li><a href="https://openor.blog/tags/xml"><span class="tag">XML</span></a></li>
+          <li><a href="/tags/xml"><span class="tag">XML</span></a></li>
         
-          <li><a href="https://openor.blog/tags/graph-theory"><span class="tag">Graph Theory</span></a></li>
+          <li><a href="/tags/graph-theory"><span class="tag">Graph Theory</span></a></li>
         
       </ul>
       
@@ -802,7 +798,7 @@ kable(results)</code></pre>
   });
 </script>
 
-<script src="https://openor.blog/js/bundle.js"></script>
+<script src="/js/bundle.js"></script>
 
 
 

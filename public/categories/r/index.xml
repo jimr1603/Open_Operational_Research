@@ -2,52 +2,52 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>R on Open Operational Research</title>
-    <link>https://openor.blog/categories/r/</link>
+    <link>/categories/r/</link>
     <description>Recent content in R on Open Operational Research</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you wish to quote or reproduce. Source code available under GPL at the linked GitHub.</copyright>
     <lastBuildDate>Fri, 30 Mar 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://openor.blog/categories/r/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/categories/r/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Open Organograms 3 - the meeting calculator</title>
-      <link>https://openor.blog/post/open-organograms-3-the-meeting-calculator/</link>
+      <link>/post/open-organograms-3-the-meeting-calculator/</link>
       <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://openor.blog/post/open-organograms-3-the-meeting-calculator/</guid>
+      <guid>/post/open-organograms-3-the-meeting-calculator/</guid>
       <description>I have data, I have a website. It’s hardly fair to ask you to take the numbers I’m spitting out of the Open Organograms series and put them in a calculator to do something useful with them. Thankfully, R markdown has a nice interface between the markdown and Javascript, called htmlwidgets.
 Having generated a median salary for (so far 2) departments, I think it might be interesting to see a meeting calculator.</description>
     </item>
     
     <item>
       <title>Open Organograms 2 - the rise of the tibble</title>
-      <link>https://openor.blog/post/open-organograms-2-the-rise-of-the-tibble/</link>
+      <link>/post/open-organograms-2-the-rise-of-the-tibble/</link>
       <pubDate>Wed, 28 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://openor.blog/post/open-organograms-2-the-rise-of-the-tibble/</guid>
+      <guid>/post/open-organograms-2-the-rise-of-the-tibble/</guid>
       <description>Background I learned data.table before tidyverse. It can be hard to read, and I’m always forgetting commas. I’m making an effort to learn the tidyverse, and I am already impressed with dplyr and tibble. (I’ve been impressed with ggplot2 for a while now.)
 I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. It’s also the case that the code run time is a tiny fraction of my overall project.</description>
     </item>
     
     <item>
       <title>Open Organograms</title>
-      <link>https://openor.blog/post/2018-03-26-open-organograms/</link>
+      <link>/post/2018-03-26-open-organograms/</link>
       <pubDate>Mon, 26 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://openor.blog/post/2018-03-26-open-organograms/</guid>
+      <guid>/post/2018-03-26-open-organograms/</guid>
       <description>Background One of the reasons I’ve founded this site is because I’ve discovered https://data.gov.uk/ and I have ideas. In particular, I won’t discuss outside of work anything I only know through work, so it was nice to see pay data in the public sphere.
 Full background is at http://guidance.data.gov.uk/organogram-data.html but basically, the Prime Minister decided that the public deserve the structure and hierarchy of the Government Departments, and a few agencies.</description>
     </item>
     
     <item>
       <title>Hello World</title>
-      <link>https://openor.blog/post/2018-03-25-hello-world/</link>
+      <link>/post/2018-03-25-hello-world/</link>
       <pubDate>Sun, 25 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://openor.blog/post/2018-03-25-hello-world/</guid>
+      <guid>/post/2018-03-25-hello-world/</guid>
       <description>This is my first post on not-my-first blog. I’ll be honest, at this stage I’m seeing if I can compile the site and push it to the net.
 Expect changes coming soon. I’d put up a Construction in Process gif, but I’m told that Geocities has been down for some years now.
 Built with R: 3.3.3</description>

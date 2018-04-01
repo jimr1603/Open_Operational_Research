@@ -2,81 +2,81 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Open Operational Research</title>
-    <link>https://openor.blog/</link>
+    <link>/</link>
     <description>Recent content on Open Operational Research</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you wish to quote or reproduce. Source code available under GPL at the linked GitHub.</copyright>
     <lastBuildDate>Sun, 25 Mar 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="https://openor.blog/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>About</title>
-      <link>https://openor.blog/about/</link>
+      <link>/about/</link>
       <pubDate>Sun, 25 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://openor.blog/about/</guid>
+      <guid>/about/</guid>
       <description>This is the personal blog of James Riley, largely as a place to share my adventures in Free/Open Operations Resrach and/or Data Science. There&amp;rsquo;ll also be Statistics, some Economics, maybe some Social Research, and definitely some bad programming.
 All data processed is available for free, for some value of free. It is my intention that anyone be able to reproduce the outputs of this site. I&amp;rsquo;m using R markdown with hosting on GitHub so you can have the source for free as well.</description>
     </item>
     
     <item>
       <title>Open Street Map - 1 Coffee Break</title>
-      <link>https://openor.blog/post/open-street-map-1-coffee-break/</link>
+      <link>/post/open-street-map-1-coffee-break/</link>
       <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://openor.blog/post/open-street-map-1-coffee-break/</guid>
+      <guid>/post/open-street-map-1-coffee-break/</guid>
       <description>Motivation I am a professional mathematician - coffee is essential to my wellbeing. Lunch is just about the right time of the day to want a 2nd coffee of the day, and get some fresh air and time not looking at the screen. Especially now that it’s not raining or snowing 100% of the time. Given a 60 minute lunch, what are my options? Does it become a massive pain if I decide I want a 30 minute lunch instead?</description>
     </item>
     
     <item>
       <title>Open Organograms 3 - the meeting calculator</title>
-      <link>https://openor.blog/post/open-organograms-3-the-meeting-calculator/</link>
+      <link>/post/open-organograms-3-the-meeting-calculator/</link>
       <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://openor.blog/post/open-organograms-3-the-meeting-calculator/</guid>
+      <guid>/post/open-organograms-3-the-meeting-calculator/</guid>
       <description>I have data, I have a website. It’s hardly fair to ask you to take the numbers I’m spitting out of the Open Organograms series and put them in a calculator to do something useful with them. Thankfully, R markdown has a nice interface between the markdown and Javascript, called htmlwidgets.
 Having generated a median salary for (so far 2) departments, I think it might be interesting to see a meeting calculator.</description>
     </item>
     
     <item>
       <title>Open Organograms 2 - the rise of the tibble</title>
-      <link>https://openor.blog/post/open-organograms-2-the-rise-of-the-tibble/</link>
+      <link>/post/open-organograms-2-the-rise-of-the-tibble/</link>
       <pubDate>Wed, 28 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://openor.blog/post/open-organograms-2-the-rise-of-the-tibble/</guid>
+      <guid>/post/open-organograms-2-the-rise-of-the-tibble/</guid>
       <description>Background I learned data.table before tidyverse. It can be hard to read, and I’m always forgetting commas. I’m making an effort to learn the tidyverse, and I am already impressed with dplyr and tibble. (I’ve been impressed with ggplot2 for a while now.)
 I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. It’s also the case that the code run time is a tiny fraction of my overall project.</description>
     </item>
     
     <item>
       <title>Open Organograms</title>
-      <link>https://openor.blog/post/2018-03-26-open-organograms/</link>
+      <link>/post/2018-03-26-open-organograms/</link>
       <pubDate>Mon, 26 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://openor.blog/post/2018-03-26-open-organograms/</guid>
+      <guid>/post/2018-03-26-open-organograms/</guid>
       <description>Background One of the reasons I’ve founded this site is because I’ve discovered https://data.gov.uk/ and I have ideas. In particular, I won’t discuss outside of work anything I only know through work, so it was nice to see pay data in the public sphere.
 Full background is at http://guidance.data.gov.uk/organogram-data.html but basically, the Prime Minister decided that the public deserve the structure and hierarchy of the Government Departments, and a few agencies.</description>
     </item>
     
     <item>
       <title>Workflow</title>
-      <link>https://openor.blog/workflow/</link>
+      <link>/workflow/</link>
       <pubDate>Mon, 26 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://openor.blog/workflow/</guid>
+      <guid>/workflow/</guid>
       <description>This is an ongoing scratchpad of what I have ideas for, what I’m working on, and what I just need to make presentable. There’s a massive difference between code I’m happy gives me an answer, and code I’m happy for someone else to see.
   Ideas Working Prettify Housekeeping    training neural nets Making table of workflow graph theory on road and train networks Add CV/publications  wikidata querires Open Organograms  Include bibliography  importing Google charts   Shortcodes  filesize to book equivalent   Tag posts with GORS compitencies  background: graph theory     background:spherical coordinates     background:xml       This was originally going to be a Trello.</description>
     </item>
     
     <item>
       <title>Hello World</title>
-      <link>https://openor.blog/post/2018-03-25-hello-world/</link>
+      <link>/post/2018-03-25-hello-world/</link>
       <pubDate>Sun, 25 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>https://openor.blog/post/2018-03-25-hello-world/</guid>
+      <guid>/post/2018-03-25-hello-world/</guid>
       <description>This is my first post on not-my-first blog. I’ll be honest, at this stage I’m seeing if I can compile the site and push it to the net.
 Expect changes coming soon. I’d put up a Construction in Process gif, but I’m told that Geocities has been down for some years now.
 Built with R: 3.3.3</description>
