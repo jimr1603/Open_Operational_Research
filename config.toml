@@ -1,10 +1,10 @@
 baseURL = "/"
 languageCode = "en"
 title = "Open Operational Research"
+theme = "hugo-nuo"
 enableRobotsTXT = true
 PygmentsCodeFences = true
 canonifyurls = true
-
 
 # Disqus Username
 disqusShortname = "openor-blog"
@@ -15,9 +15,6 @@ disqusShortname = "openor-blog"
 # Copyright of your post
 copyright = "© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you wish to quote or reproduce. Source code available under GPL at the linked GitHub."
 
-[taxonomies]
-  GORS = "GORS-techniques"
-
 # Initial site menu, you can extend menu with content.
 [[menu.main]]
   name = "Home"
@@ -26,23 +23,17 @@ copyright = "© This post is licensed under a Creative Commons Attribution-NonCo
   url = "/"
 
 [[menu.main]]
-  name = "GitHub"
+  name = "Github"
   weight = 20
-  identifier = "GitHub"
+  identifier = "github"
   url = "https://github.com/jimr1603"
- 
+
 [[menu.main]]
   name = "Tags"
-  weight = 30 
+  weight = 30
   identifier = "tags"
   url = "/tags/"
 
-[[menu.main]]
-  name = "Workflow"
-  weight = 60
-  url = "/workflow/"
-  
-# Add your own params here
 [params]
   author = "James Riley"
   avatar = "/img/avatar.jpg"

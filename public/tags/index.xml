@@ -40,11 +40,38 @@
     </item>
     
     <item>
+      <title>Gis</title>
+      <link>/tags/gis/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/gis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Graph Theory</title>
+      <link>/tags/graph-theory/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/graph-theory/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Htmlwidgets</title>
       <link>/tags/htmlwidgets/</link>
       <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
       
       <guid>/tags/htmlwidgets/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Networkx</title>
+      <link>/tags/networkx/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/networkx/</guid>
       <description></description>
     </item>
     
@@ -58,11 +85,38 @@
     </item>
     
     <item>
+      <title>Openstreetmap</title>
+      <link>/tags/openstreetmap/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/openstreetmap/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Tidyverse</title>
       <link>/tags/tidyverse/</link>
       <pubDate>Wed, 28 Mar 2018 00:00:00 +0000</pubDate>
       
       <guid>/tags/tidyverse/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Web Programming</title>
+      <link>/tags/web-programming/</link>
+      <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/web-programming/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Xml</title>
+      <link>/tags/xml/</link>
+      <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/tags/xml/</guid>
       <description></description>
     </item>
     
