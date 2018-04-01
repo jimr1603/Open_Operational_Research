@@ -1,8 +1,8 @@
 ---
-title: hello world.Rmd
+title: hello world
 author: James Riley
 date: '2018-03-25'
-slug: hello-world-rmd
+slug: hello-world
 categories: ["R"]
 tags: ["getting started"]
 ---
