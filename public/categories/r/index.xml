@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>© This post is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you wish to quote or reproduce. Source code available under GPL at the linked GitHub.</copyright>
-    <lastBuildDate>Fri, 30 Mar 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 02 Apr 2018 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/r/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>OSM 2 - interactive maps</title>
+      <link>/post/osm-2-interactive-maps/</link>
+      <pubDate>Mon, 02 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/osm-2-interactive-maps/</guid>
+      <description>Introducing the leaflet package Plain images of map data is so web 1.0. R htmlwidgets mean I don’t have to acttuully learn Javascript to mess around with Javascript libraries in this site. One of the flagship examples leaflet works with OSM out of the box.
+Last time I wrote a file containing name and distance of my coffee shops. I now need to run that script again so I can get longitude and latitude.</description>
+    </item>
     
     <item>
       <title>Open Organograms 3 - the meeting calculator</title>

@@ -1,4 +1,4 @@
-baseURL = "https://openor.blog/"
+baseURL = "/"
 languageCode = "en"
 title = "Open Operational Research"
 theme = "hugo-nuo"

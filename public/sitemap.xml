@@ -8,6 +8,11 @@
   </url>
   
   <url>
+    <loc>/post/osm-2-interactive-maps/</loc>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/post/open-street-map-1-coffee-break/</loc>
     <lastmod>2018-03-31T00:00:00+00:00</lastmod>
   </url>
@@ -38,38 +43,6 @@
   </url>
   
   <url>
-    <loc>/insightmaker/examples/engine/</loc>
-  </url>
-  
-  <url>
-    <loc>/insightmaker/examples/flight_simulator/</loc>
-  </url>
-  
-  <url>
-    <loc>/insightmaker/examples/full/</loc>
-  </url>
-  
-  <url>
-    <loc>/insightmaker/insightmaker/</loc>
-  </url>
-  
-  <url>
-    <loc>/insightmaker/resources/ace/readme/</loc>
-  </url>
-  
-  <url>
-    <loc>/insightmaker/resources/ace/editor/</loc>
-  </url>
-  
-  <url>
-    <loc>/insightmaker/resources/ace/kitchen-sink/</loc>
-  </url>
-  
-  <url>
-    <loc>/insightmaker/resources/ext/</loc>
-  </url>
-  
-  <url>
     <loc>/categories/</loc>
     <priority>0</priority>
   </url>
@@ -94,36 +67,31 @@
   
   <url>
     <loc>/tags/gis/</loc>
-    <lastmod>2018-03-31T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/tags/graph-theory/</loc>
-    <lastmod>2018-03-31T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/tags/htmlwidgets/</loc>
-    <lastmod>2018-03-30T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>/insightmaker/</loc>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/categories/javascript/</loc>
-    <lastmod>2018-03-30T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/tags/networkx/</loc>
-    <lastmod>2018-03-31T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -141,7 +109,7 @@
   
   <url>
     <loc>/tags/openstreetmap/</loc>
-    <lastmod>2018-03-31T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -153,19 +121,19 @@
   
   <url>
     <loc>/post/</loc>
-    <lastmod>2018-03-31T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/categories/python/</loc>
-    <lastmod>2018-03-31T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/categories/r/</loc>
-    <lastmod>2018-03-30T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -177,19 +145,19 @@
   
   <url>
     <loc>/tags/tidyverse/</loc>
-    <lastmod>2018-03-28T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/tags/web-programming/</loc>
-    <lastmod>2018-03-30T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/tags/xml/</loc>
-    <lastmod>2018-03-31T00:00:00+00:00</lastmod>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
