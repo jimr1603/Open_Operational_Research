@@ -35,8 +35,7 @@ Last time I wrote a file containing name and distance of my coffee shops. I now 
 coffee <- read_csv(here("static","data", "OSM", "QH coffee.csv")) %>%
   mutate(`walking distance`  = round(`walking distance`) )
 
-coffee_icon <- makeIcon("../img/coffee-cup.svg",   iconWidth = 38, iconHeight = 95,
-  iconAnchorX = 22, iconAnchorY = 94)
+coffee_icon <- makeIcon("../img/coffee-cup.svg",   iconWidth = 38, iconHeight = 38)
 
 m <- leaflet(data=coffee) %>%
     addMarkers(~longitude, ~latitude, popup = ~as.character(`walking distance`), label = ~as.character(name), icon=coffee_icon) %>%
