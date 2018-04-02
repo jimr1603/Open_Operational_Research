@@ -61,7 +61,7 @@ nodes = Quarry_House_graph.nodes()
 QH_node = ox.get_nearest_node(Quarry_House_graph, (lat, lon))</code></pre>
 <p>A feature of osmnx is that it only graps nodes that lie on a way that it is importing. i.e. if you’re making a road map, it will only grab nodes that belong to roads. Offices do not belong to roads. Coffee shops do not belong to roads. So to work within the network, I want the nearest node to my office.</p>
 <pre class="python"><code>ox.plot_graph(Quarry_House_graph)</code></pre>
-<p><img src="/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-5-1.png" /><!-- --> This is relatively useful already, but of more interest to pure mathematics than analysis. The nodes (labelled blue) are the junctions on the road network. Most of the rest of the project is: 1. Getting all coffee shops within the boundaries of this graph. 2. Plotting the coffee shops instead of the junctions.</p>
+<p><img src="/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-5-1.png" width="1030" /> This is relatively useful already, but of more interest to pure mathematics than analysis. The nodes (labelled blue) are the junctions on the road network. Most of the rest of the project is: 1. Getting all coffee shops within the boundaries of this graph. 2. Plotting the coffee shops instead of the junctions.</p>
 <p>Now, networkx and osmnx have the ability to set a node’s color attribute, but the plot commands don’t grab it, unlike when they grab the default weight/length attribute. I might dig into the networkx documentation (it’s a very, very big library) and if it has that feature port it to osmnx. For now I just slightly rewrote the plot command within osmnx.</p>
 <p>Since osmnx (and networkx, and every other library I’m using) are Free/Open Source, I’m free to make changes to the software as I need.</p>
 <p>Next I needed a bounding box for the graph so I can filter just the nodes that are near the office.</p>
@@ -192,7 +192,7 @@ coffee = osm_find_interesting_nodes(&quot;cafe_near_QH.osm&quot; )</code></pre>
    
     return fig, ax
 plot_graph_and_landmarks(G=Quarry_House_graph, landmark_nodes = coffee, central_node=nodes[QH_node], annotate=True)</code></pre>
-<p><img src="/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-9-1.png" /><!-- --></p>
+<p><img src="/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-9-1.png" width="1030" /></p>
 <p>We are almost there! There’s a few outside the confines of the graph, and because it’s a city centre the names are overlapping massively.</p>
 <p>For demonstration purposes, I’m going to calculate the great circle distance (or distance as the crow flies) and the distance it takes to actually go through the road network. I’m calling the great circle distance “bird distance”, becuase I can. To filter by this, I need the circle boundary of the graph:</p>
 <pre class="python"><code>maximum = 0
@@ -214,11 +214,11 @@ for node in nodes:
 <p>Then I filter by bird distance, and plot again:</p>
 <pre class="python"><code>coffee = dict([(k, coffee[k]) for k in coffee.keys() if coffee[k][&quot;bird distance&quot;]&lt; maximum])
 plot_graph_and_landmarks(G=Quarry_House_graph, landmark_nodes = coffee, central_node=nodes[QH_node], annotate=False)</code></pre>
-<p><img src="/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-13-1.png" /><!-- --></p>
+<p><img src="/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-13-1.png" width="1030" /></p>
 <p>And we see that just using the bird distance gives me false info - there’s a bunch of coffeee shops in the North West that it says I can reach, but I really can’t! We’ve calculated the walking distance, so let’s filter by that:</p>
 <pre class="python"><code>coffee = dict([(k, coffee[k]) for k in coffee.keys() if coffee[k][&quot;walking distance&quot;]&lt; maximum])
 plot_graph_and_landmarks(G=Quarry_House_graph, landmark_nodes = coffee, central_node=nodes[QH_node], annotate=False)</code></pre>
-<p><img src="/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-14-1.png" /><!-- --></p>
+<p><img src="/post/2018-03-31-open-street-map-1-coffee-break_files/figure-html/unnamed-chunk-14-1.png" width="1030" /></p>
 <p>That’s nice as a visualisation, but a table would also be useful.</p>
 <pre class="python"><code>coffee_distances = []
 for i in coffee:
