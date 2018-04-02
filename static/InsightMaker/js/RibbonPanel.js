@@ -1492,6 +1492,13 @@ var RibbonPanel = function(graph, mainPanel, configPanel) {
 									handler: function() {
 										exportSvg();
 									}
+								}, 
+								{
+									itemId: 'exportUrl',
+									text: getText('Create link to this model'),
+									handler: function() {
+										modelToUrl();
+									}
 								}
 
 							]

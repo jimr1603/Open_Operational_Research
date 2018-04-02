@@ -900,6 +900,25 @@ function saveModel(dialogue) {
 }
 
 
+/*Method: model to url
+
+Generates a base64 encoding of the model
+
+*/
+
+
+function modelToUrl() {
+	
+	var url_string = window.location.href;
+	var url = new URL(url_string);
+	var enc = new mxCodec(mxUtils.createXmlDocument());
+	var node = enc.encode(graph.getModel());
+	var xm = mxUtils.getXml(node);
+	var b = window.btoa(xm);
+	window.alert(url.protocol+url.hostname+url.pathname+"?"+b);
+
+}
+
 /*
 Method: clearModel
 
