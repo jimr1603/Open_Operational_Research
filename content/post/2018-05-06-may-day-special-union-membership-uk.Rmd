@@ -1,0 +1,102 @@
+---
+title: May Day special - union membership UK
+author: James Riley
+date: '2018-05-06'
+slug: may-day-special-union-membership-uk
+categories:
+  - R
+tags:
+  - data.gov.uk
+  - ONS
+  - statistics
+  - tidyverse
+  - BEIS
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+library("tidyverse")
+library("here")
+library("ggplot2")
+library("plotly")
+library("DT")
+library("scales")
+```
+
+I know May Day/International Workers Day is May 1. To actually have time to write this I needed the bank holiday.
+
+BEIS have some nice statistics on union membership since 1882, and actually, they've applied most of the functions to them I find interesting. So most of this is going to be about presentation of data, and maybe adding some context to data.
+
+Massive disclaimer: this post is explicitly pro-union. I am not, however, publicly campaigning for any particular political party. 
+
+The very first table they give yields the following plot:
+
+```{r, message=FALSE, warning=FALSE}
+total_union_membership <- read_csv(here("static","data","Open Government Licence","total union members.csv")) %>% mutate(`Trade union members` = `Trade union members`*1000)
+
+plot_ly(total_union_membership, x=~year, y=~`Trade union members`, type="scatter", mode="lines+markers")
+```
+
+There is one immediately striking thing - something big seems to have happened in 1979. Ah, there was a rather famous [general election](https://en.wikipedia.org/wiki/United_Kingdom_general_election,_1979). So it'll be interesting to add party in power for that year to the data frame, and colour the graph. (Data from [Wikipedia](https://en.wikipedia.org/wiki/List_of_Prime_Ministers_of_the_United_Kingdom). Yes, I'm being very lazy and only counting which party the PM is as that part being in power. That makes the coalition labelled Conservative in my dataset. It also makes the times Labour lead a minority government labelled as Labour.) There's an obvious problem here - I can't really split years in this table. There'll be a little bit of fudge in terms of who was in control for the majority of the year. I've not actually worked out the middle of the year, but have gone for approximately mid-June. 
+
+Also, the easy thing to do is to add it to my csv file in the background, so sorry, you're not seeing clever analysis here.
+
+```{r}
+party_colour <- c("blue", "red", "yellow", "green")
+party_colour <- setNames(party_colour, c("Conservative", "Labour", "Liberal", "National Labour"))
+ 
+plot_ly(total_union_membership, x=~year, y=~`Trade union members`, type="scatter", mode="markers", color = ~`Party in power`, colors = party_colour)
+
+```
+
+We definitely see Thatcher's election at the peak of union membership in the UK, but otherwise it doesn't tell us a lot. Union membership has otherwise increased and shrunk under every party. If I add lines then it draws a straight line from every time a party loses the PM, until the next time they gain a PM (and finishes the line for the Liberals in 1922, National Labour in 1933 and Labour in 2009-2010.). So until I can get right into the manual for how to fix this, I'm dropping the lines.
+
+Something I hear is "why do we need unions now, we already have the major wins?". (Yes, this is not unique to workers rights.) So let's see some major events in the [history of labour law in the UK](https://en.wikipedia.org/wiki/History_of_labour_law_in_the_United_Kingdom#Late_19th_century). (Since my timeline starts at 1892, I'm not going before then.) I could spend all day populating this table, so this might periodically update. 
+
+```{r}
+plot_ly(total_union_membership, x=~year, y=~`Trade union members`, type="scatter",mode="markers", color = ~`Party in power`, colors = party_colour, hoverinfo="text", text=~`History of labour rights`)
+```
+
+This is a mess. Have the data table instead.
+
+```{r}
+datatable(total_union_membership)
+```
+
+The next few tabs are interesting - union membership as a % of all employees. But it doesn't go back far enough for my interest. To go any further back, I need to compromise between what I want, and what I can actually find. I've decided to instead go for union membership as a percentage of total population. Age profiles have changed, and what we consider "working age" has changed, but this seems to be the easiest given the data.
+
+```{r}
+total_union_membership <- total_union_membership %>%
+  mutate(`% of population in a union` = 100 * `Trade union members`/`UK population estimate (ONS)`)
+
+plot_ly(total_union_membership, x=~year, y=~`% of population in a union` , type="scatter", mode="markers", color = ~`Party in power`, colors = party_colour)
+```
+
+This is basically the same graph, so union membership seems to be changing more than the population is changing.
+
+```{r}
+plot_ly(total_union_membership,x=~year,y=~`UK population estimate (ONS)`, type="scatter", mode="lines")
+```
+
+The rest are summary statistics that BEIS have calculated, so I'll comment rather than try to claim credit!
+
+- Older workers are more likely to be in a union than younger workers. As these people age out of the workforce, expect further decreases in union membership. 
+- A public sector worker is about 4x as likely to be in a union as private.
+- Women are 20% more likely to be in a union than men.
+- Managers are the least likely to be unionised, professional occupations the most likely.
+- The least unionised industry is accommodation and food service, the highest is education. Mining is missing, probably due to insufficient info.
+- Together, this suggests to me that the unions are trying to adapt to a post-industrial economy in Britain.
+- British citizens are about twice as likely to be in a union than a worker without British nationality.
+- The disabled are about 20% more likely to be in a union than the non-disabled.
+- Union membership increases in people with more education.
+- Unionised workers are more likely to have flexible working hours. (N.B., anyone who has been in a workplace more than 26 weeks can request flexible working, but it's not guaranteed to be given - https://www.gov.uk/flexible-working)
+- Unionised workers earn on average £1.13 for each £1 a non-unionised worker earns. For women, this jumps to £1.27.
+- For all 16-24s unionised workers £1.20 for each £1 a non-unionised worker earns.
+- For some industries, unionised workers earn less than non-unionised - Water supply, sewerage, waste management and remediation activities, Information and communication, Financial and insurance activities.
+- However, Other Service Industries workers in a union earn £1.35 for every £1 non-unionised workers in the same industry earn.
+
+I'm not saying that there is a payment gap in the same business by union membership. I think that would be illegal in the UK. Generally in the UK, a union will fight for the rights of everyone in a workplace, but only take resources from the active members.
+
+The rest seem to be stats going back to '95, probably because of the survey they're based on. 
+
+I now want to do some significance testing on the actual dataset, I may or may not decide to apply for the data for that. In particular, some protected classes are more unionised than others, and seem to be better paid for it. 
