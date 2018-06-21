@@ -38,7 +38,7 @@ I have a reasonably-large ebook library. I've converted everything to txt format
 
 Also in the tidyverse is stringr, which includes running regular expressions in R. 
 
-![xkcd on regular expressions](https://xkcd.com/208/) 
+![xkcd on regular expressions](https://imgs.xkcd.com/comics/regular_expressions.png) 
 
 There is a regular expression that matches the start and end of words: "\\b". Therefore, the function to get a wordcount is:
 ```{r eval=FALSE, include=TRUE}
