@@ -1,0 +1,145 @@
+---
+title: Analysis on a plane
+author: James Riley
+date: '2018-06-13'
+slug: analysis-on-a-plane
+categories:
+  - R
+tags:
+  - EDA
+  - non-open data
+  - statistics
+  - tidyverse
+---
+
+##Background
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+library("tidyverse")
+library("lubridate")
+library("ggplot2")
+```
+
+I'm on a plane! No-frills airlines don't have wifi, so I've downloaded a bunch of datasets and a bunch of libraries and seen if I can do a bit of analysis while in the air. Yes, yes, I can. 
+
+I thought this would be a part 2, but it turns out I never published part 1. 
+
+Again, this is personal data - you don't get to see exactly what books are in my library. I will give you summary stats, but you're not getting the data on individual books. 
+
+##Analysis
+
+I have a reasonably-large ebook library. I've converted everything to txt format (Calibre is an amazing piece of Free/Open software) [link to Calibre](https://calibre-ebook.com/) . Now everything is in txt, I can write a bunch of functions to analyse one text file, then get purrr to run the function over all files in the folder.
+
+Also in the tidyverse is stringr, which includes running regular expressions in R. 
+
+![xkcd on regular expressions](https://xkcd.com/208/) 
+
+There is a regular expression that matches the start and end of words: "\\b". Therefore, the function to get a wordcount is:
+```{r eval=FALSE, include=TRUE}
+count_words <- function(file){
+words <- read_file(paste0(data,file)) %>%
+  str_count("\\b")/2
+return(list(file=file, words=words))
+}
+```
+
+It returns as a list so I can get a pretty table:
+
+```{r eval=FALSE, include=TRUE}
+files <- list.files("data/")
+words <- map_df(files, count_words)
+  
+size <- file.size(paste0(data, files))
+
+```
+
+```{r, eval=TRUE, include=FALSE}
+
+words <- read_csv("~/bin/R/Analyse books/library word analysis.csv") %>% select(-`estimated reading time`) 
+```
+
+Then a very basic bit of table manipulation:
+
+```{r}
+
+
+words_per_minute <- 400
+
+transfer_rate <- pull(summarise(words, mean(`bytes per word`))) * words_per_minute / 60
+
+words <- words %>%
+  mutate(`estimated reading time` = as.duration(60*words/words_per_minute))
+
+```
+
+Words per minute is taken from an online test I took a while ago. I would have liked to set myself a mini test, but I wasn't sure how to make R display a few hundred words and time how long it took me to read it. 
+
+Therefore, I read (English) at `r round(transfer_rate)`B/s. (Now I've landed, let's look at the history of data transmission. Approximately a 1972 modem!)
+
+Just to check that these numbers were sensible, I added the estimated reading time, since lubridate has nice human-readable outputs for intervals. I am happy to let you know that these particular books are in my library:
+
+```{r}
+words %>%
+  filter(str_detect(`file`, "Lord")) %>%
+  print
+```
+
+```{r}
+words %>%
+  filter(str_detect(`file`, "Lord of the")) %>%
+  summarise(sum(`estimated reading time`)) %>%
+  pull() %>%
+  as.duration() %>%
+  print
+
+```
+
+So, about 22 hours to read all of LOTR. That sounds about right to me. (You may enter your own bragging about LOTR in the comments.)
+
+How about the full library?
+
+```{r}
+words %>%
+  summarise(sum(`estimated reading time`)) %>%
+  pull %>%
+  as.duration %>%
+  print
+
+```
+
+15 weeks! I do think I need to prioritise my reading list.
+
+
+##Caveats
+
+Some of the books failed to convert, and skew the ananlysis towards saying my library is shorter. Similalry, there are the occasional merged words. Some of the ebooks are entirely images, so there is no text to extract. 
+
+Yes, I need to work on my data cleanup.
+
+The reading speed was based on a relatively small sample that might not be representative of my library. This number was pulled from my memory. 
+
+##Reflections
+
+The inbuilt R documentation and the documentation on these packages is good enough to write this post offline. The only parts I needed internet for were external links.
+
+The [Rstudio cheat sheets](https://www.rstudio.com/resources/cheatsheets/) were also really valuable for this.
+
+It was interesting working in a situation where I can't google the answer. I either had to make do with what I knew, or try something else.
+
+I'm enjoying analysing the data I've generated. 
+
+##Future work
+
+Part 1 needs writing up - it looks at the reading ages of my library.
+
+I should also look into using the dump of the Calibre library metadata, but to make that useful I really need to clean it up, massively. 
+
+See if there's any relationship between length of a book and its reading age.
+
+##We're landing now. I did it. I wrote a blog on a plane!
