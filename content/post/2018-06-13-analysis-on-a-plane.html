@@ -1,0 +1,105 @@
+---
+title: Analysis on a plane
+author: James Riley
+date: '2018-06-13'
+slug: analysis-on-a-plane
+categories:
+  - R
+tags:
+  - EDA
+  - non-open data
+  - statistics
+  - tidyverse
+---
+
+
+
+<div id="background" class="section level2">
+<h2>Background</h2>
+<p>I’m on a plane! No-frills airlines don’t have wifi, so I’ve downloaded a bunch of datasets and a bunch of libraries and seen if I can do a bit of analysis while in the air. Yes, yes, I can.</p>
+<p>I thought this would be a part 2, but it turns out I never published part 1.</p>
+<p>Again, this is personal data - you don’t get to see exactly what books are in my library. I will give you summary stats, but you’re not getting the data on individual books.</p>
+</div>
+<div id="analysis" class="section level2">
+<h2>Analysis</h2>
+<p>I have a reasonably-large ebook library. I’ve converted everything to txt format (Calibre is an amazing piece of Free/Open software) <a href="https://calibre-ebook.com/">link to Calibre</a> . Now everything is in txt, I can write a bunch of functions to analyse one text file, then get purrr to run the function over all files in the folder.</p>
+<p>Also in the tidyverse is stringr, which includes running regular expressions in R.</p>
+<div class="figure">
+<img src="https://imgs.xkcd.com/comics/regular_expressions.png" alt="xkcd on regular expressions" />
+<p class="caption">xkcd on regular expressions</p>
+</div>
+<p>There is a regular expression that matches the start and end of words: “\b”. Therefore, the function to get a wordcount is:</p>
+<pre class="r"><code>count_words &lt;- function(file){
+words &lt;- read_file(paste0(data,file)) %&gt;%
+  str_count(&quot;\\b&quot;)/2
+return(list(file=file, words=words))
+}</code></pre>
+<p>It returns as a list so I can get a pretty table:</p>
+<pre class="r"><code>files &lt;- list.files(&quot;data/&quot;)
+words &lt;- map_df(files, count_words)
+  
+size &lt;- file.size(paste0(data, files))
+</code></pre>
+<p>Then a very basic bit of table manipulation:</p>
+<pre class="r"><code>
+
+words_per_minute &lt;- 400
+
+transfer_rate &lt;- pull(summarise(words, mean(`bytes per word`))) * words_per_minute / 60
+
+words &lt;- words %&gt;%
+  mutate(`estimated reading time` = as.duration(60*words/words_per_minute))</code></pre>
+<p>Words per minute is taken from an online test I took a while ago. I would have liked to set myself a mini test, but I wasn’t sure how to make R display a few hundred words and time how long it took me to read it.</p>
+<p>Therefore, I read (English) at 38B/s. (Now I’ve landed, let’s look at the history of data transmission. Approximately a 1972 modem!)</p>
+<p>Just to check that these numbers were sensible, I added the estimated reading time, since lubridate has nice human-readable outputs for intervals. I am happy to let you know that these particular books are in my library:</p>
+<pre class="r"><code>words %&gt;%
+  filter(str_detect(`file`, &quot;Lord&quot;)) %&gt;%
+  print
+## # A tibble: 6 x 5
+##   file       words `size (bytes)` `bytes per word` `estimated reading tim…
+##   &lt;chr&gt;      &lt;int&gt;          &lt;dbl&gt;            &lt;dbl&gt; &lt;S4: Duration&gt;         
+## 1 Discworl…  92111         515469             5.60 13816.65s (~3.84 hours)
+## 2 Lord of …  96246         527222             5.48 14436.9s (~4.01 hours) 
+## 3 Lord of … 189999        1011850             5.33 28499.85s (~7.92 hours)
+## 4 Lord of … 156501         834133             5.33 23475.15s (~6.52 hours)
+## 5 Lord of … 185771         987270             5.31 27865.65s (~7.74 hours)
+## 6 Lords an…  92555         525819             5.68 13883.25s (~3.86 hours)</code></pre>
+<pre class="r"><code>words %&gt;%
+  filter(str_detect(`file`, &quot;Lord of the&quot;)) %&gt;%
+  summarise(sum(`estimated reading time`)) %&gt;%
+  pull() %&gt;%
+  as.duration() %&gt;%
+  print
+## [1] &quot;79840.65s (~22.18 hours)&quot;</code></pre>
+<p>So, about 22 hours to read all of LOTR. That sounds about right to me. (You may enter your own bragging about LOTR in the comments.)</p>
+<p>How about the full library?</p>
+<pre class="r"><code>words %&gt;%
+  summarise(sum(`estimated reading time`)) %&gt;%
+  pull %&gt;%
+  as.duration %&gt;%
+  print
+## [1] &quot;9281114.85s (~15.35 weeks)&quot;</code></pre>
+<p>15 weeks! I do think I need to prioritise my reading list.</p>
+</div>
+<div id="caveats" class="section level2">
+<h2>Caveats</h2>
+<p>Some of the books failed to convert, and skew the ananlysis towards saying my library is shorter. Similalry, there are the occasional merged words. Some of the ebooks are entirely images, so there is no text to extract.</p>
+<p>Yes, I need to work on my data cleanup.</p>
+<p>The reading speed was based on a relatively small sample that might not be representative of my library. This number was pulled from my memory.</p>
+</div>
+<div id="reflections" class="section level2">
+<h2>Reflections</h2>
+<p>The inbuilt R documentation and the documentation on these packages is good enough to write this post offline. The only parts I needed internet for were external links.</p>
+<p>The <a href="https://www.rstudio.com/resources/cheatsheets/">Rstudio cheat sheets</a> were also really valuable for this.</p>
+<p>It was interesting working in a situation where I can’t google the answer. I either had to make do with what I knew, or try something else.</p>
+<p>I’m enjoying analysing the data I’ve generated.</p>
+</div>
+<div id="future-work" class="section level2">
+<h2>Future work</h2>
+<p>Part 1 needs writing up - it looks at the reading ages of my library.</p>
+<p>I should also look into using the dump of the Calibre library metadata, but to make that useful I really need to clean it up, massively.</p>
+<p>See if there’s any relationship between length of a book and its reading age.</p>
+</div>
+<div id="were-landing-now.-i-did-it.-i-wrote-a-blog-on-a-plane" class="section level2">
+<h2>We’re landing now. I did it. I wrote a blog on a plane!</h2>
+</div>
