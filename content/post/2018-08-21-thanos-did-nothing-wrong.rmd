@@ -124,4 +124,4 @@ Imagine two scenarioes:
 Enough people prefer (2) that we apply a discount factor to future (good/ill) health, detailed in the Green Book[Green Book](link%20to%20hmt%20green%20book). 
 
 So, applying these time preferences we get the new figures: **new data table**
- 
+
