@@ -17,12 +17,26 @@ tags:
 knitr::opts_chunk$set(
 	message = FALSE,
 	warning = FALSE,
-	collapse = TRUE
+	collapse = TRUE,
+	cache = TRUE
 )
 library("tidyverse")
-library("ggplot2")
+library("plotly")
 
-uk_pop <- 65e6
+data_dir <- here::here("static", "data", "Open Government Licence/")
+
+health_discount <- read_csv(paste0(data_dir, "HMT health discount.csv"))
+
+printing_large_num <- function(number) 
+  number %>%
+    signif(3) %>%
+  format(number, digits=3, scientific = F, big.mark = ",")
+
+forecast <- read_csv(paste0(data_dir, "ONS population projection.csv"), col_types = c("int", "numeric"))
+
+
+uk_pop <- forecast$`All Ages`[1]
+
 ```
 
 ## Background
@@ -88,12 +102,12 @@ Ultimately, Thanos has to choose one of the following two options:
 
 I'm going to do the sums for both options on the UK, and handwave "if one policy is better in the UK, then it's better in the whole MCU.".
 
-At time of publication, Google thinks the UK population is `r uk_pop`. Which is good enough for my purposes.
+At time of publication, ONS thinks the 2016 UK population is `r printing_large_num(uk_pop)`. Which is good enough for my purposes.
 
 Thanos thinks the analysis is easy:
 
-1. `r uk_pop` deaths. 
-2. `r uk_pop/2` deaths.
+1. `r printing_large_num(uk_pop)` deaths. 
+2. `r printing_large_num(uk_pop/2)` deaths.
 
 (Any Brits who died while Thanos was getting the gauntlet are a rounding error for these purposes. I'm not falling down the rabithole of who died in Infinity War and where their character is from. From the 2nd viewing I don't think and Brits died before the big wipe.)
 
@@ -103,15 +117,49 @@ However, that assumes that the universal catasphroe where everyone dies would ha
 1. Thanos does nothing, and is right. At some point in the near future everyone dies.
 2. Thanos wipes out half the population now, avoiding the death of absolutely everyone in the near future.
 
-Thanos hasn't told us exactly when the death of everyone due to overpopulation is going to happen, so let's assume it happens at some point in the next hundred years. Why 100? Because the ONS have forcasted UK births and deaths for the next 100 years. (With increasing uncertainty...)
+Thanos hasn't told us exactly when the death of everyone due to overpopulation is going to happen, so let's assume it happens at some point in the next hundred years. Why 100? Because the ONS have forcasted UK births and deaths for the next 100 years. (With increasing uncertainty...) (Also, my base year for this will be 2016, it's when my data starts.)
 
-*import the nowcast of the UK*
+So we have two scenarios, one where Thanos snaps his fingers, and one where he doesn't.
 
-This gives us a starting population, and the ONS have also provided birth and death estimates for the next 100 years. 
+And I can compare the number of life years experienced in both scenarioes (under the assumption that the universal catastrophe is in the next 100 years). This is just the number of people alive in a one year in one scenario, minus the number of people alive in one year in the other scenario.
 
-So we have two scenarios, one where Thanos snaps his fingers, and one where he doesn't: *DIAGRAM*
+```{r}
+last_year <- forecast %>% pull(1) %>% max() #store the largest year in the forecast, for later use.
+first_year <- forecast %>% pull(1) %>% min() # We need the first one as well
 
-And I can compare the number of life years experienced in both scenarioes (under the assumption that the universal catastrophe is in the next 100 years) **data table**. 
+life_years <- function(forecast, intervention=FALSE, year_of_catastrophe=Inf){
+  if(intervention){ #i.e. Thanos snaps his fingers
+    forecast %>%
+      mutate(`All Ages` = `All Ages`/2) %>% #half the population              disappears, but no universal catastrophe.
+      summarise(total_life_years = sum(`All Ages` * `Discount Factor`))
+  }
+  else if(year_of_catastrophe<=last_year){
+      forecast %>%
+        mutate(`All Ages` = if_else(`Projected Year` < year_of_catastrophe + first_year,
+                                    `All Ages`,
+                                    0)) %>% #Everything progresses as normal, apart from when everyone dies.
+      summarise(total_life_years = sum(`All Ages` * `Discount Factor`))
+  }
+  
+}
+
+cost_of_no_intervention <- map_dfr(1:100, function(year) life_years(forecast, FALSE, year) %>%
+                             mutate(year_of_catastrophe = year))
+
+intervention <- life_years(forecast, TRUE) %>% pull()
+
+cost_of_no_intervention <- cost_of_no_intervention %>%
+  mutate(`Years of life lost if Thanos does nothing` = intervention - total_life_years)
+
+plot_ly(cost_of_no_intervention, x=~year_of_catastrophe) %>%
+  add_lines(y=~`Years of life lost if Thanos does nothing`)
+
+
+```
+
+So, if the universal catastrophe was going to happen tomorrow, then Thanos would have saved approximately 4 billion years of life in the UK over the next 100 years.
+
+(If the catastrophe were to happen more than 53 years in the future, then over the next 100 years Thanos has caused more loss of life than he has saved.)
 
 ### Serious Economics
 
@@ -121,7 +169,76 @@ Imagine two scenarioes:
 1. You develop a migrane today, it lasts a year, and then you recover.
 2. You develop a migrane 20 years in the future, it lasts for a year, and then you recover.
 
-Enough people prefer (2) that we apply a discount factor to future (good/ill) health, detailed in the Green Book[Green Book](link%20to%20hmt%20green%20book). 
+Enough people prefer (2) that we apply a discount factor to future (good/ill) health, detailed in the [Green Book](https://www.gov.uk/government/publications/the-green-book-appraisal-and-evaluation-in-central-governent).
 
-So, applying these time preferences we get the new figures: **new data table**
- 
+So, let's apply these discount factors.
+
+```{r}
+
+forecast <- forecast %>%
+  mutate(Year = `Projected Year` - 2016) %>%
+  left_join(health_discount) %>%
+  select(-Year)
+
+discounted_life_years <- function(forecast, intervention=FALSE, year_of_catastrophe=Inf){
+  if(intervention){ #i.e. Thanos snaps his fingers
+    forecast %>%
+      mutate(`All Ages` = `All Ages`/2) %>% #half the population              disappears, but no universal catastrophe.
+      mutate(`All Ages` = `All Ages`)
+      summarise(total_life_years = sum(`All Ages` * `Discount Factor`))
+  }
+  else if(year_of_catastrophe<=last_year){
+      forecast %>%
+        mutate(`All Ages` = if_else(`Projected Year` < year_of_catastrophe + first_year,
+                                    `All Ages`,
+                                    0)) %>% #Everything progresses as normal, apart from when everyone dies.
+      summarise(total_life_years = sum(`All Ages` * `Discount Factor`))
+  }
+  
+}
+
+cost_of_no_intervention <- map_dfr(1:100, function(year) life_years(forecast, FALSE, year) %>%
+                             mutate(year_of_catastrophe = year))
+
+intervention <- life_years(forecast, TRUE) %>% pull()
+
+cost_of_no_intervention <- cost_of_no_intervention %>%
+  mutate(`Years of life lost if Thanos does nothing` = intervention - total_life_years)
+
+plot_ly(cost_of_no_intervention, x=~year_of_catastrophe) %>%
+  add_lines(y=~`Years of life lost if Thanos does nothing`)
+```
+
+I've just halved the best and worst case scenarioes from Thanos' point of view. Also, the point where Thanos stops being right is now 38 years from now...
+
+## But...
+
+I deliberately left out the *else* condition in the function that generates the total life years experienced in a scenario. The remaining scenario is
+
+**The universal catastrophe does not happen**
+
+The final case, not considered, is that the universe is not overpopulated and about to collapse. My final function is then:
+
+```{r}
+
+discounted_life_years <- function(forecast, intervention=FALSE, year_of_catastrophe=Inf){
+  if(intervention){ #i.e. Thanos snaps his fingers
+    forecast %>%
+      mutate(`All Ages` = `All Ages`/2) %>% #half the population              disappears, but no universal catastrophe.
+      mutate(`All Ages` = `All Ages`)
+      summarise(total_life_years = sum(`All Ages` * `Discount Factor`))
+  }
+  else if(year_of_catastrophe<=last_year){
+      forecast %>%
+        mutate(`All Ages` = if_else(`Projected Year` < year_of_catastrophe + first_year,
+                                    `All Ages`,
+                                    0)) %>% #Everything progresses as normal, apart from when everyone dies.
+      summarise(total_life_years = sum(`All Ages` * `Discount Factor`))
+  }
+  else{ #Scenario where Thanos is wrong.
+    forecast %>%
+      summarise(total_life_years = sum(`All Ages` * `Discount Factor`))
+  }
+}
+
+```
