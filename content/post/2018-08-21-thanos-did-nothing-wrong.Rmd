@@ -10,7 +10,7 @@ tags:
   - ethics
   - marvel cinematic universe
   - ONS
-  - NOMIS
+  - trolley problem
 ---
 
 ```{r setup, include=FALSE}
@@ -41,16 +41,16 @@ uk_pop <- forecast$`All Ages`[1]
 
 ## Background
 
-I, like so many nerds, watched [Avengers: Infinity War](https://www.imdb.com/title/tt4154756/?ref_=nv_sr_1), and are eargerly awating part 2. I love how the Marvel Cinematic Universe has built in the interest the X-men movies as a kid, via pulpy action and *all the feels*. 
+I, like so many nerds, watched [Avengers: Infinity War](https://www.imdb.com/title/tt4154756/?ref_=nv_sr_1), and are eagerly awaiting part 2. I love how the Marvel Cinematic Universe has built in the interest the X-men movies as a kid, via pulpy action and *all the feels*. 
 
 I'm going to look at Infinity War through the lens of one of Thanos' analysts. What advice might an Operational Analyst for Thanos give?
 
-Since starting this post Infinity War has come out on dvd and I've rewatched it. I still like it!
+Since starting this post Infinity War has come out on DVD and I've re-watched it. I still like it!
 
 
 ## Trolley Problem
 
-Thanos, like so many villians who don't see themselves as the villian, hits the viewer with [the trolley problem](https://en.wikipedia.org/wiki/Trolley_problem). In this case: is it morally good to kill half of the population of the universe, in order to save the other half?
+Thanos, like so many villains who don't see themselves as the villain, hits the viewer with [the trolley problem](https://en.wikipedia.org/wiki/Trolley_problem). In this case: is it morally good to kill half of the population of the universe, in order to save the other half?
 
 Or, in terms of the trolley problem:
 
@@ -78,13 +78,13 @@ Everyone agrees that it would be best if there were enough resources to save eve
 
 The largest problem, as I see it, in Health Economics is the effective use of *limited* resources to maximise health in a population. 
 
-We do not have unlimited doctors, nurses, medicine, tools, etc. so we are dealing with limited resources. (Human staff are the easiest to see this for. Even if we put 100% of our population into medical school, we'd have a limited number of medics.) 
+We do not have unlimited doctors, nurses, medicine, tools, etc.. so we are dealing with limited resources. (Human staff are the easiest to see this for. Even if we put 100% of our population into medical school, we'd have a limited number of medics.) 
 
-I will talk in the future about the Quality-Adusted Life Year (QALY), but today I will only consider life-years. Except, because it's easier to work with, I'll consider deaths.
+I will talk in the future about the Quality-Adjusted Life Year (QALY), but today I will only consider life-years. Except, because it's easier to work with, I'll consider deaths.
 
 # Back to Thanos
 
-Thanos thinks that his policy of grabing all the infinity stones and wiping out half the universe is choosing the track with less people on it.
+Thanos thinks that his policy of grabbing all the infinity stones and wiping out half the universe is choosing the track with less people on it.
 
 Except...
 
@@ -100,7 +100,7 @@ Ultimately, Thanos has to choose one of the following two options:
 1. Do nothing.
 2. Get the infinity gauntlet, and wipe out half the universe.
 
-I'm going to do the sums for both options on the UK, and handwave "if one policy is better in the UK, then it's better in the whole MCU.".
+I'm going to do the sums for both options on the UK, and hand-wave "if one policy is better in the UK, then it's better in the whole MCU.".
 
 At time of publication, ONS thinks the 2016 UK population is `r printing_large_num(uk_pop)`. Which is good enough for my purposes.
 
@@ -109,19 +109,19 @@ Thanos thinks the analysis is easy:
 1. `r printing_large_num(uk_pop)` deaths. 
 2. `r printing_large_num(uk_pop/2)` deaths.
 
-(Any Brits who died while Thanos was getting the gauntlet are a rounding error for these purposes. I'm not falling down the rabithole of who died in Infinity War and where their character is from. From the 2nd viewing I don't think and Brits died before the big wipe.)
+(Any Brits who died while Thanos was getting the gauntlet are a rounding error for these purposes. I'm not falling down the rabbit-hole of who died in Infinity War and where their character is from. From the 2nd viewing I don't think and Brits died before the big wipe.)
 
 
-However, that assumes that the universal catasphroe where everyone dies would have happened right now if not averted. Maybe that's not the case. So let's consider 2 cases:
+However, that assumes that the universal catastrophe where everyone dies would have happened right now if not averted. Maybe that's not the case. So let's consider 2 cases:
 
 1. Thanos does nothing, and is right. At some point in the near future everyone dies.
 2. Thanos wipes out half the population now, avoiding the death of absolutely everyone in the near future.
 
-Thanos hasn't told us exactly when the death of everyone due to overpopulation is going to happen, so let's assume it happens at some point in the next hundred years. Why 100? Because the ONS have forcasted UK births and deaths for the next 100 years. (With increasing uncertainty...) (Also, my base year for this will be 2016, it's when my data starts.)
+Thanos hasn't told us exactly when the death of everyone due to overpopulation is going to happen, so let's assume it happens at some point in the next hundred years. Why 100? Because the ONS have foretasted UK births and deaths for the next 100 years. (With increasing uncertainty...) (Also, my base year for this will be 2016, it's when my data starts.)
 
 So we have two scenarios, one where Thanos snaps his fingers, and one where he doesn't.
 
-And I can compare the number of life years experienced in both scenarioes (under the assumption that the universal catastrophe is in the next 100 years). This is just the number of people alive in a one year in one scenario, minus the number of people alive in one year in the other scenario.
+And I can compare the number of life years experienced in both scenarios (under the assumption that the universal catastrophe is in the next 100 years). This is just the number of people alive in a one year in one scenario, minus the number of people alive in one year in the other scenario.
 
 ```{r}
 last_year <- forecast %>% pull(1) %>% max() #store the largest year in the forecast, for later use.
@@ -131,14 +131,14 @@ life_years <- function(forecast, intervention=FALSE, year_of_catastrophe=Inf){
   if(intervention){ #i.e. Thanos snaps his fingers
     forecast %>%
       mutate(`All Ages` = `All Ages`/2) %>% #half the population              disappears, but no universal catastrophe.
-      summarise(total_life_years = sum(`All Ages` * `Discount Factor`))
+      summarise(total_life_years = sum(`All Ages`))
   }
   else if(year_of_catastrophe<=last_year){
       forecast %>%
         mutate(`All Ages` = if_else(`Projected Year` < year_of_catastrophe + first_year,
                                     `All Ages`,
                                     0)) %>% #Everything progresses as normal, apart from when everyone dies.
-      summarise(total_life_years = sum(`All Ages` * `Discount Factor`))
+      summarise(total_life_years = sum(`All Ages`))
   }
   
 }
@@ -165,9 +165,9 @@ So, if the universal catastrophe was going to happen tomorrow, then Thanos would
 
 Discounting. The real reason I wanted to work with UK numbers. 
 
-Imagine two scenarioes:
-1. You develop a migrane today, it lasts a year, and then you recover.
-2. You develop a migrane 20 years in the future, it lasts for a year, and then you recover.
+Imagine two scenarios:
+1. You develop a migraine today, it lasts a year, and then you recover.
+2. You develop a migraine 20 years in the future, it lasts for a year, and then you recover.
 
 Enough people prefer (2) that we apply a discount factor to future (good/ill) health, detailed in the [Green Book](https://www.gov.uk/government/publications/the-green-book-appraisal-and-evaluation-in-central-governent).
 
@@ -208,7 +208,7 @@ plot_ly(cost_of_no_intervention, x=~year_of_catastrophe) %>%
   add_lines(y=~`Years of life lost if Thanos does nothing`)
 ```
 
-I've just halved the best and worst case scenarioes from Thanos' point of view. Also, the point where Thanos stops being right is now 38 years from now...
+I've just halved the best and worst case scenarios from Thanos' point of view. Also, the point where Thanos stops being right is now 38 years from now...
 
 ## But...
 
@@ -245,7 +245,7 @@ discounted_life_years <- function(forecast, intervention=FALSE, year_of_catastro
   printing_large_num()
 ```
 
-Of course, this comes out the same as the case when the catastrophe happens at the endof the 100 year appraisal, but it's satisfying to write code that suggests Thanos might not be right on this.
+Of course, this comes out the same as the case when the catastrophe happens at the end of the 100 year appraisal, but it's satisfying to write code that suggests Thanos might not be right on this.
 
 ## Overpopulation (MCU)
 
@@ -253,3 +253,27 @@ Many people have written at length about how *our* earth isn't actually overpopu
 
 Maybe this doesn't apply in the MCU, maybe the human superpower is that we can control our fertility.
 
+But, an overpopulation catastrophe must be because there are more people (and Groots are people) than the universe can support. 
+
+1. The MCU shows no sign of lack of resources. Like this universe, it seems that energy is convertible into any resource you need. The dwarf uses the energy of a dying neutron star to make an *awesome* axe, and there's no shortage of neutron stars.
+2. Our laws of thermodynamics don't seem to apply in the MCU. Or at least, the MCU isn't a closed system. Dr Strange interacted with a universe where time didn't exist. Strange could open a portal to a universe where entropy flows the opposite direction, and we have unlimited energy.[^1]
+
+The history of the overpopulation idea has been one that supports restrictions on breeding, as otherwise:
+```{r echo=FALSE}
+period = 10
+
+bind_rows( tibble(t=seq(0,period,length.out = 1e4),y=2^t),
+           tibble(t=seq(0, period, length.out = 1e4), y=(2^t)+(2^(period-1))) %>% mutate(t = t+period)  
+           ) %>%
+  ggplot(aes(x=t, y=y)) + geom_line() + theme_minimal()
+
+```
+(Graph illustrative, ignore the numbers.)
+
+Really, Thanos has a policy where he's going to have to use the gauntlet every so often because the universe will keep getting overpopulated.
+
+Except he's wrong, because there's no resource crisis.
+
+And he doesn't care. He has the Time Stone, he could have performed a much better analysis than me, and chose not to.
+
+[^1]: I briefly looked into how much energy we could get out of Cyclops, but the X-men are Marvel, but not MCU. Maybe a later post. 
