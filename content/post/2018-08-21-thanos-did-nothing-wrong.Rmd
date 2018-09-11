@@ -184,7 +184,6 @@ discounted_life_years <- function(forecast, intervention=FALSE, year_of_catastro
   if(intervention){ #i.e. Thanos snaps his fingers
     forecast %>%
       mutate(`All Ages` = `All Ages`/2) %>% #half the population              disappears, but no universal catastrophe.
-      mutate(`All Ages` = `All Ages`)
       summarise(total_life_years = sum(`All Ages` * `Discount Factor`))
   }
   else if(year_of_catastrophe<=last_year){
@@ -197,10 +196,10 @@ discounted_life_years <- function(forecast, intervention=FALSE, year_of_catastro
   
 }
 
-cost_of_no_intervention <- map_dfr(1:100, function(year) life_years(forecast, FALSE, year) %>%
-                             mutate(year_of_catastrophe = year))
+intervention <- discounted_life_years(forecast, TRUE) %>% pull()
 
-intervention <- life_years(forecast, TRUE) %>% pull()
+cost_of_no_intervention <- map_dfr(1:100, function(year) discounted_life_years(forecast, FALSE, year) %>%
+                             mutate(year_of_catastrophe = year))
 
 cost_of_no_intervention <- cost_of_no_intervention %>%
   mutate(`Years of life lost if Thanos does nothing` = intervention - total_life_years)
@@ -225,7 +224,6 @@ discounted_life_years <- function(forecast, intervention=FALSE, year_of_catastro
   if(intervention){ #i.e. Thanos snaps his fingers
     forecast %>%
       mutate(`All Ages` = `All Ages`/2) %>% #half the population              disappears, but no universal catastrophe.
-      mutate(`All Ages` = `All Ages`)
       summarise(total_life_years = sum(`All Ages` * `Discount Factor`))
   }
   else if(year_of_catastrophe<=last_year){
@@ -241,4 +239,17 @@ discounted_life_years <- function(forecast, intervention=FALSE, year_of_catastro
   }
 }
 
+(discounted_life_years(forecast, FALSE, Inf) -
+  discounted_life_years(forecast, TRUE)) %>%
+  pull() %>%
+  printing_large_num()
 ```
+
+Of course, this comes out the same as the case when the catastrophe happens at the endof the 100 year appraisal, but it's satisfying to write code that suggests Thanos might not be right on this.
+
+## Overpopulation (MCU)
+
+Many people have written at length about how *our* earth isn't actually overpopulated. Mostly because the exponential growth seems to slow into a sigmoid curve as areas become more economically developed.
+
+Maybe this doesn't apply in the MCU, maybe the human superpower is that we can control our fertility.
+
