@@ -1,0 +1,106 @@
+---
+title: Life & Death part 3
+author: James Riley
+date: '2018-04-22'
+slug: life-death-part-3
+categories:
+  - R
+tags:
+  - conditional probability
+  - data.gov.uk
+  - forecasting
+  - ONS
+  - probability
+  - statistics
+  - Web-programming
+  - plotly
+  - tidyverse
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+library("tidyverse")
+library("here")
+library("ggplot2")
+library("plotly")
+```
+##Background
+
+From *before I hit publish* on part 2, I had people telling me that the graphs were cool and they wanted their version. I briefly considered making a page with 404 graphs on it - 2 graphs $*$ 2 sexes $*$ 101 age groups. Then I remembered that this is a webpage, not a static document, and Javascript is a thing. I discovered the rather useful htmlwidget plotly, which adds interactivity and drops some of the painful aspects of ggplot.
+
+##Generating the data
+
+As usual, I'm generating all the data before publishing, and the widget just selects the right data to show according to your selection. This means I need a list where each element has a table containing the survival chance past a particular year, or to exactly a particular year. Given that my ONS tables are based on males and females, and I've not actually got around to doing my dplyr tutorial yet, I'm going to write a males function and a females function. 
+
+```{r, message=FALSE, warning=FALSE}
+mortality_tables <- read_csv(here("static","data","Open Government Licence","uk mortality 14-16.csv"))
+
+male_mort <- function(age){
+mort_table <- mortality_tables %>%
+  select(-Females) %>%
+  filter(Age>=age) %>%
+  rename(p_death = Males) %>%
+  mutate(p_survive = 1-p_death) %>%
+  mutate(survive_at_least = cumprod(p_survive)) %>%
+  mutate(die_at_exactly = survive_at_least * p_death) %>%
+  mutate(sex="male", base_age=age)
+return(mort_table)
+}
+
+female_mort <- function(age){
+mort_table <- mortality_tables %>%
+  select(-Males) %>%
+  filter(Age>=age) %>%
+  rename(p_death = Females) %>%
+  mutate(p_survive = 1-p_death) %>%
+  mutate(survive_at_least = cumprod(p_survive)) %>%
+  mutate(die_at_exactly = survive_at_least * p_death) %>%
+  mutate(sex="female", base_age=age)
+return(mort_table)
+}
+
+males <- map(mortality_tables$Age, male_mort) 
+females <- map(mortality_tables$Age, female_mort)
+```
+
+So at this point I have 2 lists, one for males, one for females, each containing the equivalent data to `James_example` in the previous post. This turned out to be the easy part. The hard part was sending all these plots to plotly, with the correct filters on each line. I've just about try-and-errored my way to the right settings. I need to read a manual and/or contact the plotly community.
+
+To contain all the plots in one graph, but only show the relevant ones at once, I need to add all the plots (traces in this context), but make only one age visible at a time. It also felt sensible to show the survival and the death curves at the same time, and to show the male and female curves for the same age at the same time. 
+
+An advantage of plotly is mouseover. And other bits of interactivity. But now you can get the numbers of a point by mousing over the point.
+
+```{r}
+die <- survive <- plot_ly(mode="lines", type="scatter")
+
+dropdown <- list()
+mask <- list()
+min_age <- 0
+max_age <- 99
+for (i in (min_age+1):(max_age+1)){
+  survive <- survive %>% add_trace(x=males[[i]]$Age,y=males[[i]]$survive_at_least,  name="male", visible=(i==min_age+1), line=list(color="blue")) %>%
+    add_trace(x=females[[i]]$Age, y=females[[i]]$survive_at_least, name="female", visible=(i==min_age+1), line=list(color="red")) 
+ die <- die %>% add_trace(x=males[[i]]$Age,y=males[[i]]$die_at_exactly, name="male",  visible=(i==min_age+1),line=list(color="blue")) %>%
+   add_trace(x=females[[i]]$Age, y=females[[i]]$die_at_exactly, name=paste("female"), visible=(i==min_age+1), line=list(color="red"))
+  
+  mask[[i]] <- rep(FALSE,10*(max_age))
+  mask[[i]][(2*i):(2*i+1)]<- TRUE
+  mask[[i]][(2*(max_age)+2*i+3):(2*(max_age)+2*i+4)]<- TRUE
+  
+  dropdown[[i]] <- list(method="restyle",
+                      label=paste("current age", i-1),
+                      args=list("visible",mask[[i]])
+                      )
+  }
+add_slider <- function(a){
+a <- a %>%   layout(
+      sliders= list( list(
+        steps=dropdown)
+    )
+  )
+return(a)
+}
+
+add_slider(subplot(survive, die, nrows=2))
+
+
+```
+

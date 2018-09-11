@@ -25,7 +25,7 @@ hasCJKLanguage = false
 
 	enableSummary = true
 	# Set the value to true if use description in post front matter replace content summary
-	useDescriptionReplaceSummary = false
+	useDescriptionReplaceSummary = true
 
 
 	enableGoogleAnalytics = true
@@ -52,7 +52,7 @@ hasCJKLanguage = false
 
 	olderPosts = ""
 	newerPosts = ""
-	copyright = ""
+	copyright = "This site is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License，please give source if you wish to quote or reproduce. Source code available under GPL at the linked GitHub.""
 
 	# show latest posts in single page
 	showLatestPosts = false
@@ -78,3 +78,5 @@ hasCJKLanguage = false
 #	facebook-square = "https://www.facebook.com/nodejh"
 #	twitter-square = "https://www.twitter.com/nodejh"
 	github-square = "https://www.github.com/jimr1603"
+
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
