@@ -1,0 +1,184 @@
+---
+title: '''Aint no sunshine ... in winter'
+author: James Riley
+date: '2018-10-19'
+slug: aint-no-sunshine-in-winter
+categories:
+  - R
+tags:
+  - ggplot
+  - suncalc
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+library("tidyverse")
+library("suncalc")
+
+theme <- ggthemes::theme_few()
+```
+
+Hi y'all, short one today. 
+
+Partially it's about how days of sunlight change through the year, unless you're on the equator. Partially it's about how hard it is to make 3d plots in a 2d space.
+
+I have [SAD](https://en.wikipedia.org/wiki/Seasonal_affective_disorder), which seems to flare up at the solstices and equinoxes, plus and minus a couple of weeks. 
+
+The solstices make sense - there's either too much or too little sunshine. But the equinoxes? I *think* we're dealing with the hours of sunshine per day changing too quickly. I *think* the equinoxes are the steepest parts of that curve?
+
+I have 2 options:
+
+1. A lot of geometry involving a tilted oblate spheroid in an eliptic.... *no...*
+2. Find a library.
+
+Enter [Suncalc](https://cran.r-project.org/web/packages/suncalc/index.html). The first thing to worry about is "what is the start of day?", and "what is the end of day?". There seem to be about 3 events that you could call the start of the day! For SAD purposes, let's just say that we're interested in the difference between sunrise and sunset.
+
+```{r}
+leeds <- getSunlightTimes(date = as.Date("2018-09-21")+0:365,
+                          lat = 53.8008,
+                          lon = -1.5491,
+                          keep = c("sunrise", "sunset")) %>%
+  select(-lat,-lon) %>%
+  mutate(date = as.Date(date)) %>%
+  mutate(day_length = sunset-sunrise)
+
+
+ggplot(leeds, aes(x=date,y=day_length)) + geom_line() + theme + labs(
+  title = "Daylight in Leeds for 1 year",
+  y="hours of daylight"
+)
+plotly::ggplotly()
+```
+
+Looks a bit like a sine wave to me, with the peaks and stuff in approximately the right places. Maybe worth giving it more than 1 year to see:
+
+```{r}
+leeds <- getSunlightTimes(date = as.Date("2018-09-21")+0:3650,
+                          lat = 53.8008,
+                          lon = -1.5491,
+                          keep = c("sunrise", "sunset")) %>%
+  select(-lat,-lon) %>%
+  mutate(date = as.Date(date)) %>%
+  mutate(day_length = sunset-sunrise)
+
+
+ggplot(leeds, aes(x=date,y=day_length)) + geom_line() + theme + labs(
+  title="10 years of daylight, Leeds",
+  y="hours of daylight"
+)
+plotly::ggplotly()
+```
+
+Eyeball method says it looks like a sine. I'm considering converting to audio to let my ears consider it as well.
+
+## More dimensions
+
+This falls apart if I want a lot of latitudes. Then I have 2 free dimensions (date, latitude), and one dependent dimension (length of day).
+
+3d plots are a pain. The obvious 3d render can look pretty, but doesn't usually tell us much. In this case, I'm going to let the x axis be date (again), the y axis be latitude, and show the length of day in various ways through *colour*.
+
+First I need my data. For simplicity, I'm fixing the longitude at 0.
+
+```{r}
+world_times <- getSunlightTimes(
+  data = expand.grid(date = as.Date("2018-09-21") + 0:365,
+                     lat = seq(-90,90, by=1),
+                     lon = 0),
+   keep = c("sunrise", "sunset")
+) %>%
+  mutate(date = as.Date(date)) %>%
+  mutate(day_length = sunset-sunrise) %>%
+  mutate(day_length = as.numeric(day_length)/60)
+
+
+```
+
+The defaults in ggplot when supplying continuous data are kinda useful, but...
+
+```{r}
+
+ggplot(world_times, aes(x=date, y=lat, fill=day_length)) + geom_raster() + 
+  theme + labs(
+    title = "Length of day around the world, over a year",
+    y = "latitude",
+    fill = "length of day (hours)"
+  )
+
+```
+
+Yeah, I can't read that well. 
+
+Interestingly, we've got grey zones, that are exactly where a given day does not have a sunrise or a sunset. So they're the polar circles dealing with eternal day, or eternal night. 
+
+One option is to make the day lengths a categorical variable, and throw it at a rainbow. Everyone I talk to at first think this makes good plots, and I did, at first. Rather than going with the defaults, I'm going to round to the nearest hour.
+
+```{r}
+
+world_times %>%
+  mutate(day_length = round(day_length, 0) %>% as.factor()) %>%
+  ggplot(aes(x=date, y=lat, fill=day_length)) + geom_raster() + 
+  theme + labs(
+    title = "Rainbow plot of day lengths",
+    y="latitude",
+    fill = "length of day (nearest hour)"
+  ) 
+
+```
+
+We see the nice shapes in the data, but it fails on accesibility. Ggplot ships with 2 colourblind-friendly scales; 1 discrete and 1 continuous, so I'll throw them at the rounded and unrounded data.
+
+Also, Olga is going to kill me when she sees this ugly graph. :)
+
+```{r}
+world_times %>%
+  mutate(day_length = round(day_length, 0) %>% as.factor()) %>%
+  ggplot(aes(x=date, y=lat, fill=day_length)) + geom_raster() + 
+  theme + labs(
+    title = "Colourblind-friendly rounded daylight",
+    y="latitude",
+    fill = "length of day (nearest hour)"
+  ) + scale_fill_viridis_d()
+
+```
+
+```{r}
+world_times %>%
+  ggplot(aes(x=date, y=lat, fill=day_length)) + geom_raster() + 
+  theme + labs(
+    title = "Colourblind-friendly unrounded daylight",
+    y="latitude",
+    fill = "length of day (nearest hour)"
+  ) + scale_fill_viridis_c()
+
+```
+
+My favourite in this example involves thinking about what the data is representing. If 12 hours is "normal", then we're interested in "how unusal" each location is on a given day. There's a scale for that.
+
+```{r}
+
+world_times %>%
+  ggplot(aes(x=date, y=lat, fill=day_length)) + geom_raster() + 
+  theme + labs(
+    title = "Comparison against 12-hour days",
+    y="latitude",
+    fill = "length of day"
+  ) + scale_fill_gradient2(midpoint = 12)
+
+```
+
+Someone will complain if I don't give you it as an actual 3d plot. (Well, the nearest approximation you can get on a 2d screen. 3d printing it or throwing it at 3d goggles is an exercise for the reader.) I consider this another example of how not to do it:
+
+```{r}
+
+plotly::plot_ly(world_times%>% filter(lat %% 3 == 0), x=~date, y=~lat, z=~day_length, type='mesh3d')
+
+
+```
+
+If Olga didn't murderise me for the first one, I'm definitely a gonner for this one. 
+
