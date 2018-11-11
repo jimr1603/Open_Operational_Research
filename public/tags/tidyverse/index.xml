@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tidyverse on Open Operational Research</title>
+    <link>/tags/tidyverse/</link>
+    <description>Recent content in Tidyverse on Open Operational Research</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Wed, 13 Jun 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/tidyverse/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Analysis on a plane</title>
+      <link>/post/analysis-on-a-plane/</link>
+      <pubDate>Wed, 13 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/analysis-on-a-plane/</guid>
+      <description>Background I’m on a plane! No-frills airlines don’t have wifi, so I’ve downloaded a bunch of datasets and a bunch of libraries and seen if I can do a bit of analysis while in the air. Yes, yes, I can.
+I thought this would be a part 2, but it turns out I never published part 1.
+Again, this is personal data - you don’t get to see exactly what books are in my library.</description>
+    </item>
+    
+    <item>
+      <title>May Day special - union membership UK</title>
+      <link>/post/may-day-special-union-membership-uk/</link>
+      <pubDate>Sun, 06 May 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/may-day-special-union-membership-uk/</guid>
+      <description>I know May Day/International Workers Day is May 1. To actually have time to write this I needed the bank holiday.
+BEIS have some nice statistics on union membership since 1882, and actually, they’ve applied most of the functions to them I find interesting. So most of this is going to be about presentation of data, and maybe adding some context to data.</description>
+    </item>
+    
+    <item>
+      <title>Life &amp; Death part 3</title>
+      <link>/post/life-death-part-3/</link>
+      <pubDate>Sun, 22 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/life-death-part-3/</guid>
+      <description>Background From before I hit publish on part 2, I had people telling me that the graphs were cool and they wanted their version. I briefly considered making a page with 404 graphs on it - 2 graphs \(*\) 2 sexes \(*\) 101 age groups. Then I remembered that this is a webpage, not a static document, and Javascript is a thing. I discovered the rather useful htmlwidget plotly, which adds interactivity and drops some of the painful aspects of ggplot.</description>
+    </item>
+    
+    <item>
+      <title>Life &amp; Death part 2</title>
+      <link>/post/life-death-part-2/</link>
+      <pubDate>Tue, 10 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/life-death-part-2/</guid>
+      <description>The story so far In part 1 we saw how you can estimate difficult probabilities with a large number of simulations. Every time I updated that post my poor home desktop took 10 mins to run the simulation. And it still wasn’t good enough. Also, it doesn’t scale. 10 minutes times 100 ages times 2 sexes = NO.
+ Probability Trees It is time to think smarter. When in doubt in probability with a small number of outcomes, I like to draw probability trees.</description>
+    </item>
+    
+    <item>
+      <title>OSM 2 - interactive maps</title>
+      <link>/post/osm-2-interactive-maps/</link>
+      <pubDate>Mon, 02 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/osm-2-interactive-maps/</guid>
+      <description>Introducing the leaflet package Plain images of map data is so web 1.0. R htmlwidgets mean I don’t have to acttuully learn Javascript to mess around with Javascript libraries in this site. One of the flagship examples leaflet works with OSM out of the box.
+Last time I wrote a file containing name and distance of my coffee shops. I now need to run that script again so I can get longitude and latitude.</description>
+    </item>
+    
+    <item>
+      <title>Open Organograms 2 - the rise of the tibble</title>
+      <link>/post/open-organograms-2-the-rise-of-the-tibble/</link>
+      <pubDate>Wed, 28 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/open-organograms-2-the-rise-of-the-tibble/</guid>
+      <description>Background I learned data.table before tidyverse. It can be hard to read, and I’m always forgetting commas. I’m making an effort to learn the tidyverse, and I am already impressed with dplyr and tibble. (I’ve been impressed with ggplot2 for a while now.)
+I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. It’s also the case that the code run time is a tiny fraction of my overall project.</description>
+    </item>
+    
+    <item>
+      <title>Open Organograms</title>
+      <link>/post/2018-03-26-open-organograms/</link>
+      <pubDate>Mon, 26 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2018-03-26-open-organograms/</guid>
+      <description>Background One of the reasons I’ve founded this site is because I’ve discovered https://data.gov.uk/ and I have ideas. In particular, I won’t discuss outside of work anything I only know through work, so it was nice to see pay data in the public sphere.
+Full background is at http://guidance.data.gov.uk/organogram-data.html but basically, the Prime Minister decided that the public deserve the structure and hierarchy of the Government Departments, and a few agencies.</description>
+    </item>
+    
+  </channel>
+</rss>

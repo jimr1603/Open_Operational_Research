@@ -1,0 +1,275 @@
+---
+title: Spotify & me
+author: James Riley
+date: '2018-06-09'
+slug: spotify-me
+categories:
+  - R
+tags:
+  - EDA
+  - GDPR
+  - Spotify
+  - non-open data
+  - json
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+library("tidyverse")
+library("ggplot2")
+library("plotly")
+library("rjson")
+library("lubridate")
+library("dygraphs")
+```
+
+##Note
+
+This post is analysis on data that I obtained freely - through GDPR, but you're not getting access to. I'm not sharing my full playing history for the last 3 months with everyone who reads this!
+
+Also, the long delay since last post is because I moved house. Picking this back up now.
+
+##Background
+
+GDPR means that EU citizens are entitled to a copy of personal data that a company is holding on them. In particular, it must be in a machine-readable format. 
+
+Right now, Spotify has an interface for downloading the last 90 days of data, and I'm asking them for my whole history. For now, let's look at the last 90 days. To start - importing the data, and a bit of clean-up.
+
+##Exploratory Data Analysis
+
+This is deliberately unorganised. I'm just diving into the data to see what stories it can tell me.
+
+```{r}
+data <- fromJSON(file="~/bin/R/data I've not yet worked on//my_spotify_data/StreamingHistory.json") %>%
+  bind_rows() %>%
+  mutate(time = ymd_hms(time)) %>%
+  mutate(artistName = str_split(artistName, ", "))
+
+```
+
+Let's start with my top artists. The artistName field is sometimes the band, sometimes including the members of the band. By the looks of things, the first entry in this list is always the band, so let's look at that.
+
+```{r}
+
+first <- function(x){
+  x[[1]]
+}
+
+top_artists <- data %>%
+  mutate(artistName = map(artistName, first)) %>%
+  mutate(artistName = as.character(artistName)) %>%
+  group_by(artistName) %>%
+  summarise(plays = n()) %>%
+  dplyr::arrange(desc(plays)) %>%
+  head(10)
+
+top_artists
+
+```
+
+In fact, the first item in artistName seems to be rather useful, so let's add it to the dataset.
+
+```{r}
+data <- data %>%
+  mutate(band = map(artistName, first)) %>%
+  mutate(band = as.character(band))
+
+```
+
+My motivating example was "what am I paying per track?". Spotify is £9.99/month UK (but I'm looking at switching to the £14.99/month family package.) and this is 3 months of data. So per track, this is a very easy calculation:
+
+```{r}
+total_tracks <- data %>%
+  nrow()
+
+9.99 * 3 / total_tracks
+```
+
+0.7p/track isn't bad. Of course, it beats a traditional store if I'm getting good diversity, otherwise I'm better off buying just what I want.
+
+```{r}
+distinct_tracks <- data %>%
+  select(-time) %>%
+  unique() %>%
+  nrow()
+
+9.99*3/distinct_tracks
+```
+
+So about 2p per track. It'll be interesting looking at this again when I get my whole data.
+
+It also means that I listened to a track `r total_tracks/distinct_tracks` times on average. 
+
+There are timestamps on the data, and I've already converted them to a sensible format. Let's get some wide looks at the data
+
+```{r}
+
+g <- ggplot(data, aes(x=time)) + geom_freqpoly()
+
+ggplotly(g)
+```
+
+It looks like freqpoly is the right plot, but it's not brilliant at binning the data. I'm going to throw the lubridate package at using sensible time intervals for the binning.
+
+```{r}
+data %>%
+  mutate(date = round_date(time, unit = "day")) %>%
+  group_by(date) %>%
+  summarise(plays = n()) %>%
+  plot_ly(x=~date, y=~plays, type="scatter", mode="lines")
+
+```
+
+I think I need to check my calendar for what was so exciting about Apr 14. And May 23. 
+
+What about time of day?
+
+```{r}
+data %>%
+  mutate(hour = hour(time)) %>%
+  group_by(hour) %>%
+  summarise(plays = n()) %>%
+  plot_ly(x=~hour, y=~plays, mode="lines")
+  
+```
+So my busy period seems to be 17:00. Or, "When I leave work".
+
+And there's already privacy concerns here. If I'm listening to music, then I must be awake. (Usually, anyway. In the past I have left cds playing overnight. It was rather calming.)
+
+I now wonder if there is a difference in the shape of this by day?
+
+```{r}
+data %>%
+  mutate(day = wday(time, label = TRUE)) %>%
+  mutate(hour = hour(time)) %>%
+  group_by(hour, day) %>%
+  summarise(plays = n()) %>%
+  group_by(day) %>%
+  plot_ly(x=~hour, y=~plays, type="scatter", mode="lines", split=~day)
+```
+It's easier just to leave the days of the week as numeric, because I then don't have to tell it what the ordering of days of the week is. I just read the documentation, and lubridate already has the option of returning an ordered factor. 
+
+It's messy, but you can remove lines by clicking the legend.
+
+Or a column chart by day:
+
+```{r}
+data %>%
+  mutate(day = wday(time, label = TRUE, week_start = 1)) %>%
+  group_by(day) %>%
+  summarise(plays = n()) %>%
+  plot_ly(x=~day, y=~plays, type = "bar")
+```
+
+Now, I like stacked columns. I don't have genre data, yet, but I can look at my most common artists.
+
+```{r}
+
+top_artists <- pull(top_artists, artistName)
+
+data %>%
+  mutate(day = wday(time, label = TRUE, week_start = 1)) %>%
+  filter(band %in% top_artists) %>%
+  group_by(day, band) %>%
+    summarise(plays = n()) %>%
+  group_by(band) %>%
+    plot_ly(x=~day, y=~plays, type = "bar", split = ~band)
+```
+
+I initially kept "other" bands, but they vastly outnumbered everyone else. Let's look at that long tail.
+
+```{r}
+data %>%
+  group_by(band) %>%
+  summarise(plays=n()) %>%
+  mutate(plays = plays/sum(plays)) %>%
+  dplyr::arrange(desc(plays)) %>%
+  plot_ly(y=~plays, type="scatter", mode="lines")
+```
+
+So my top artist is less than 5% of my played tracks, and I've over 600 artists in these 3 months. 
+
+It looks a bit like a 1/x function, but there's nothing really interesting in doing a regression analysis on this: the x value must be a whole number, it must be at least 1, and I've no interest in extrapolating past 600. 
+
+I'm now interested in my average session. Let's say that if a track is more than 10 minutes after the last one, then it's a new session. Then I can just number sessions.
+
+```{r}
+
+data <- data %>%
+  mutate(`new session` = (time - lag(time)) > dminutes(10)) %>%
+  replace_na(list("new session"=TRUE)) %>%
+  mutate(session = cumsum(`new session`)) %>% 
+  select(-`new session`)
+
+data %>%
+  group_by(session) %>%
+  summarise(plays=n()) %>%
+  group_by(plays) %>%
+  summarise(count=n()) %>%
+  plot_ly(y=~count, x=~plays, type="bar")
+```
+
+I'm rather disappointed that it doesn't appear to be one of the usual distributions. Also, when did I listen to 136 tracks back-to-back?
+
+```{r}
+data %>%
+  add_count(session) %>%
+  top_n(1, n) %>%
+  summarise(start=min(time), end=max(time))
+  
+```
+
+I don't recall getting up at 5 that day. 
+
+I don't have album data, but do have track data. First thought was to just group by track name, but...
+```{r}
+data %>%
+  select(trackName, band) %>%
+  unique() %>%
+  add_count(trackName) %>%
+  top_n(1) %>%
+  select(trackName) %>%
+  inner_join(data) %>%
+  select(trackName, band) %>%
+  unique()
+```
+Some nice examples there of the same track name covered by 2 different bands. Or the same band, under different names. So my "top track" needs to consider this. (Of course, internally Spotify will have a unique track ID, and I don't have that.)
+
+```{r}
+data %>%
+  select(trackName, band) %>%
+  group_by_all() %>%
+  summarise(n()) %>%
+  dplyr::arrange(desc(`n()`)) %>%
+  head(10)
+```
+
+I'm now going to look at a band that is well-represented in my dataset, and has 3 different lists of members - blink-182. 
+
+```{r}
+data %>%
+  filter(band=="blink-182") %>%
+  pull(artistName) %>%
+  map(unique) %>%
+  map_chr(toString) %>% #So far, this undoes the bit where I turned the string of artists into a list.
+  as.data.frame() %>%
+  group_by_all %>%
+  tally
+```
+
+This definitely reveals that I was misunderstood about what the artistName field was for. At first I thought it was every artist on the track, so I'd get singers, guitarists, bassists, drummers for blink-182, and split by era. Instead it seems that Spotify have merged several fields, some with incomplete information, into one field. And not documented it. So I don't have a way to reliably identify a producer. (And I've just identified some producers I might want to listen to more of.)
+
+So, this analysis suggests that I might want to go back to Spotify and ask them to not merge the artistName field, but keep the various fields separate. 
+
+Or...
+
+##Next Steps
+
+Most of this analysis has focused on time of listening rather than the track data, mostly because the track data is very sparse. I've found my top bands, and my top tracks, but I want to go into genre(s), writers, year, who was in the band at that point, album. 
+
+I want to look at graph generation, and graph visualisation, so I think I'll make a massive graph linking any two tracks that share a person. 
+

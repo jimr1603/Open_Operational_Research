@@ -1,0 +1,294 @@
+---
+title: Scrabble numbers
+author: James Riley
+date: '2018-11-11'
+slug: scrabble-numbers
+categories: R
+tags:
+  - recreational mathematics
+  - combinatorics
+  - self-reference
+  - brute-force
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+library("tidyverse")
+library("DT")
+library("plotly")
+
+theme <- ggthemes::theme_few()
+```
+
+## 
+
+I was reading one of [Ian Stewart's](https://ianstewartjoat.weebly.com/) books of popular maths, and I found a potentially incomplete solutuion to a puzzle.
+
+Given the (English) Scrable tileset, do any numbers give their own score?
+
+"One" certainly doesn't, since "O","N","E"each score 1 point, and $3 \neq 1$.
+
+For various reasons, you can see that you don't need to test every number:
+
+* Scrabble scores are non-negative integers. 
+* Score increases as wordlength increases. The length of the name of a number increases approximately by powers of ten. (Or logrithmically.)
+
+So "zero", "one", score more points than their number, while "one thousand" definitely scores less than itself. (And there's no word seperator in Scrabble. Anyway "thousand" definitely scores less than 1000 points.) Somewhere in the middle we might get some wins?
+
+## Code
+
+We just need a function that turns a number into a word and into a scrabble score. 
+
+```{r}
+scores <- tibble(
+  letters = letters,
+  score = c(
+    1, 3, 3,
+    2, 1, 4,
+    2, 4, 1,
+    8, 5, 1,
+    3, 1, 1,
+    3, 10, 1,
+    1, 1, 1,
+    4, 4, 8,
+    4, 10
+  )
+)
+
+convert_word_to_score <- function(word) {
+  suppressMessages(str_to_lower(word) %>%
+    str_extract_all("[a-z]") %>%
+    unlist() %>%
+    tibble(letters = .) %>%
+    left_join(scores) %>%
+    pull(score) %>%
+    sum())
+}
+
+```
+
+Giving it a try:
+
+```{r}
+convert_word_to_score("one")
+
+```
+
+I've grabbed names for numbers off [Wiki](https://en.wikipedia.org/wiki/List_of_numbers), so let's make a table. (Copy paste is way easier in this case than messing around with scrapes or wiki API.)
+
+```{r}
+base_scores <- tribble(
+  ~number, ~name,
+  0, "Zero",
+  1, "One",
+  2, "Two",
+  3, "Three",
+  4, "Four",
+  5, "Five",
+  6, "Six",
+  7, "Seven",
+  8, "Eight",
+  9, "Nine",
+  10, "Ten",
+  11, "Eleven",
+  12, "Twelve",
+  13, "Thirteen",
+  14, "Fourteen",
+  15, "Fifteen",
+  16, "Sixteen",
+  17, "Seventeen",
+  18, "Eighteen",
+  19, "Nineteen",
+  20, "Twenty"
+) %>%
+  rowwise() %>%
+  mutate(score = convert_word_to_score(name))
+
+filter(base_scores, number == score) %>%
+  knitr::kable()
+```
+
+Fortunately, my results match Prof. Stewart's - "Twelve" scores 12 points.
+
+(Let's do a few plots...
+```{r}
+base_scores %>%
+  ggplot(aes(x = number, y = score)) + geom_point() + geom_line(aes(x = 0:20, y = 0:20)) + theme + ggtitle("Twelve is the only number with its own Scrabble score", subtitle = "Line y=x added")
+```
+And:
+
+```{r}
+base_scores %>%
+  filter(number > 0) %>% # Whoops, don't divide by zero.
+  mutate(relative_score = score / number) %>%
+  ggplot(aes(x = number, y = relative_score)) + geom_point() + theme + geom_hline(yintercept = 1) + labs(
+    title = "Small numbers score greater than themselves\n
+    but large numbers smaller.",
+    y = "Score/number"
+  )
+```
+)
+
+I attack this puzzle from two additional angles:
+
+1. Numbers have more than one name in English. 
+2. There are many ways to modify the base score in Scrabble. (blank tile, letter multipliers, word multipliers...)
+
+# Additional names
+
+"Twelve" wins, but "Dozen" scores 15, and $15 \neq 12$. This could push us into another couple of winning words.
+
+Apologies for the massive table. DT doesn't work with the theme I'm trying now, and I've not got it working yet.
+
+```{r}
+
+alias_scores <- read_csv(here::here("static", "data", "Wiki", "names_of_numbers.csv")) %>%
+  separate(3, as.character(1:100), ",") %>%
+  gather("key", "name", -Number) %>%
+  select(-key) %>%
+  drop_na() %>%
+  mutate(name = str_extract(name, "[a-zA-Z \\-]+")) %>% # Too many footnotes and references to countries that need dropping
+  drop_na() %>%
+  rowwise() %>%
+  mutate(score = convert_word_to_score(name)) %>%
+  arrange(Number)
+
+ knitr::kable(alias_scores, rownames = F)
+```
+
+About here I realised I need to get better at tidyr, so I dropped into the manual. There might be a better way with purrr, but I liked turning this into tidy data, particularly because I can chuck it at ggplot again.
+
+Anyway, did I get more solutions?
+
+```{r}
+
+alias_scores %>%
+  filter(Number==score) %>%
+  knitr::kable()
+
+```
+
+Sweet, I explanded the solution space 5x!
+
+Let's have another look at score relative to number:
+
+```{r}
+alias_scores %>%
+  filter(Number > 0) %>%
+  mutate(relative_score = score / Number) %>%
+  ggplot(aes(x = Number, y = relative_score)) + geom_point() + theme + geom_hline(yintercept = 1) + labs(
+    title = "There are more winning numbers if we take other common name",
+    y = "Score/Number"
+  )
+```
+
+# Score modifications
+
+## Part 1: the blank tile
+
+Quite a few of the early numbers score more than their value. We might get some of these to turn into winners if we replace some of their letters with the blank tile. This is allowed to substitute any letter, but gives no score.
+
+Right now I'm not going to worry about the actual number of blanks in a Scrabble set, and allow myself as many blank tiles as I want. (Which was implicit in the earlier stuff with the actual letters.)
+
+I need to modify the function that makes a score so it can accept modifiers. In this case, the zero multiplier on a given tile:
+
+```{r}
+
+word_to_score <- function(word, modifier = 1) {
+
+  # I am terrible at writing vectorised functions.
+
+  if (class(modifier) == "list") modifier <- unlist(modifier)
+
+  suppressMessages(str_to_lower(word) %>%
+    str_extract_all("[a-z]") %>%
+    unlist() %>%
+    tibble(letters = ., modifier = modifier) %>%
+    left_join(scores) %>%
+    summarise(score = sum(score * modifier)) %>%
+    pull())
+}
+```
+
+The *hiliarious* thing is that for a word of length $n$, I have to work out $2^n$ ways you can fill it in with blank tiles. At least I know this will only decrease the score, so I can start with the ones who overscored.
+
+I'm not sure about generating all the binary codes with the word's length, so I recursed. For a small time save, I generate them all now.
+
+```{r}
+binary <- list(crossing(0:1))
+
+for (i in 2:12) {
+  binary <- append(
+    binary,
+    list(
+      crossing(binary[[i - 1]], 0:1)
+    )
+  )
+}
+
+binary <- map(binary, transpose) %>%
+  flatten() %>%
+  tibble(sequence = .) %>%
+  rowwise() %>%
+  mutate(length = length(sequence)) %>%
+  ungroup()
+```
+
+Now I can slap these sequences on the words that overscored. As I mentioned above, the solutions for 0 are boring, since they are all blank tiles, so I'm filtering them out. 
+
+```{r}
+blank_scores <- alias_scores %>%
+  mutate(name = name %>%
+    str_to_lower() %>%
+    str_remove_all("\\W")) %>%
+  filter(score > Number) %>%
+  mutate(length = str_length(name)) %>%
+  left_join(binary) %>%
+  rowwise() %>%
+  mutate(score_with_blanks = word_to_score(name, sequence))
+
+
+blank_scores %>%
+  select(Number, name, score_with_blanks) %>%
+  filter(Number == score_with_blanks) %>%
+  unique() %>%
+  group_by(Number) %>%
+  summarise(name = str_flatten(name, " , ")) %>%
+  dplyr::arrange(Number) %>%
+   knitr::kable()
+```
+
+Most of the previous losers have at least one winner. 0 and 1 are easy to see why - all blanks gives you 0 points, and most names for 1 have a letter that only has one point.
+
+I'll just add a function to show where the blank tile(s) are appearing, and I'll do that table again:
+
+```{r}
+blankify <- function(word, mask) {
+  word %>%
+    str_extract_all("[a-z]") %>%
+    unlist() %>%
+    replace(which(mask == 0), "☐") %>%
+    str_flatten()
+}
+
+
+blank_scores %>%
+    select(Number, sequence, name, score_with_blanks) %>%
+    filter(Number == score_with_blanks, Number > 0) %>%
+    mutate(name_with_blanks = blankify(name, sequence)) %>%
+    select(name, name_with_blanks,Number) %>%
+    group_by(Number, name) %>%
+    summarise(name_with_blanks = str_flatten(name_with_blanks, " , ")) %>%
+  ungroup() %>%
+  dplyr::arrange(Number) %>%
+   knitr::kable()
+```
+
+
+## Moving on
+
+This suggests a method that can be extended for dealing with double/triple letters, and even triple words, but I feel this post is long enough for now. 

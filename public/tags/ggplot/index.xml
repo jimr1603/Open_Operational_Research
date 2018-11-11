@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Ggplot on Open Operational Research</title>
+    <link>/tags/ggplot/</link>
+    <description>Recent content in Ggplot on Open Operational Research</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Fri, 19 Oct 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/ggplot/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>&#39;Aint no sunshine ... in winter</title>
+      <link>/post/aint-no-sunshine-in-winter/</link>
+      <pubDate>Fri, 19 Oct 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/aint-no-sunshine-in-winter/</guid>
+      <description>Hi y’all, short one today.
+Partially it’s about how days of sunlight change through the year, unless you’re on the equator. Partially it’s about how hard it is to make 3d plots in a 2d space.
+I have SAD, which seems to flare up at the solstices and equinoxes, plus and minus a couple of weeks.
+The solstices make sense - there’s either too much or too little sunshine.</description>
+    </item>
+    
+  </channel>
+</rss>

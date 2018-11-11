@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Data.table on Open Operational Research</title>
+    <link>/tags/data.table/</link>
+    <description>Recent content in Data.table on Open Operational Research</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Mon, 26 Mar 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/data.table/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Open Organograms</title>
+      <link>/post/2018-03-26-open-organograms/</link>
+      <pubDate>Mon, 26 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2018-03-26-open-organograms/</guid>
+      <description>Background One of the reasons I’ve founded this site is because I’ve discovered https://data.gov.uk/ and I have ideas. In particular, I won’t discuss outside of work anything I only know through work, so it was nice to see pay data in the public sphere.
+Full background is at http://guidance.data.gov.uk/organogram-data.html but basically, the Prime Minister decided that the public deserve the structure and hierarchy of the Government Departments, and a few agencies.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Non-open data on Open Operational Research</title>
+    <link>/tags/non-open-data/</link>
+    <description>Recent content in Non-open data on Open Operational Research</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Wed, 13 Jun 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/non-open-data/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Analysis on a plane</title>
+      <link>/post/analysis-on-a-plane/</link>
+      <pubDate>Wed, 13 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/analysis-on-a-plane/</guid>
+      <description>Background I’m on a plane! No-frills airlines don’t have wifi, so I’ve downloaded a bunch of datasets and a bunch of libraries and seen if I can do a bit of analysis while in the air. Yes, yes, I can.
+I thought this would be a part 2, but it turns out I never published part 1.
+Again, this is personal data - you don’t get to see exactly what books are in my library.</description>
+    </item>
+    
+    <item>
+      <title>Spotify &amp; me</title>
+      <link>/post/spotify-me/</link>
+      <pubDate>Sat, 09 Jun 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/spotify-me/</guid>
+      <description>Note This post is analysis on data that I obtained freely - through GDPR, but you’re not getting access to. I’m not sharing my full playing history for the last 3 months with everyone who reads this!
+Also, the long delay since last post is because I moved house. Picking this back up now.
+ Background GDPR means that EU citizens are entitled to a copy of personal data that a company is holding on them.</description>
+    </item>
+    
+  </channel>
+</rss>

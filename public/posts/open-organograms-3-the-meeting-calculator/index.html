@@ -1,0 +1,782 @@
+
+
+
+    
+
+
+
+
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <script type="application/ld+json">
+    {
+        "@context" : "http://schema.org",
+        "@type" : "BlogPosting",
+        "mainEntityOfPage": {
+             "@type": "WebPage",
+             "@id": "/"
+        },
+        "articleSection" : "posts",
+        "name" : "Open Organograms 3 - the meeting calculator",
+        "headline" : "Open Organograms 3 - the meeting calculator",
+        "description" : "I have data, I have a website. It’s hardly fair to ask you to take the numbers I’m spitting out of the Open Organograms series and put them in a calculator to do something useful with them. Thankfully, R markdown has a nice interface between the markdown and Javascript, called htmlwidgets.
+Having generated a median salary for (so far 2) departments, I think it might be interesting to see a meeting calculator.",
+        "inLanguage" : "en",
+        "author" : "",
+        "creator" : "",
+        "publisher": "",
+        "accountablePerson" : "",
+        "copyrightHolder" : "",
+        "copyrightYear" : "2018",
+        "datePublished": "2018-03-30 00:00:00 &#43;0000 UTC",
+        "dateModified" : "2018-03-30 00:00:00 &#43;0000 UTC",
+        "url" : "/posts/open-organograms-3-the-meeting-calculator/",
+        "wordCount" : "439",
+        "keywords" : [ "data.gov.uk","Open-Organograms","htmlwidgets","Web-programming","Blog" ]
+    }
+    </script>
+        
+            <title>Open Organograms 3 - the meeting calculator - Open Operational Research</title>
+        
+
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="generator" content="Hugo 0.37.1" />
+        
+
+
+        
+            <meta name="author" content="James Riley">
+        
+        
+            
+                <meta name="description" content="Hobby projects with open code and open data">
+            
+        
+
+        <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Open Organograms 3 - the meeting calculator"/>
+<meta name="twitter:description" content="I have data, I have a website. It’s hardly fair to ask you to take the numbers I’m spitting out of the Open Organograms series and put them in a calculator to do something useful with them. Thankfully, R markdown has a nice interface between the markdown and Javascript, called htmlwidgets.
+Having generated a median salary for (so far 2) departments, I think it might be interesting to see a meeting calculator."/>
+
+        <meta property="og:title" content="Open Organograms 3 - the meeting calculator" />
+<meta property="og:description" content="I have data, I have a website. It’s hardly fair to ask you to take the numbers I’m spitting out of the Open Organograms series and put them in a calculator to do something useful with them. Thankfully, R markdown has a nice interface between the markdown and Javascript, called htmlwidgets.
+Having generated a median salary for (so far 2) departments, I think it might be interesting to see a meeting calculator." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/open-organograms-3-the-meeting-calculator/" />
+
+
+
+<meta property="article:published_time" content="2018-03-30T00:00:00&#43;00:00"/>
+
+<meta property="article:modified_time" content="2018-03-30T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+        <meta property="og:image" content="//images/logo.png">
+        <meta property="og:image:type" content="image/png">
+        <meta property="og:image:width" content="512">
+        <meta property="og:image:height" content="512">
+        
+<meta itemprop="name" content="Open Organograms 3 - the meeting calculator">
+<meta itemprop="description" content="I have data, I have a website. It’s hardly fair to ask you to take the numbers I’m spitting out of the Open Organograms series and put them in a calculator to do something useful with them. Thankfully, R markdown has a nice interface between the markdown and Javascript, called htmlwidgets.
+Having generated a median salary for (so far 2) departments, I think it might be interesting to see a meeting calculator.">
+
+
+<meta itemprop="datePublished" content="2018-03-30T00:00:00&#43;00:00" />
+<meta itemprop="dateModified" content="2018-03-30T00:00:00&#43;00:00" />
+<meta itemprop="wordCount" content="439">
+
+
+
+<meta itemprop="keywords" content="data.gov.uk,Open-Organograms,htmlwidgets,Web-programming," />
+
+        
+
+        
+            
+        
+
+        
+        
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css">
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:400,800,900|Source+Sans+Pro:400,700">
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.25/jquery.fancybox.min.css">
+            <link rel="stylesheet" href="/css/main.css">
+            <link rel="stylesheet" href="/css/add-on.css">
+            <link rel="stylesheet" href="/css/academicons.min.css">
+        
+
+        
+            
+                
+            
+        
+
+
+  
+    
+    <link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+  
+
+
+      
+    </head>
+    <body>
+
+      
+      <div id="wrapper">
+
+    
+<header id="header">
+    
+      <h1><a href="/">posts</a></h1>
+    
+
+    <nav class="links">
+        <ul>
+            
+                <li>
+                    <a href="/">
+                            <i class="fa fa-home">&nbsp;</i>Home
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/about/">
+                            <i class="fa fa-id-card-o">&nbsp;</i>About
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/blog/">
+                            <i class="fa fa-newspaper-o">&nbsp;</i>Blog
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/itemized/">
+                            <i class="fa fa-list">&nbsp;</i>Itemized
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/categories/">
+                            <i class="fa fa-sitemap">&nbsp;</i>Categories
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/contact/">
+                            <i class="fa fa-envelope-o">&nbsp;</i>Contact
+                    </a>
+                </li>
+            
+                <li>
+                    <a href="/about/">
+                            <i class="">&nbsp;</i>About
+                    </a>
+                </li>
+            
+        </ul>
+    </nav>
+    <nav class="main">
+        <ul>
+            
+            <li class="search">
+                <a class="fa-search" href="#search">Search</a>
+                <form id="search" method="get" action="//google.com/search">
+                    <input type="text" name="q" placeholder="Search" />
+                    <input type="hidden" name="as_sitesearch" value="/">
+                </form>
+            </li>
+            <li class="menu">
+                <a class="fa-bars" href="#menu">Menu</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+
+<section id="menu">
+
+    
+        <section>
+            <form class="search" method="get" action="//google.com/search">
+                <input type="text" name="q" placeholder="Search" />
+                <input type="hidden" name="as_sitesearch" value="/">
+            </form>
+        </section>
+
+    
+        <section>
+            <ul class="links">
+                
+                    <li>
+                        <a href="/">
+                            <h3>
+                                <i class="fa fa-home">&nbsp;</i>Home
+                            </h3>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/about/">
+                            <h3>
+                                <i class="fa fa-id-card-o">&nbsp;</i>About
+                            </h3>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/blog/">
+                            <h3>
+                                <i class="fa fa-newspaper-o">&nbsp;</i>Blog
+                            </h3>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/itemized/">
+                            <h3>
+                                <i class="fa fa-list">&nbsp;</i>Itemized
+                            </h3>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories/">
+                            <h3>
+                                <i class="fa fa-sitemap">&nbsp;</i>Categories
+                            </h3>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/contact/">
+                            <h3>
+                                <i class="fa fa-envelope-o">&nbsp;</i>Contact
+                            </h3>
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/about/">
+                            <h3>
+                                <i class="">&nbsp;</i>About
+                            </h3>
+                        </a>
+                    </li>
+                
+            </ul>
+        </section>
+
+    
+        <section class="recent-posts">
+            <div class="mini-posts">
+                <header>
+                    <h3>Recent Posts</h3>
+                </header>
+                
+
+                
+                    
+                
+
+                
+                        <article class="mini-post">
+                            <header>
+                                <h3><a href="/post/scrabble-numbers/">Scrabble numbers</a></h3>
+                                
+                                <time class="published" datetime=
+                                    '2018-11-04'>
+                                    November 4, 2018</time>
+                            </header>
+                            
+
+                        </article>
+                
+                        <article class="mini-post">
+                            <header>
+                                <h3><a href="/post/">Post</a></h3>
+                                
+                                <time class="published" datetime=
+                                    '2018-11-04'>
+                                    November 4, 2018</time>
+                            </header>
+                            
+
+                        </article>
+                
+
+                
+            </div>
+        </section>
+
+    
+        
+</section>
+
+    
+    <div id="main">
+        <article class="post">
+            
+            <header>
+    <div class="title">
+        
+            <h1><a href="/posts/open-organograms-3-the-meeting-calculator/">Open Organograms 3 - the meeting calculator</a></h1>
+            
+        
+        
+    </div>
+</header>
+
+            <div id="content">
+                <script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/mywidget-binding/mywidget.js"></script>
+
+
+<p>I have data, I have a website. It’s hardly fair to ask you to take the numbers I’m spitting out of the Open Organograms series and put them in a calculator to do something useful with them. Thankfully, R markdown has a nice interface between the markdown and Javascript, called htmlwidgets.</p>
+<p>Having generated a median salary for (so far 2) departments, I think it might be interesting to see a meeting calculator. If a number of people are in a meeting for a number of hours, what is the cost in payroll? (Again, building costs and employer contributions to pensions and NI not considered.) It doesn’t just have to be meetings. What if the technology is so old that it takes about 5 minutes (or 1/12 of an hour) for everyone’s PC to boot up and down in a day.</p>
+<p>When I’ve processed DExEU’s Organogram, I might try turning the IAs that weren’t IAs that were so many man-hours of work into a £ cost.</p>
+<p>There <em>is</em> R shiny, which throws computations back to the server, but I’m using a free server that doesn’t want me giving it more workload. Also, the hard computation is being done in R when the site is generated, the rest is taking the number of people times the number of hours times the median hourly salary.</p>
+<pre class="r"><code>DWP_median = 24476
+total_hours =(365.25 / 7 * 5 - 25 -9) * (37/5)
+DWP_hourly = round(DWP_median/total_hours,2)</code></pre>
+<div id="dwp-meeting-calculator" class="section level2">
+<h2>DWP meeting calculator</h2>
+<pre class="r"><code>mywidget(DWP_hourly)</code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="mywidget html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"hourly":14.58},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>DHSC_median = 33675
+total_hours =(365.25 / 7 * 5 - 25 -9) * (37/5)
+DHSC_hourly = round(DHSC_median/total_hours,2)</code></pre>
+</div>
+<div id="dhsc-meeting-calculator" class="section level2">
+<h2>DHSC meeting calculator</h2>
+<pre class="r"><code>mywidget(DHSC_hourly)</code></pre>
+<div id="htmlwidget-2" style="width:672px;height:480px;" class="mywidget html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2">{"x":{"hourly":20.06},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="caveats" class="section level2">
+<h2>Caveats</h2>
+<p>However, I’ve never properly played with HTML or Javascript. It could certainly be made more pretty, and eventually I’ll want a dropdown or something with the available departments/agencies. But, I’ve got an idea for something I can do when I’ve processed a lot of Organogram data. The main algorithms are fine, I just need to:</p>
+<ol style="list-style-type: decimal">
+<li>Get all the latest Org data.</li>
+<li>Filter out departments that no longer exist.</li>
+<li>Standardise the grading systems.</li>
+<li>Optional: Filter out executive agencies.</li>
+</ol>
+<p>2 and 3 are going to be the tricky parts. There’s going to be a few runs of “assume the data looks like this, and if it doesn’t alert me” until I’ve found every format someone has used. 2 should be relatively easy once I have a list of active departments, but there’s no guarantee that it’ll match any of the metadata in the data.gov.uk entry.</p>
+<p>However, it’s probably time to develop some of the other projects a little. In particular, I started with my graph theory/GIS, but haven’t got it to writeup stage yet.</p>
+</div>
+
+            </div>
+        </article>
+    </div>
+    
+<section id="sidebar">
+
+  
+  <section id="intro">
+    
+    
+      
+        <a href='/' class="logo"><img src="/img/main/logo.jpg" alt="Hugo Future Imperfect" /></a>
+      
+    
+    
+      <header>
+        <h2>Hugo Future Imperfect</h2>
+        <p>Another fine responsive site template by <a href="http://html5up.net">HTML5 UP</a>. Ported by Julio Pescador with some extra goodies <i class='fa fa-hand-peace-o'></i></p>
+      </header>
+    
+    
+      <ul class="icons">
+        
+          
+    <li><a href="/index.xml" type="application/rss+xml" target="_blank" title="RSS" class="fa fa-rss"></a></li>
+
+
+        
+        
+  <li><a href="//github.com/jimr1603/" target="_blank" title="GitHub" class="fa fa-github"></a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <li><a href="//flickr.com/photos/example" target="_blank" title="Flickr" class="fa fa-flickr"></a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <li><a href="//reddit.com/user/jimr1603" target="_blank" title="Reddit" class="fa fa-reddit"></a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <li><a href="mailto:jimr1603&#43;oor@gmail.com" title="Email" class="fa fa-envelope"></a></li>
+
+
+      </ul>
+    
+  </section>
+
+  
+  <section class="recent-posts">
+    <div class="mini-posts">
+      <header>
+        <h3>Recent Posts</h3>
+      </header>
+      <div class="posts-container">
+        
+
+        
+          
+        
+
+        
+          <article class="mini-post">
+            <header>
+              <h3>
+                <a href="/post/scrabble-numbers/">Scrabble numbers</a>
+              </h3>
+              
+              <time class="published" datetime='2018-11-04'>
+                November 4, 2018
+              </time>
+            </header>
+            
+
+          </article>
+        
+          <article class="mini-post">
+            <header>
+              <h3>
+                <a href="/post/">Post</a>
+              </h3>
+              
+              <time class="published" datetime='2018-11-04'>
+                November 4, 2018
+              </time>
+            </header>
+            
+
+          </article>
+        
+      </div>
+
+      
+    </div>
+  </section>
+
+  
+  
+  
+  
+  
+    <section id="categories">
+      <header>
+        <h3>
+          <a href="/categories/">Categories</a>
+        </h3>
+      </header>
+        
+          
+        
+
+        
+        <p>
+          <article>
+            <header>
+              
+                <a href="/categories/r/">R</a>
+                <span style="float:right;">15</span>
+              
+            </header>
+          </article>
+        </p>
+        
+        <p>
+          <article>
+            <header>
+              
+                <a href="/categories/organogram/">Organogram</a>
+                <span style="float:right;">2</span>
+              
+            </header>
+          </article>
+        </p>
+        
+        <p>
+          <article>
+            <header>
+              
+                <a href="/categories/python/">Python</a>
+                <span style="float:right;">2</span>
+              
+            </header>
+          </article>
+        </p>
+        
+        <p>
+          <article>
+            <header>
+              
+                <a href="/categories/javascript/">javascript</a>
+                <span style="float:right;">2</span>
+              
+            </header>
+          </article>
+        </p>
+        
+    </section>
+  
+  
+
+  
+  
+    <section id="mini-bio">
+      <h3>About</h3>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent tellus lacus, auctor vehicula molestie quis, tempor quis velit. Quisque in quam ac leo efficitur vulputate. Phasellus ullamcorper aliquam sodales. Maecenas sit amet condimentum ipsum. Proin sit amet ligula elit. Mauris.</p>
+      <a href="/about/" class="button">Learn More</a>
+    </section>
+  
+
+  
+  <section id="footer">
+    
+      <ul class="icons">
+        
+          
+    <li><a href="/index.xml" type="application/rss+xml" target="_blank" title="RSS" class="fa fa-rss"></a></li>
+
+
+        
+        
+  <li><a href="//github.com/jimr1603/" target="_blank" title="GitHub" class="fa fa-github"></a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <li><a href="//flickr.com/photos/example" target="_blank" title="Flickr" class="fa fa-flickr"></a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <li><a href="//reddit.com/user/jimr1603" target="_blank" title="Reddit" class="fa fa-reddit"></a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <li><a href="mailto:jimr1603&#43;oor@gmail.com" title="Email" class="fa fa-envelope"></a></li>
+
+
+      </ul>
+    
+    <p class="copyright">
+      
+        &copy; 2018
+        
+          Open Operational Research
+        
+      .
+      Powered by <a href="//gohugo.io" target="_blank">Hugo</a>
+    </p>
+  </section>
+</section>
+
+    </div>
+    <a id="back-to-top" href="#" class="fa fa-arrow-up fa-border fa-2x"></a>
+    
+
+    
+      
+    
+
+    
+      
+      
+      
+        <script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+        
+        
+        
+        <script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+        <script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+        <script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/css.min.js"></script>
+        <script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+      
+    
+    
+    
+      <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/skel/3.0.1/skel.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.25/jquery.fancybox.min.js"></script>
+      <script src="/js/util.js"></script>
+      <script src="/js/main.js"></script>
+      <script src="/js/backToTop.js"></script>
+    
+
+    
+      
+        
+      
+    
+
+    
+    <script>hljs.initHighlightingOnLoad();</script>
+      <script src="//yihui.name/js/math-code.js"></script>
+<script async
+src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+  </body>
+</html>
+

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Conditional probability on Open Operational Research</title>
+    <link>/tags/conditional-probability/</link>
+    <description>Recent content in Conditional probability on Open Operational Research</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-gb</language>
+    <lastBuildDate>Sun, 22 Apr 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/conditional-probability/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Life &amp; Death part 3</title>
+      <link>/post/life-death-part-3/</link>
+      <pubDate>Sun, 22 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/life-death-part-3/</guid>
+      <description>Background From before I hit publish on part 2, I had people telling me that the graphs were cool and they wanted their version. I briefly considered making a page with 404 graphs on it - 2 graphs \(*\) 2 sexes \(*\) 101 age groups. Then I remembered that this is a webpage, not a static document, and Javascript is a thing. I discovered the rather useful htmlwidget plotly, which adds interactivity and drops some of the painful aspects of ggplot.</description>
+    </item>
+    
+    <item>
+      <title>Life &amp; Death part 2</title>
+      <link>/post/life-death-part-2/</link>
+      <pubDate>Tue, 10 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/life-death-part-2/</guid>
+      <description>The story so far In part 1 we saw how you can estimate difficult probabilities with a large number of simulations. Every time I updated that post my poor home desktop took 10 mins to run the simulation. And it still wasn’t good enough. Also, it doesn’t scale. 10 minutes times 100 ages times 2 sexes = NO.
+ Probability Trees It is time to think smarter. When in doubt in probability with a small number of outcomes, I like to draw probability trees.</description>
+    </item>
+    
+    <item>
+      <title>Life &amp; Death part 1</title>
+      <link>/post/life-death-part-1/</link>
+      <pubDate>Tue, 03 Apr 2018 00:00:00 +0000</pubDate>
+      
+      <guid>/post/life-death-part-1/</guid>
+      <description>Motivation As I just had another birthday with a ‘0’ at the end, I’m thinking about how long I have left.And it relates to other forecasts I could make, like will I ever pay off my student loans? The ONS publish national life tables under the OGL, so we have the data, and the permission to use it. And straight away I can see that the average UK 30-year old male has about 50 years left.</description>
+    </item>
+    
+  </channel>
+</rss>

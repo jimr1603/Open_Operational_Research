@@ -1,0 +1,186 @@
+---
+title: Open Organograms 2 - the rise of the tibble
+author: James Riley
+date: '2018-03-28'
+slug: open-organograms-2-the-rise-of-the-tibble
+categories: ["R", "Organogram"]
+tags:
+- data.gov.uk
+- tidyverse
+- Open-Organograms
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+library("here")
+library("tidyverse")
+library("knitr")
+
+```
+##Background
+I learned data.table before tidyverse. It can be hard to read, and I'm always forgetting commas. I'm making an effort to learn the tidyverse, and I am already impressed with dplyr and tibble. (I've been impressed with ggplot2 for a while now.)
+
+I've seen benchmarks that suggests data.table is about 2ce as fast as tibble. It's also the case that the code run time is a tiny fraction of my overall project. (Either at home or work.) In either case I make things that run once for an answer, maybe 1ce a year, and we spend way longer QAing the thing than actually running it.
+
+The pipe works really well for anyone who things "I want to do this, then that, and maybe this". It works a lot like how you're taught to use Excel, but you get to throw away the intermediate cells. 
+
+Personal bugbear is that ggplot doesn't recognise that my tibble is ordered by Grade, so I had to mutate the 
+
+##DWP
+I wanted a department that I knew had a very different structure to DHSC, so the overall graphs would look different. I also know that they use both an internal and the external grading system, so it would be a good test of what people were actually putting in the "Grade" field. They have a large string that includes way too much info about grade, and I just want the national pay grades. I've tidied up the field a bit, but I've been overzealous and turned all their Fast Streamers into HEOs or SEOs. 
+
+##Other stuff
+I found the API for data.gov, and have managed to get all the latest Organograms. I'm going to have to do much, much filtering, as I've grabbed the last by date, even if it's a department that no longer exists. I had to grad old ones, because some departments like DHSC haven't updated in over a year! Script needs tweaking, but when it's good, it's going on this blog. In particular, I want to get some of my Python on here.
+
+##Code
+
+```{r, message=FALSE}
+
+juniors <- read_csv(here("static","data","Open Government Licence", "DWP Organogram 31-Sept-2017_2-junior.csv"))
+
+juniors <- juniors %>%
+  select(contains("Grade"), contains("FTE"), contains("minimum")) %>%
+  mutate(Grade = str_extract(Grade, "FS|AA|AO|EO|HEO|SEO|G7|G6")) %>%
+  rename(minimum =  `Payscale Minimum (£)`) %>%
+  rename(FTE = `Number of Posts in FTE`) 
+
+seniors <-read_csv(here("static","data","Open Government Licence", "DWP Organogram 31-Sept-2017_2-senior.csv"))
+
+seniors <- seniors %>%
+  filter(Name != "N/A") %>%
+  select(contains("Grade"), contains("FTE"), contains("Floor")) %>%
+  rename(minimum =  `Actual Pay Floor (£)`) %>%
+  filter(minimum > 0) %>%
+  rename(Grade = `Grade (or equivalent)`) 
+
+```
+For a start, this is many less lines than the equivalent in data.table. read_csv mostly works at pulling a csv into a tibble, and I can start running it through the pipe. To put into plain English, the juniors pipe goes:
+* take tibble juniors
+* only keep the columns that have "Grade", "FTE" or "minimum" in the title
+* go through the grade column, and extract one of these values in this list 
+* rename the column "payscale minimum (£)" to the more manageable "minimum"
+* rename another column
+
+Seniors is similar, but filter drops records according to values. Again I have seniors with no pay or no name. Both have slightly different original names that I'm forcing into the new names, so I can't run them through the same pipe. Maybe in the future when I'm better with this stuff.
+
+I get a warning about what turns out to be a blank column, but I drop it immediately, so I'm not worried.
+
+I'm already ready to merge my tables. 
+
+```{r}
+combined <- bind_rows(juniors, seniors) %>%
+  arrange(minimum) %>%
+  mutate(running_total = cumsum(FTE))
+```
+I've not yet found a way to tell the median function that I already have a count of population, so I'm working with the cumulative sum again. I can also see in this version that I've a lot of people who on paper are the same grade, but at a different payscale min. This will affect the median calculations.
+
+```{r}
+
+total_staff <- last(combined$running_total)
+median_staff <- total_staff/2
+
+median_record <- combined %>%
+  filter(running_total > median_staff) %>%
+  top_n(-1)
+
+median_salary <- median_record$minimum
+print(median_salary)
+```
+Relatively straightforward. I create a running total column of all staff, find the halfway point, split the table at that point, and pick the least one (by salary). I'm not altogether happy that top_n(-1) is a thing rather than bottom_n(1), and I might just define the latter in projects.
+
+Turns out the median person in DWP is an EO on `r paste(median_salary)`. I'm aware that I also should format these as financial numbers for the ease of my reader. There's probably a good library for this.
+
+```{r}
+combined <- combined %>%
+  group_by(Grade) %>%
+  summarise(Total_pay = sum(FTE * minimum), FTE=sum(FTE)) %>%
+  mutate(avg_minimum = Total_pay / FTE) %>%
+  arrange(avg_minimum)
+
+summary_table <- combined %>%
+  summarise(sum(Total_pay), sum(FTE))
+total_bill_year <- summary_table$`sum(Total_pay)`
+
+kable(combined)
+```
+
+
+I now have a nice table for total people at each grade, and the average they are paid at that grade. I might find the median at each grade for comparison, which is doable with group_by. My summary_table makes some of the values I need a bit easier, and I just extract total_pay from it (I already have total FTE).
+
+
+
+```{r}
+Grades = combined$Grade
+combined <- mutate(combined, Grade = factor(Grade, levels = Grades, ordered=TRUE))
+ggplot(combined, aes(y=FTE,x=Grade)) + geom_col()
+
+```
+Three lines that do what I wanted. I extract the values of Grade (remembering that I've collapsed every record to their grade, so no repeated values). Also, it's in order. Then I tell the combined table that it's not storing Grade as a string, but as a factor, which in this case just tells ggplot that there's a different order than "alphabetical" to it. 
+
+
+The rest is as before, so outputs are given, but not the code. If you really want, it's in the GitHub.
+```{r, echo=FALSE}
+
+
+total_hours <- (365.25 / 7 * 5 - 25 -9) * (37)
+
+avg_hourly <- median_salary/total_hours 
+avg_minutely <- avg_hourly/60
+
+print(paste("total staff:", total_staff))
+print(paste("median salary:", median_salary))
+
+total_bill_min <- total_bill_year / total_hours
+print(paste("Cost of salary in DWP per minute:", total_bill_min))
+
+```
+
+
+
+Finally, running the same code with the DHSC data gives the correct graph! (For 2016)
+```{r, echo=FALSE, message=FALSE}
+juniors <- read_csv(here("static","data","Open Government Licence", "department-of-health__31-03-2016__dh_010416-DH-Organogram-junior.csv"))
+
+juniors <- juniors %>%
+  select(contains("Grade"), contains("FTE"), contains("minimum")) %>%
+  mutate(Grade = str_extract(Grade, "AA|AO|EO|HEO|FS|SEO|G7|G6")) %>%
+  rename(minimum =  `Payscale Minimum (£)`) %>%
+  rename(FTE = `Number of Posts in FTE`) 
+
+seniors <-read_csv(here("static","data","Open Government Licence", "department-of-health__31-03-2016__dh_010416-DH-Organogram-senior.csv"))
+
+seniors <- seniors %>%
+  filter(Name != "N/A") %>%
+  select(contains("Grade"), contains("FTE"), contains("Floor")) %>%
+  rename(minimum =  `Actual Pay Floor (£)`) %>%
+  filter(minimum > 0) %>%
+  rename(Grade = `Grade (or equivalent)`) 
+
+combined <- bind_rows(juniors, seniors) %>%
+  arrange(minimum) %>%
+  mutate(running_total = cumsum(FTE))
+
+total_staff <- last(combined$running_total)
+median_staff <- total_staff/2
+
+median_record <- combined %>%
+  filter(running_total > median_staff) %>%
+  top_n(-1)
+
+median_salary <- median_record$minimum
+
+combined <- combined %>%
+  group_by(Grade) %>%
+  summarise(Total_pay = sum(FTE * minimum), FTE=sum(FTE)) %>%
+  mutate(avg_minimum = Total_pay / FTE) %>%
+  arrange(avg_minimum)
+
+summary_table <- combined %>%
+  summarise(sum(Total_pay), sum(FTE))
+total_bill_year <- summary_table$`sum(Total_pay)`
+
+Grades = combined$Grade
+combined <- mutate(combined, Grade = factor(Grade, levels = Grades, ordered=TRUE))
+ggplot(combined, aes(y=FTE,x=Grade)) + geom_col()
+```
+Always read the Y axis on these things. The peak on the DHSC graph is about 350 FTE. That's less than almost every bar in DWP. I'm going to think about this sort of thing when I mess with arrays of plots.

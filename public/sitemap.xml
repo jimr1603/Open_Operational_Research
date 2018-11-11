@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>/about/</loc>
+    <lastmod>2018-03-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/scrabble-numbers/</loc>
+    <lastmod>2018-11-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/aint-no-sunshine-in-winter/</loc>
+    <lastmod>2018-10-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/thanos-did-nothing-wrong/</loc>
+    <lastmod>2018-08-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/analysis-on-a-plane/</loc>
+    <lastmod>2018-06-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/spotify-me/</loc>
+    <lastmod>2018-06-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/may-day-special-union-membership-uk/</loc>
+    <lastmod>2018-05-06T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/life-death-part-3/</loc>
+    <lastmod>2018-04-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/life-death-part-2/</loc>
+    <lastmod>2018-04-10T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/life-death-part-1/</loc>
+    <lastmod>2018-04-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/osm-2-interactive-maps/</loc>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/open-street-map-1-coffee-break/</loc>
+    <lastmod>2018-03-31T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/open-organograms-3-the-meeting-calculator/</loc>
+    <lastmod>2018-03-30T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/open-organograms-2-the-rise-of-the-tibble/</loc>
+    <lastmod>2018-03-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/2018-03-26-open-organograms/</loc>
+    <lastmod>2018-03-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/workflow/</loc>
+    <lastmod>2018-03-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/2018-03-25-hello-world/</loc>
+    <lastmod>2018-03-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/beis/</loc>
+    <lastmod>2018-05-06T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/brute-force/</loc>
+    <lastmod>2018-11-11T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/combinatorics/</loc>
+    <lastmod>2018-11-11T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/conditional-probability/</loc>
+    <lastmod>2018-04-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/data.gov.uk/</loc>
+    <lastmod>2018-05-06T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/data.table/</loc>
+    <lastmod>2018-03-26T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/eda/</loc>
+    <lastmod>2018-06-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/ethics/</loc>
+    <lastmod>2018-08-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/forecasting/</loc>
+    <lastmod>2018-04-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/gdpr/</loc>
+    <lastmod>2018-06-09T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/gis/</loc>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/getting-started/</loc>
+    <lastmod>2018-03-25T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/ggplot/</loc>
+    <lastmod>2018-10-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/graph-theory/</loc>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/health-economics/</loc>
+    <lastmod>2018-08-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/htmlwidgets/</loc>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/javascript/</loc>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/json/</loc>
+    <lastmod>2018-06-09T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/marvel-cinematic-universe/</loc>
+    <lastmod>2018-08-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/monte-carlo/</loc>
+    <lastmod>2018-04-03T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/networkx/</loc>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/non-open-data/</loc>
+    <lastmod>2018-06-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/ons/</loc>
+    <lastmod>2018-08-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/</loc>
+    <lastmod>2018-03-25T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/open-organograms/</loc>
+    <lastmod>2018-03-30T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/openstreetmap/</loc>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/organogram/</loc>
+    <lastmod>2018-03-28T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/plotly/</loc>
+    <lastmod>2018-04-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
+    <lastmod>2018-11-11T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/probability/</loc>
+    <lastmod>2018-04-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/python/</loc>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/r/</loc>
+    <lastmod>2018-11-11T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/recreational-mathematics/</loc>
+    <lastmod>2018-11-11T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/self-reference/</loc>
+    <lastmod>2018-11-11T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/spotify/</loc>
+    <lastmod>2018-06-09T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/statistics/</loc>
+    <lastmod>2018-06-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/suncalc/</loc>
+    <lastmod>2018-10-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <lastmod>2018-05-06T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/tidyverse/</loc>
+    <lastmod>2018-06-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/trolley-problem/</loc>
+    <lastmod>2018-08-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/web-programming/</loc>
+    <lastmod>2018-04-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/xml/</loc>
+    <lastmod>2018-04-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>
