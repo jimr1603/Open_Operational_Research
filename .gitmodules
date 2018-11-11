@@ -1,3 +1,6 @@
 [submodule "hugo-theme-cactus-plus"]
 	path = themes/hugo-theme-cactus-plus
 	url = https://github.com/nodejh/hugo-theme-cactus-plus.git
+[submodule "hugo-future-imperfect"]
+	path = themes/hugo-future-imperfect
+	url = https://github.com/jpescador/hugo-future-imperfect.git
