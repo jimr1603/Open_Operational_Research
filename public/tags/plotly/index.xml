@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Plotly on Open Operational Research</title>
-    <link>/tags/plotly/</link>
+    <link>https://openor.blog/tags/plotly/</link>
     <description>Recent content in Plotly on Open Operational Research</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
     <lastBuildDate>Sun, 22 Apr 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/plotly/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://openor.blog/tags/plotly/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Life &amp; Death part 3</title>
-      <link>/post/life-death-part-3/</link>
+      <link>https://openor.blog/post/life-death-part-3/</link>
       <pubDate>Sun, 22 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/life-death-part-3/</guid>
+      <guid>https://openor.blog/post/life-death-part-3/</guid>
       <description>Background From before I hit publish on part 2, I had people telling me that the graphs were cool and they wanted their version. I briefly considered making a page with 404 graphs on it - 2 graphs \(*\) 2 sexes \(*\) 101 age groups. Then I remembered that this is a webpage, not a static document, and Javascript is a thing. I discovered the rather useful htmlwidget plotly, which adds interactivity and drops some of the painful aspects of ggplot.</description>
     </item>
     

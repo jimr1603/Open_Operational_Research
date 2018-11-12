@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>GDPR on Open Operational Research</title>
-    <link>/tags/gdpr/</link>
+    <link>https://openor.blog/tags/gdpr/</link>
     <description>Recent content in GDPR on Open Operational Research</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
     <lastBuildDate>Sat, 09 Jun 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/gdpr/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://openor.blog/tags/gdpr/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Spotify &amp; me</title>
-      <link>/post/spotify-me/</link>
+      <link>https://openor.blog/post/spotify-me/</link>
       <pubDate>Sat, 09 Jun 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/spotify-me/</guid>
+      <guid>https://openor.blog/post/spotify-me/</guid>
       <description>Note This post is analysis on data that I obtained freely - through GDPR, but you’re not getting access to. I’m not sharing my full playing history for the last 3 months with everyone who reads this!
 Also, the long delay since last post is because I moved house. Picking this back up now.
  Background GDPR means that EU citizens are entitled to a copy of personal data that a company is holding on them.</description>

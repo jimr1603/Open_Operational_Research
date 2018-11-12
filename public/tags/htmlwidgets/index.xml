@@ -2,31 +2,31 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Htmlwidgets on Open Operational Research</title>
-    <link>/tags/htmlwidgets/</link>
+    <link>https://openor.blog/tags/htmlwidgets/</link>
     <description>Recent content in Htmlwidgets on Open Operational Research</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
     <lastBuildDate>Mon, 02 Apr 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/htmlwidgets/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://openor.blog/tags/htmlwidgets/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>OSM 2 - interactive maps</title>
-      <link>/post/osm-2-interactive-maps/</link>
+      <link>https://openor.blog/post/osm-2-interactive-maps/</link>
       <pubDate>Mon, 02 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/osm-2-interactive-maps/</guid>
+      <guid>https://openor.blog/post/osm-2-interactive-maps/</guid>
       <description>Introducing the leaflet package Plain images of map data is so web 1.0. R htmlwidgets mean I don’t have to acttuully learn Javascript to mess around with Javascript libraries in this site. One of the flagship examples leaflet works with OSM out of the box.
 Last time I wrote a file containing name and distance of my coffee shops. I now need to run that script again so I can get longitude and latitude.</description>
     </item>
     
     <item>
       <title>Open Organograms 3 - the meeting calculator</title>
-      <link>/post/open-organograms-3-the-meeting-calculator/</link>
+      <link>https://openor.blog/post/open-organograms-3-the-meeting-calculator/</link>
       <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/open-organograms-3-the-meeting-calculator/</guid>
+      <guid>https://openor.blog/post/open-organograms-3-the-meeting-calculator/</guid>
       <description>I have data, I have a website. It’s hardly fair to ask you to take the numbers I’m spitting out of the Open Organograms series and put them in a calculator to do something useful with them. Thankfully, R markdown has a nice interface between the markdown and Javascript, called htmlwidgets.
 Having generated a median salary for (so far 2) departments, I think it might be interesting to see a meeting calculator.</description>
     </item>

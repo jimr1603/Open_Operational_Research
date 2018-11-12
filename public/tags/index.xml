@@ -2,192 +2,192 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Open Operational Research</title>
-    <link>/tags/</link>
+    <link>https://openor.blog/tags/</link>
     <description>Recent content in Tags on Open Operational Research</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
     <lastBuildDate>Sun, 06 May 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://openor.blog/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>BEIS</title>
-      <link>/tags/beis/</link>
+      <link>https://openor.blog/tags/beis/</link>
       <pubDate>Sun, 06 May 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/beis/</guid>
+      <guid>https://openor.blog/tags/beis/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Brute-force</title>
-      <link>/tags/brute-force/</link>
+      <link>https://openor.blog/tags/brute-force/</link>
       <pubDate>Sun, 11 Nov 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/brute-force/</guid>
+      <guid>https://openor.blog/tags/brute-force/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Combinatorics</title>
-      <link>/tags/combinatorics/</link>
+      <link>https://openor.blog/tags/combinatorics/</link>
       <pubDate>Sun, 11 Nov 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/combinatorics/</guid>
+      <guid>https://openor.blog/tags/combinatorics/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Conditional probability</title>
-      <link>/tags/conditional-probability/</link>
+      <link>https://openor.blog/tags/conditional-probability/</link>
       <pubDate>Sun, 22 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/conditional-probability/</guid>
+      <guid>https://openor.blog/tags/conditional-probability/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Data.gov.uk</title>
-      <link>/tags/data.gov.uk/</link>
+      <link>https://openor.blog/tags/data.gov.uk/</link>
       <pubDate>Sun, 06 May 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/data.gov.uk/</guid>
+      <guid>https://openor.blog/tags/data.gov.uk/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Data.table</title>
-      <link>/tags/data.table/</link>
+      <link>https://openor.blog/tags/data.table/</link>
       <pubDate>Mon, 26 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/data.table/</guid>
+      <guid>https://openor.blog/tags/data.table/</guid>
       <description></description>
     </item>
     
     <item>
       <title>EDA</title>
-      <link>/tags/eda/</link>
+      <link>https://openor.blog/tags/eda/</link>
       <pubDate>Wed, 13 Jun 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/eda/</guid>
+      <guid>https://openor.blog/tags/eda/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Ethics</title>
-      <link>/tags/ethics/</link>
+      <link>https://openor.blog/tags/ethics/</link>
       <pubDate>Tue, 21 Aug 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/ethics/</guid>
+      <guid>https://openor.blog/tags/ethics/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Forecasting</title>
-      <link>/tags/forecasting/</link>
+      <link>https://openor.blog/tags/forecasting/</link>
       <pubDate>Sun, 22 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/forecasting/</guid>
+      <guid>https://openor.blog/tags/forecasting/</guid>
       <description></description>
     </item>
     
     <item>
       <title>GDPR</title>
-      <link>/tags/gdpr/</link>
+      <link>https://openor.blog/tags/gdpr/</link>
       <pubDate>Sat, 09 Jun 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/gdpr/</guid>
+      <guid>https://openor.blog/tags/gdpr/</guid>
       <description></description>
     </item>
     
     <item>
       <title>GIS</title>
-      <link>/tags/gis/</link>
+      <link>https://openor.blog/tags/gis/</link>
       <pubDate>Mon, 02 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/gis/</guid>
+      <guid>https://openor.blog/tags/gis/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Getting started</title>
-      <link>/tags/getting-started/</link>
+      <link>https://openor.blog/tags/getting-started/</link>
       <pubDate>Sun, 25 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/getting-started/</guid>
+      <guid>https://openor.blog/tags/getting-started/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Ggplot</title>
-      <link>/tags/ggplot/</link>
+      <link>https://openor.blog/tags/ggplot/</link>
       <pubDate>Fri, 19 Oct 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/ggplot/</guid>
+      <guid>https://openor.blog/tags/ggplot/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Graph theory</title>
-      <link>/tags/graph-theory/</link>
+      <link>https://openor.blog/tags/graph-theory/</link>
       <pubDate>Mon, 02 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/graph-theory/</guid>
+      <guid>https://openor.blog/tags/graph-theory/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Health economics</title>
-      <link>/tags/health-economics/</link>
+      <link>https://openor.blog/tags/health-economics/</link>
       <pubDate>Tue, 21 Aug 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/health-economics/</guid>
+      <guid>https://openor.blog/tags/health-economics/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Htmlwidgets</title>
-      <link>/tags/htmlwidgets/</link>
+      <link>https://openor.blog/tags/htmlwidgets/</link>
       <pubDate>Mon, 02 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/htmlwidgets/</guid>
+      <guid>https://openor.blog/tags/htmlwidgets/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Json</title>
-      <link>/tags/json/</link>
+      <link>https://openor.blog/tags/json/</link>
       <pubDate>Sat, 09 Jun 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/json/</guid>
+      <guid>https://openor.blog/tags/json/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Marvel cinematic universe</title>
-      <link>/tags/marvel-cinematic-universe/</link>
+      <link>https://openor.blog/tags/marvel-cinematic-universe/</link>
       <pubDate>Tue, 21 Aug 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/marvel-cinematic-universe/</guid>
+      <guid>https://openor.blog/tags/marvel-cinematic-universe/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Monte carlo</title>
-      <link>/tags/monte-carlo/</link>
+      <link>https://openor.blog/tags/monte-carlo/</link>
       <pubDate>Tue, 03 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/monte-carlo/</guid>
+      <guid>https://openor.blog/tags/monte-carlo/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Networkx</title>
-      <link>/tags/networkx/</link>
+      <link>https://openor.blog/tags/networkx/</link>
       <pubDate>Mon, 02 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>/tags/networkx/</guid>
+      <guid>https://openor.blog/tags/networkx/</guid>
       <description></description>
     </item>
     

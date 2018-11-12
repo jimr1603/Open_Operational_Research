@@ -2,31 +2,31 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Open Operational Research</title>
-    <link>/</link>
+    <link>https://openor.blog/</link>
     <description>Recent content on Open Operational Research</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
     <lastBuildDate>Sun, 25 Mar 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://openor.blog/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>About</title>
-      <link>/about/</link>
+      <link>https://openor.blog/about/</link>
       <pubDate>Sun, 25 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>/about/</guid>
+      <guid>https://openor.blog/about/</guid>
       <description>This is the personal blog of James Riley, largely as a place to share my adventures in Free/Open Operations Research and/or Data Science. There&amp;rsquo;ll also be Statistics, some Economics, maybe some Social Research, and definitely some bad programming.
 All data processed is available for free, for some value of free. It is my intention that anyone be able to reproduce the outputs of this site. I&amp;rsquo;m using R markdown with hosting on GitHub so you can have the source for free as well.</description>
     </item>
     
     <item>
       <title>Scrabble numbers</title>
-      <link>/post/scrabble-numbers/</link>
+      <link>https://openor.blog/post/scrabble-numbers/</link>
       <pubDate>Sun, 11 Nov 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/scrabble-numbers/</guid>
+      <guid>https://openor.blog/post/scrabble-numbers/</guid>
       <description>I was reading one of Ian Stewart’s books of popular maths, and I found a potentially incomplete solutuion to a puzzle.
 Given the (English) Scrable tileset, do any numbers give their own score?
 “One” certainly doesn’t, since “O”,“N”,“E”each score 1 point, and \(3 \neq 1\).
@@ -36,10 +36,10 @@ For various reasons, you can see that you don’t need to test every number:
     
     <item>
       <title>&#39;Aint no sunshine ... in winter</title>
-      <link>/post/aint-no-sunshine-in-winter/</link>
+      <link>https://openor.blog/post/aint-no-sunshine-in-winter/</link>
       <pubDate>Fri, 19 Oct 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/aint-no-sunshine-in-winter/</guid>
+      <guid>https://openor.blog/post/aint-no-sunshine-in-winter/</guid>
       <description>Hi y’all, short one today.
 Partially it’s about how days of sunlight change through the year, unless you’re on the equator. Partially it’s about how hard it is to make 3d plots in a 2d space.
 I have SAD, which seems to flare up at the solstices and equinoxes, plus and minus a couple of weeks.
@@ -48,20 +48,20 @@ The solstices make sense - there’s either too much or too little sunshine.</de
     
     <item>
       <title>Thanos did nothing wrong</title>
-      <link>/post/thanos-did-nothing-wrong/</link>
+      <link>https://openor.blog/post/thanos-did-nothing-wrong/</link>
       <pubDate>Tue, 21 Aug 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/thanos-did-nothing-wrong/</guid>
+      <guid>https://openor.blog/post/thanos-did-nothing-wrong/</guid>
       <description>Background I, like so many nerds, watched Avengers: Infinity War, and are eagerly awaiting part 2. I love how the Marvel Cinematic Universe has built in the interest the X-men movies as a kid, via pulpy action and all the feels.
 I’m going to look at Infinity War through the lens of one of Thanos’ analysts. What advice might an Operational Researcher for Thanos give?</description>
     </item>
     
     <item>
       <title>Analysis on a plane</title>
-      <link>/post/analysis-on-a-plane/</link>
+      <link>https://openor.blog/post/analysis-on-a-plane/</link>
       <pubDate>Wed, 13 Jun 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/analysis-on-a-plane/</guid>
+      <guid>https://openor.blog/post/analysis-on-a-plane/</guid>
       <description>Background I’m on a plane! No-frills airlines don’t have wifi, so I’ve downloaded a bunch of datasets and a bunch of libraries and seen if I can do a bit of analysis while in the air. Yes, yes, I can.
 I thought this would be a part 2, but it turns out I never published part 1.
 Again, this is personal data - you don’t get to see exactly what books are in my library.</description>
@@ -69,10 +69,10 @@ Again, this is personal data - you don’t get to see exactly what books are in 
     
     <item>
       <title>Spotify &amp; me</title>
-      <link>/post/spotify-me/</link>
+      <link>https://openor.blog/post/spotify-me/</link>
       <pubDate>Sat, 09 Jun 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/spotify-me/</guid>
+      <guid>https://openor.blog/post/spotify-me/</guid>
       <description>Note This post is analysis on data that I obtained freely - through GDPR, but you’re not getting access to. I’m not sharing my full playing history for the last 3 months with everyone who reads this!
 Also, the long delay since last post is because I moved house. Picking this back up now.
  Background GDPR means that EU citizens are entitled to a copy of personal data that a company is holding on them.</description>
@@ -80,87 +80,87 @@ Also, the long delay since last post is because I moved house. Picking this back
     
     <item>
       <title>May Day special - union membership UK</title>
-      <link>/post/may-day-special-union-membership-uk/</link>
+      <link>https://openor.blog/post/may-day-special-union-membership-uk/</link>
       <pubDate>Sun, 06 May 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/may-day-special-union-membership-uk/</guid>
+      <guid>https://openor.blog/post/may-day-special-union-membership-uk/</guid>
       <description>I know May Day/International Workers Day is May 1. To actually have time to write this I needed the bank holiday.
 BEIS have some nice statistics on union membership since 1882, and actually, they’ve applied most of the functions to them I find interesting. So most of this is going to be about presentation of data, and maybe adding some context to data.</description>
     </item>
     
     <item>
       <title>Life &amp; Death part 3</title>
-      <link>/post/life-death-part-3/</link>
+      <link>https://openor.blog/post/life-death-part-3/</link>
       <pubDate>Sun, 22 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/life-death-part-3/</guid>
+      <guid>https://openor.blog/post/life-death-part-3/</guid>
       <description>Background From before I hit publish on part 2, I had people telling me that the graphs were cool and they wanted their version. I briefly considered making a page with 404 graphs on it - 2 graphs \(*\) 2 sexes \(*\) 101 age groups. Then I remembered that this is a webpage, not a static document, and Javascript is a thing. I discovered the rather useful htmlwidget plotly, which adds interactivity and drops some of the painful aspects of ggplot.</description>
     </item>
     
     <item>
       <title>Life &amp; Death part 2</title>
-      <link>/post/life-death-part-2/</link>
+      <link>https://openor.blog/post/life-death-part-2/</link>
       <pubDate>Tue, 10 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/life-death-part-2/</guid>
+      <guid>https://openor.blog/post/life-death-part-2/</guid>
       <description>The story so far In part 1 we saw how you can estimate difficult probabilities with a large number of simulations. Every time I updated that post my poor home desktop took 10 mins to run the simulation. And it still wasn’t good enough. Also, it doesn’t scale. 10 minutes times 100 ages times 2 sexes = NO.
  Probability Trees It is time to think smarter. When in doubt in probability with a small number of outcomes, I like to draw probability trees.</description>
     </item>
     
     <item>
       <title>Life &amp; Death part 1</title>
-      <link>/post/life-death-part-1/</link>
+      <link>https://openor.blog/post/life-death-part-1/</link>
       <pubDate>Tue, 03 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/life-death-part-1/</guid>
+      <guid>https://openor.blog/post/life-death-part-1/</guid>
       <description>Motivation As I just had another birthday with a ‘0’ at the end, I’m thinking about how long I have left.And it relates to other forecasts I could make, like will I ever pay off my student loans? The ONS publish national life tables under the OGL, so we have the data, and the permission to use it. And straight away I can see that the average UK 30-year old male has about 50 years left.</description>
     </item>
     
     <item>
       <title>OSM 2 - interactive maps</title>
-      <link>/post/osm-2-interactive-maps/</link>
+      <link>https://openor.blog/post/osm-2-interactive-maps/</link>
       <pubDate>Mon, 02 Apr 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/osm-2-interactive-maps/</guid>
+      <guid>https://openor.blog/post/osm-2-interactive-maps/</guid>
       <description>Introducing the leaflet package Plain images of map data is so web 1.0. R htmlwidgets mean I don’t have to acttuully learn Javascript to mess around with Javascript libraries in this site. One of the flagship examples leaflet works with OSM out of the box.
 Last time I wrote a file containing name and distance of my coffee shops. I now need to run that script again so I can get longitude and latitude.</description>
     </item>
     
     <item>
       <title>Open Street Map - 1 Coffee Break</title>
-      <link>/post/open-street-map-1-coffee-break/</link>
+      <link>https://openor.blog/post/open-street-map-1-coffee-break/</link>
       <pubDate>Sat, 31 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/open-street-map-1-coffee-break/</guid>
+      <guid>https://openor.blog/post/open-street-map-1-coffee-break/</guid>
       <description>Motivation I am a professional mathematician - coffee is essential to my wellbeing. Lunch is just about the right time of the day to want a 2nd coffee of the day, and get some fresh air and time not looking at the screen. Especially now that it’s not raining or snowing 100% of the time. Given a 60 minute lunch, what are my options? Does it become a massive pain if I decide I want a 30 minute lunch instead?</description>
     </item>
     
     <item>
       <title>Open Organograms 3 - the meeting calculator</title>
-      <link>/post/open-organograms-3-the-meeting-calculator/</link>
+      <link>https://openor.blog/post/open-organograms-3-the-meeting-calculator/</link>
       <pubDate>Fri, 30 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/open-organograms-3-the-meeting-calculator/</guid>
+      <guid>https://openor.blog/post/open-organograms-3-the-meeting-calculator/</guid>
       <description>I have data, I have a website. It’s hardly fair to ask you to take the numbers I’m spitting out of the Open Organograms series and put them in a calculator to do something useful with them. Thankfully, R markdown has a nice interface between the markdown and Javascript, called htmlwidgets.
 Having generated a median salary for (so far 2) departments, I think it might be interesting to see a meeting calculator.</description>
     </item>
     
     <item>
       <title>Open Organograms 2 - the rise of the tibble</title>
-      <link>/post/open-organograms-2-the-rise-of-the-tibble/</link>
+      <link>https://openor.blog/post/open-organograms-2-the-rise-of-the-tibble/</link>
       <pubDate>Wed, 28 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/open-organograms-2-the-rise-of-the-tibble/</guid>
+      <guid>https://openor.blog/post/open-organograms-2-the-rise-of-the-tibble/</guid>
       <description>##Background I learned data.table before tidyverse. It can be hard to read, and I’m always forgetting commas. I’m making an effort to learn the tidyverse, and I am already impressed with dplyr and tibble. (I’ve been impressed with ggplot2 for a while now.)
 I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. It’s also the case that the code run time is a tiny fraction of my overall project.</description>
     </item>
     
     <item>
       <title>Open Organograms</title>
-      <link>/post/2018-03-26-open-organograms/</link>
+      <link>https://openor.blog/post/2018-03-26-open-organograms/</link>
       <pubDate>Mon, 26 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/2018-03-26-open-organograms/</guid>
+      <guid>https://openor.blog/post/2018-03-26-open-organograms/</guid>
       <description>##Background
 One of the reasons I’ve founded this site is because I’ve discovered https://data.gov.uk/ and I have ideas. In particular, I won’t discuss outside of work anything I only know through work, so it was nice to see pay data in the public sphere.
 Full background is at http://guidance.data.gov.uk/organogram-data.html but basically, the Prime Minister decided that the public deserve the structure and hierarchy of the Government Departments, and a few agencies.</description>
@@ -168,20 +168,20 @@ Full background is at http://guidance.data.gov.uk/organogram-data.html but basic
     
     <item>
       <title>Workflow</title>
-      <link>/workflow/</link>
+      <link>https://openor.blog/workflow/</link>
       <pubDate>Mon, 26 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>/workflow/</guid>
+      <guid>https://openor.blog/workflow/</guid>
       <description>This is an ongoing scratchpad of what I have ideas for, what I’m working on, and what I just need to make presentable. There’s a massive difference between code I’m happy gives me an answer, and code I’m happy for someone else to see.
   Ideas Working Prettify Housekeeping    training neural nets Making table of workflow graph theory on road and train networks Add CV/publications  wikidata querires Open Organograms  Include bibliography  importing Google charts   Shortcodes  filesize to book equivalent   Tag posts with GORS compitencies  background: graph theory     background:spherical coordinates     background:xml       This was originally going to be a Trello.</description>
     </item>
     
     <item>
       <title>Hello World</title>
-      <link>/post/2018-03-25-hello-world/</link>
+      <link>https://openor.blog/post/2018-03-25-hello-world/</link>
       <pubDate>Sun, 25 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/2018-03-25-hello-world/</guid>
+      <guid>https://openor.blog/post/2018-03-25-hello-world/</guid>
       <description>This is my first post on not-my-first blog. I’ll be honest, at this stage I’m seeing if I can compile the site and push it to the net.
 Expect changes coming soon. I’d put up a Construction in Process gif, but I’m told that Geocities has been down for some years now.
 Built with R: 3.5.1</description>

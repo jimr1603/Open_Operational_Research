@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Getting started on Open Operational Research</title>
-    <link>/tags/getting-started/</link>
+    <link>https://openor.blog/tags/getting-started/</link>
     <description>Recent content in Getting started on Open Operational Research</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-gb</language>
     <lastBuildDate>Sun, 25 Mar 2018 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/tags/getting-started/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://openor.blog/tags/getting-started/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Hello World</title>
-      <link>/post/2018-03-25-hello-world/</link>
+      <link>https://openor.blog/post/2018-03-25-hello-world/</link>
       <pubDate>Sun, 25 Mar 2018 00:00:00 +0000</pubDate>
       
-      <guid>/post/2018-03-25-hello-world/</guid>
+      <guid>https://openor.blog/post/2018-03-25-hello-world/</guid>
       <description>This is my first post on not-my-first blog. I’ll be honest, at this stage I’m seeing if I can compile the site and push it to the net.
 Expect changes coming soon. I’d put up a Construction in Process gif, but I’m told that Geocities has been down for some years now.
 Built with R: 3.5.1</description>
