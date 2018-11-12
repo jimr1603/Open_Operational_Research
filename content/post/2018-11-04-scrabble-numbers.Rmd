@@ -1,7 +1,7 @@
 ---
 title: Scrabble numbers
 author: James Riley
-date: '2018-11-11'
+date: '2018-11-12'
 slug: scrabble-numbers
 categories: R
 tags:
@@ -22,22 +22,23 @@ library("DT")
 library("plotly")
 
 theme <- ggthemes::theme_few()
+scale <- ggthemes::scale_colour_few()
 ```
 
 ## 
 
-I was reading one of [Ian Stewart's](https://ianstewartjoat.weebly.com/) books of popular maths, and I found a potentially incomplete solutuion to a puzzle.
+I was reading one of [Ian Stewart's](https://ianstewartjoat.weebly.com/) books of popular maths, and I found a potentially incomplete solution to a puzzle.
 
-Given the (English) Scrable tileset, do any numbers give their own score?
+Given the (English) Scrabble tile set, do any numbers give their own score?
 
 "One" certainly doesn't, since "O","N","E"each score 1 point, and $3 \neq 1$.
 
 For various reasons, you can see that you don't need to test every number:
 
 * Scrabble scores are non-negative integers. 
-* Score increases as wordlength increases. The length of the name of a number increases approximately by powers of ten. (Or logrithmically.)
+* Score increases as word length increases. The length of the name of a number increases approximately by powers of ten. (Or logarithmically.)
 
-So "zero", "one", score more points than their number, while "one thousand" definitely scores less than itself. (And there's no word seperator in Scrabble. Anyway "thousand" definitely scores less than 1000 points.) Somewhere in the middle we might get some wins?
+So "zero", "one", score more points than their number, while "one thousand" definitely scores less than itself. (And there's no word separator in Scrabble. Anyway "thousand" definitely scores less than 1000 points.) Somewhere in the middle we might get some wins?
 
 ## Code
 
@@ -117,7 +118,7 @@ Fortunately, my results match Prof. Stewart's - "Twelve" scores 12 points.
 (Let's do a few plots...
 ```{r}
 base_scores %>%
-  ggplot(aes(x = number, y = score)) + geom_point() + geom_line(aes(x = 0:20, y = 0:20)) + theme + ggtitle("Twelve is the only number with its own Scrabble score", subtitle = "Line y=x added")
+  ggplot(aes(x = number, y = score, colour=(number==score))) + geom_point() + geom_line(aes(x = 0:20, y = 0:20, colour=TRUE)) + theme + ggtitle("Twelve is the only number with its own Scrabble score", subtitle = "Line y=x added") + guides(colour=FALSE) + scale
 ```
 And:
 
@@ -125,11 +126,11 @@ And:
 base_scores %>%
   filter(number > 0) %>% # Whoops, don't divide by zero.
   mutate(relative_score = score / number) %>%
-  ggplot(aes(x = number, y = relative_score)) + geom_point() + theme + geom_hline(yintercept = 1) + labs(
+  ggplot(aes(x = number, y = relative_score, colour=as.factor(sign(relative_score-1)))) + geom_point() + theme + geom_line(aes(x=1:20,y=1,colour="0")) + labs(
     title = "Small numbers score greater than themselves\n
     but large numbers smaller.",
     y = "Score/number"
-  )
+  ) + guides(colour=FALSE) + scale
 ```
 )
 
@@ -172,7 +173,7 @@ alias_scores %>%
 
 ```
 
-Sweet, I explanded the solution space 5x!
+Sweet, I expanded the solution space 5x!
 
 Let's have another look at score relative to number:
 
@@ -180,10 +181,11 @@ Let's have another look at score relative to number:
 alias_scores %>%
   filter(Number > 0) %>%
   mutate(relative_score = score / Number) %>%
-  ggplot(aes(x = Number, y = relative_score)) + geom_point() + theme + geom_hline(yintercept = 1) + labs(
+  ggplot(aes(x = Number, y = relative_score,
+             colour=as.factor(sign(relative_score-1)))) + geom_point() + theme + geom_line(aes(x=c(1:60, rep(60,67)),y=1,colour="0")) + labs(
     title = "There are more winning numbers if we take other common name",
     y = "Score/Number"
-  )
+  ) + scale + guides(colour=FALSE)
 ```
 
 # Score modifications
@@ -214,7 +216,7 @@ word_to_score <- function(word, modifier = 1) {
 }
 ```
 
-The *hiliarious* thing is that for a word of length $n$, I have to work out $2^n$ ways you can fill it in with blank tiles. At least I know this will only decrease the score, so I can start with the ones who overscored.
+The *hiliarious* thing is that for a word of length $n$, I have to work out $2^n$ ways you can fill it in with blank tiles. At least I know this will only decrease the score, so I can start with the ones who over-scored.
 
 I'm not sure about generating all the binary codes with the word's length, so I recursed. For a small time save, I generate them all now.
 
@@ -238,7 +240,7 @@ binary <- map(binary, transpose) %>%
   ungroup()
 ```
 
-Now I can slap these sequences on the words that overscored. As I mentioned above, the solutions for 0 are boring, since they are all blank tiles, so I'm filtering them out. 
+Now I can slap these sequences on the words that over-scored. As I mentioned above, the solutions for 0 are boring, since they are all blank tiles, so I'm filtering them out. 
 
 ```{r}
 blank_scores <- alias_scores %>%
@@ -289,6 +291,6 @@ blank_scores %>%
 ```
 
 
-## Moving on
+## Moving on 
 
 This suggests a method that can be extended for dealing with double/triple letters, and even triple words, but I feel this post is long enough for now. 
