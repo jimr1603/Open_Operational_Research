@@ -1,43 +1,37 @@
-Copyright = '<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>'
 baseurl = "/"
-languageCode = "en-gb"
-title = "Open Operational Research"
+languageCode = "en-us"
+title = "Hugo Future Imperfect"
 theme = "hugo-future-imperfect"
 preserveTaxonomyNames = true
 paginate = 3
-disqusShortname = "openor-blog"
+disqusShortname = "shortname"
 googleAnalytics = ""
-pluralizeListTitles = true
+pluralizeListTitles = false
 # Set the followings to true as part of your site SEO
 enableRobotsTXT = true
 canonifyURLs = true
-enableEmoji =  true
-
-ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
-
-rssLimit = 20
 
 [params]
   # Sets the meta tag description
-  description          = ""
+  description          = "HTML5 UP theme, Future Imperfect with some extra goodies, ported by Julio Pescador. Powered by Hugo"
   # Sets the navbarTitle that appears in the top left of the navigation bar
-  navbarTitle          = "Open Operational Research"
+  navbarTitle          = "Future Imperfect"
   # Sets where "View More Posts" links
-  viewMorePostLink     = "/post/"
+  viewMorePostLink     = "/blog/"
 
 # Optional Params
   # Sets navbarTitle to match the section of the website
-  dynamicTitles        = false
+  dynamicTitles        = true
   # Sets RSS icons to appear on the sidebar with the social media buttons
-  rssAppearAtTop       = false
+  rssAppearAtTop       = true
   rssAppearAtBottom    = true
   # Sets Social Media icons to appear on the sidebar
-  socialAppearAtTop    = false
+  socialAppearAtTop    = true
   socialAppearAtBottom = true
   # Sets Categories to sort by number of posts instead of alphabetical
   categoriesByCount    = true
   # set to show or to hide categories in the sidebar
-  showSidebarCategories = false
+  showSidebarCategories = true
   # Sets Estimated Reading Time to appear in post headers
   includeReadingTime   = true
   # Sets the Favicon and Version for the site. Default support is for
@@ -54,7 +48,7 @@ rssLimit = 20
   socialShareFacebook  = true
   socialShareReddit    = true
   socialShareLinkedin  = true
-  socialShareStumbleupon = false
+  socialShareStumbleupon = true
   socialSharePinterest = true
   socialShareEmail     = true
 
@@ -86,27 +80,29 @@ rssLimit = 20
   repo      = ""
   branch    = ""
 
-#  [params.staticman.recaptcha]
-#    sitekey = "SITE_KEY"
-#    secret  = "ENCRYPTED_SECRET"
+  [params.staticman.recaptcha]
+    sitekey = "SITE_KEY"
+    secret  = "ENCRYPTED_SECRET"
 
   # These are optional params related to the sidebar. They are recommended, but not
   # required for proper functionality. HTML is supported within the params.
 [params.intro]
-  header    = ""
-  paragraph = ""
-  about     = ""
+  header    = "Hugo Future Imperfect"
+
+  paragraph = "Another fine responsive site template by <a href=\"http://html5up.net\">HTML5 UP</a>. Ported by Julio Pescador with some extra goodies <i class='fa fa-hand-peace-o'></i>"
+
+  about     = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent tellus lacus, auctor vehicula molestie quis, tempor quis velit. Quisque in quam ac leo efficitur vulputate. Phasellus ullamcorper aliquam sodales. Maecenas sit amet condimentum ipsum. Proin sit amet ligula elit. Mauris."
 
   # This appears at the top of the sidebar above params.intro.header.
   # A width of less than 100px is recommended from a design perspective.
-[params.intro.pic]
-    src       = "/img/Game_of_life_animated_glider.gif"
+  [params.intro.pic]
+    src       = "/img/main/logo.jpg"
     # Sets Image to be a cirlce
-    circle    = true
+    circle    = false
     # Sets Image to be Future Imperfect's hexagon
-    imperfect = false
+    imperfect = true
     width     = ""
-    alt       = "Conway's Life glider"
+    alt       = "Hugo Future Imperfect"
 
 [params.postAmount]
 # Sets the number of recent posts to show in the sidebar. The default value is 5.
@@ -114,11 +110,11 @@ rssLimit = 20
 
 # Sets the menu items in the navigation bar
 # Identifier prepends a Font Awesome icon to the menu item
-#[[menu.main]]
-#  name = "Home"
-#  url = "/"
-#  identifier = "fa fa-home"
-#  weight = 1
+[[menu.main]]
+  name = "Home"
+  url = "/"
+  identifier = "fa fa-home"
+  weight = 1
 
 [[menu.main]]
   name = "About"
@@ -128,34 +124,34 @@ rssLimit = 20
 
 [[menu.main]]
   name = "Blog"
-  url = "/post/"
+  url = "/blog/"
   identifier = "fa fa-newspaper-o"
   weight = 3
-  
+
 [[menu.main]]
-  name = "R-Bloggers"
-  url = "https://www.r-bloggers.com/"
-  identifier = "fa fa-rss"
+  name = "Itemized"
+  url = "/itemized/"
+  identifier = "fa fa-list"
+  weight = 4
+
+[[menu.main]]
+  name = "Categories"
+  url = "/categories/"
+  identifier = "fa fa-sitemap"
   weight = 5
 
-#[[menu.main]]
-#  name = "Itemized"
-#  url = "/itemized/"
-#  identifier = "fa fa-list"
-#  weight = 4
-
-#[[menu.main]]
-#  name = "Contact"
-#  url = "/contact/"
-#  identifier = "fa fa-envelope-o"
-#  weight = 6
+[[menu.main]]
+  name = "Contact"
+  url = "/contact/"
+  identifier = "fa fa-envelope-o"
+  weight = 6
 
 # Sets Social Media icons to appear and link to your account. Value should be your
 # username unless otherwise noted. These are the icons affected by socialAppearAtTop
 # and socialAppearAtBottom.
 [social]
   # Coding Communities
-  github           = "jimr1603"
+  github           = "jpescador/hugo-future-imperfect"
   gitlab           = ""
   stackoverflow    = "" # User Number
   bitbucket        = ""
@@ -163,22 +159,22 @@ rssLimit = 20
   codepen          = ""
   # Visual Art Communities
   deviantart       = ""
-  flickr           = ""
+  flickr           = "example"
   behance          = ""
   dribbble         = ""
   # Publishing Communities
   wordpress        = ""
   medium           = ""
   # Professional/Business Oriented Communities
-  linkedin         = ""
-  linkedin_company = ""
+  linkedin         = "example"
+  linkedin_company = "examplebusiness"
   foursquare       = ""
   xing             = ""
   slideshare       = ""
   # Social Networks
-  facebook         = ""
+  facebook         = "example"
   googleplus       = ""
-  reddit           = ""
+  reddit           = "example"
   quora            = ""
   youtube          = ""
   vimeo            = ""
@@ -186,17 +182,16 @@ rssLimit = 20
     # WeChat and QQ need testing.
     wechat         = ""
     qq             = "" # User ID Number
-  instagram        = ""
+  instagram        = "example"
   tumblr           = ""
-  twitter          = ""
+  twitter          = "example"
   skype            = ""
   snapchat         = ""
-  pinterest        = ""
-  telegram         = ""
+  pinterest        = "example"
+  telegram         = "example"
   vine             = ""
   googlescholar    = ""
   orcid            = ""
-  researchgate     = ""
+  researchgate     = "example"
   # Email
-  email            = ""
-
+  email            = "example"

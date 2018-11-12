@@ -13,6 +13,8 @@ All data processed is available for free, for some value of free. It is my inten
 
 I am an Operational Resarcher for the UK [Department of Health and Social Care](https://www.gov.uk/government/organisations/department-of-health-and-social-care). All opinions are my own and not those of my employer. I have not used any restricted/official data or code in this site.
 
-Website built with the [blogdown](https://github.com/rstudio/blogdown) package, using the [Hugo-theme-cactus-plus](https://github.com/nodejh/hugo-theme-cactus-plus) theme.
+Website built with the [blogdown](https://github.com/rstudio/blogdown) package, using the [hugo-future-imperfect](https://themes.gohugo.io/theme/future-imperfect/) theme.
+
+Code on the website is made available on [the attached github](https://github.com/jimr1603/Open_Operational_Research) under GPL v3.
 
 Kindly hosted by GitHub and Netlify.
