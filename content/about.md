@@ -15,4 +15,6 @@ I am an Operational Resarcher for the UK [Department of Health and Social Care](
 
 Website built with the [blogdown](https://github.com/rstudio/blogdown) package, using the [hugo-future-imperfect](https://themes.gohugo.io/theme/future-imperfect/) theme.
 
+Code on the website is made available on [the attached github](https://github.com/jimr1603/Open_Operational_Research) under GPL v3.
+
 Kindly hosted by GitHub and Netlify.
