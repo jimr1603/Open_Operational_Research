@@ -151,7 +151,7 @@ Having generated a median salary for (so far 2) departments, I think it might be
       <pubDate>Wed, 28 Mar 2018 00:00:00 +0000</pubDate>
       
       <guid>/post/open-organograms-2-the-rise-of-the-tibble/</guid>
-      <description>Background I learned data.table before tidyverse. It can be hard to read, and I’m always forgetting commas. I’m making an effort to learn the tidyverse, and I am already impressed with dplyr and tibble. (I’ve been impressed with ggplot2 for a while now.)
+      <description>##Background I learned data.table before tidyverse. It can be hard to read, and I’m always forgetting commas. I’m making an effort to learn the tidyverse, and I am already impressed with dplyr and tibble. (I’ve been impressed with ggplot2 for a while now.)
 I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. It’s also the case that the code run time is a tiny fraction of my overall project.</description>
     </item>
     
@@ -161,7 +161,8 @@ I’ve seen benchmarks that suggests data.table is about 2ce as fast as tibble. 
       <pubDate>Mon, 26 Mar 2018 00:00:00 +0000</pubDate>
       
       <guid>/post/2018-03-26-open-organograms/</guid>
-      <description>Background One of the reasons I’ve founded this site is because I’ve discovered https://data.gov.uk/ and I have ideas. In particular, I won’t discuss outside of work anything I only know through work, so it was nice to see pay data in the public sphere.
+      <description>##Background
+One of the reasons I’ve founded this site is because I’ve discovered https://data.gov.uk/ and I have ideas. In particular, I won’t discuss outside of work anything I only know through work, so it was nice to see pay data in the public sphere.
 Full background is at http://guidance.data.gov.uk/organogram-data.html but basically, the Prime Minister decided that the public deserve the structure and hierarchy of the Government Departments, and a few agencies.</description>
     </item>
     
@@ -183,7 +184,7 @@ Full background is at http://guidance.data.gov.uk/organogram-data.html but basic
       <guid>/post/2018-03-25-hello-world/</guid>
       <description>This is my first post on not-my-first blog. I’ll be honest, at this stage I’m seeing if I can compile the site and push it to the net.
 Expect changes coming soon. I’d put up a Construction in Process gif, but I’m told that Geocities has been down for some years now.
-Built with R: 3.3.3</description>
+Built with R: 3.5.1</description>
     </item>
     
   </channel>

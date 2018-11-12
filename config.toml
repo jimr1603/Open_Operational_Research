@@ -1,4 +1,4 @@
-baseurl = "/"
+baseurl = "https://openor.blog"
 languageCode = "en-gb"
 title = "Open Operational Research"
 theme = "hugo-future-imperfect"
@@ -6,16 +6,21 @@ preserveTaxonomyNames = true
 paginate = 3
 disqusShortname = "openor-blog"
 googleAnalytics = ""
-pluralizeListTitles = false
+pluralizeListTitles = true
 # Set the followings to true as part of your site SEO
 enableRobotsTXT = true
 canonifyURLs = true
+enableEmoji =  true
+
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+
+rssLimit = 20
 
 [params]
   # Sets the meta tag description
-  description          = "Hobby projects with open code and open data"
+  description          = ""
   # Sets the navbarTitle that appears in the top left of the navigation bar
-  navbarTitle          = "Open Operational Research"
+  navbarTitle          = "Open Operational Research (blog)"
   # Sets where "View More Posts" links
   viewMorePostLink     = "/post/"
 
@@ -23,15 +28,15 @@ canonifyURLs = true
   # Sets navbarTitle to match the section of the website
   dynamicTitles        = false
   # Sets RSS icons to appear on the sidebar with the social media buttons
-  rssAppearAtTop       = true
+  rssAppearAtTop       = false
   rssAppearAtBottom    = true
   # Sets Social Media icons to appear on the sidebar
-  socialAppearAtTop    = true
+  socialAppearAtTop    = false
   socialAppearAtBottom = true
   # Sets Categories to sort by number of posts instead of alphabetical
   categoriesByCount    = true
   # set to show or to hide categories in the sidebar
-  showSidebarCategories = true
+  showSidebarCategories = false
   # Sets Estimated Reading Time to appear in post headers
   includeReadingTime   = true
   # Sets the Favicon and Version for the site. Default support is for
@@ -48,7 +53,7 @@ canonifyURLs = true
   socialShareFacebook  = true
   socialShareReddit    = true
   socialShareLinkedin  = true
-  socialShareStumbleupon = true
+  socialShareStumbleupon = false
   socialSharePinterest = true
   socialShareEmail     = true
 
@@ -80,29 +85,27 @@ canonifyURLs = true
   repo      = ""
   branch    = ""
 
-  [params.staticman.recaptcha]
-    sitekey = "SITE_KEY"
-    secret  = "ENCRYPTED_SECRET"
+#  [params.staticman.recaptcha]
+#    sitekey = "SITE_KEY"
+#    secret  = "ENCRYPTED_SECRET"
 
   # These are optional params related to the sidebar. They are recommended, but not
   # required for proper functionality. HTML is supported within the params.
 [params.intro]
-  header    = "Open Operational Resarch"
-
-  paragraph = "Working out just what I can do with open code and open data."
-  
-  about     = "I'm James Riley, an Operatial Researcher for the Department of Health and Social Care, but this is what I do in my time off. This is entirely my own work and does not reflect on my employer. I have a few hobby projects involving open data, or no data, so I started blogging them here."
+  header    = ""
+  paragraph = "Totally expe[r]imental<i class='fa fa-hand-peace-o'></i>"
+  about     = ""
 
   # This appears at the top of the sidebar above params.intro.header.
   # A width of less than 100px is recommended from a design perspective.
-  [params.intro.pic]
+[params.intro.pic]
     src       = "/img/Game_of_life_animated_glider.gif"
     # Sets Image to be a cirlce
-    circle    = false
+    circle    = true
     # Sets Image to be Future Imperfect's hexagon
-    imperfect = true
+    imperfect = false
     width     = ""
-    alt       = "Hugo Future Imperfect"
+    alt       = "Conway's Life glider"
 
 [params.postAmount]
 # Sets the number of recent posts to show in the sidebar. The default value is 5.
@@ -110,11 +113,11 @@ canonifyURLs = true
 
 # Sets the menu items in the navigation bar
 # Identifier prepends a Font Awesome icon to the menu item
-[[menu.main]]
-  name = "Home"
-  url = "/"
-  identifier = "fa fa-home"
-  weight = 1
+#[[menu.main]]
+#  name = "Home"
+#  url = "/"
+#  identifier = "fa fa-home"
+#  weight = 1
 
 [[menu.main]]
   name = "About"
@@ -127,13 +130,31 @@ canonifyURLs = true
   url = "/post/"
   identifier = "fa fa-newspaper-o"
   weight = 3
+  
+[[menu.main]]
+  name = "R-Bloggers"
+  url = "https://www.r-bloggers.com/"
+  identifier = "fa fa-rss"
+  weight = 5
+
+#[[menu.main]]
+#  name = "Itemized"
+#  url = "/itemized/"
+#  identifier = "fa fa-list"
+#  weight = 4
+
+#[[menu.main]]
+#  name = "Contact"
+#  url = "/contact/"
+#  identifier = "fa fa-envelope-o"
+#  weight = 6
 
 # Sets Social Media icons to appear and link to your account. Value should be your
 # username unless otherwise noted. These are the icons affected by socialAppearAtTop
 # and socialAppearAtBottom.
 [social]
   # Coding Communities
-  github           = "jimr1603/"
+  github           = "jimr1603"
   gitlab           = ""
   stackoverflow    = "" # User Number
   bitbucket        = ""
@@ -156,7 +177,7 @@ canonifyURLs = true
   # Social Networks
   facebook         = ""
   googleplus       = ""
-  reddit           = "jimr1603"
+  reddit           = ""
   quora            = ""
   youtube          = ""
   vimeo            = ""
@@ -176,6 +197,5 @@ canonifyURLs = true
   orcid            = ""
   researchgate     = ""
   # Email
-  email            = "jimr1603+oor@gmail.com"
+  email            = ""
 
-ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
