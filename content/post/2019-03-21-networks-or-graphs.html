@@ -1,0 +1,196 @@
+---
+title: Networks, or Graphs
+author: James Riley
+date: '2019-03-21'
+slug: networks-or-graphs
+categories: []
+tags:
+  - Graph theory
+  - network theory
+  - Discrete Mathematics
+  - d3
+  - pokemon go
+  - collatz conjecture
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+---
+
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<link href="/rmarkdown-libs/vis/vis.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/vis/vis.min.js"></script>
+<script src="/rmarkdown-libs/visNetwork-binding/visNetwork.js"></script>
+
+
+<p>With thanks to <a href="http://kateto.net/netscix2016">this tutorial on network analysis in R</a>
+I’ve not followed all the suggestions, but it’s been a good springboard.</p>
+<div id="intro" class="section level2">
+<h2>Intro</h2>
+<p>Looks like I’m going to sometimes use tidygraph, sometimes go down one level and go to igraph as necessary.</p>
+<p>Graph Theory (as I was taught it), or Network Theory (which makes googling it easier because there’s something else called a graph) is a nice bit of Discrete Maths. It opens with Euler trying to walk across all these bridges exactly once:</p>
+<pre class="r"><code>tribble(
+  ~from, ~to,
+  &quot;a&quot;, &quot;b&quot;,
+  &quot;a&quot;, &quot;b&quot;,
+  &quot;a&quot;, &quot;c&quot;,
+  &quot;a&quot;, &quot;c&quot;,
+  &quot;a&quot;, &quot;d&quot;,
+  &quot;b&quot;, &quot;d&quot;,
+  &quot;c&quot;, &quot;d&quot;
+) %&gt;%
+as_tbl_graph(directed=FALSE) %&gt;%
+  plot()</code></pre>
+<p><img src="/post/2019-03-21-networks-or-graphs_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>Which finds its way into general usage as “draw that figure without taking your pen off the paper”. (Or punching a hole in the paper, or folding the paper over to extend…)</p>
+<p>That one can’t be done. Neither can these:</p>
+<pre class="r"><code>make_full_bipartite_graph(3,3) %&gt;%
+  plot(layout=layout_as_bipartite)</code></pre>
+<p><img src="/post/2019-03-21-networks-or-graphs_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>make_full_graph(5) %&gt;%
+  plot()</code></pre>
+<p><img src="/post/2019-03-21-networks-or-graphs_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="rock-paper-scissors-psychic-dark" class="section level2">
+<h2>Rock-Paper-Scissors-Psychic-Dark</h2>
+<p>All you need for a network is some objects and some relationship between them. If your relationship is “wins against” then rock-paper-scissors looks like:</p>
+<pre class="r"><code>tribble(
+  ~from, ~to,
+  &quot;rock&quot;, &quot;scissors&quot;,
+  &quot;scissors&quot;, &quot;paper&quot;,
+  &quot;paper&quot;, &quot;rock&quot;
+) %&gt;%
+  as_tbl_graph() %&gt;%
+  plot(vertex.shape=&quot;none&quot;)</code></pre>
+<p><img src="/post/2019-03-21-networks-or-graphs_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Which shows the symmetry and ‘fairness’ in RPS quite nicely. Rock-paper-scissors-lizard-Spock and a multitude of more have similar shapes.</p>
+<p>Pokemon has a similar thing, but not the same symmetries. I’m going to focus on Pokemon-Go, because that’s what I’m currently playing.</p>
+<p>Pokemon has normal damage, super-effective, not very effective, and immune. Go has implemented “immune” as not very effective 2ce, rather than actual immunity. The below shows these with different coloured arrows.</p>
+<pre class="r"><code>
+pogo_type_effectiveness &lt;- read_csv(here(&quot;static&quot;, &quot;data&quot;, &quot;PoGo&quot;, &quot;type_effectiveness.csv&quot;)) %&gt;%
+  rename(from=X1) %&gt;%
+  gather(to, value, -from)
+
+pogo_graph &lt;- pogo_type_effectiveness %&gt;%
+  filter(!is.na(value)) %&gt;%
+  mutate(game_text = case_when(
+    value&lt;0.6 ~ &quot;Immune&quot;,
+    value &lt; 1 ~ &quot;Not very effective&quot;,
+    TRUE ~ &quot;Super-effective&quot;
+  )) %&gt;%
+  mutate(color = case_when(
+    value&lt;0.6 ~ &quot;maroon&quot;,
+    value &lt; 1 ~ &quot;red&quot;,
+    TRUE ~ &quot;green&quot;
+  )) %&gt;%
+  as_tbl_graph() 
+
+plot(pogo_graph, edge.color = E(pogo_graph)$color, layout=layout_in_circle, vertex.shape = &quot;none&quot;, edge.arrow.size=0.3, edge.curved=0.1)</code></pre>
+<p><img src="/post/2019-03-21-networks-or-graphs_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>This is absolutely a hairball graph!</p>
+<p>Throwing tidygraph at it, I can filter out just the super effective, or the not very effective:</p>
+<pre class="r"><code>
+pogo_graph %&gt;%
+  activate(edges) %&gt;%
+  filter(color==&quot;green&quot;) %&gt;%
+  plot(edge.color=&quot;green&quot;, layout=layout_in_circle, vertex.shape = &quot;none&quot;, edge.arrow.size=0.3, edge.curved=0.1)</code></pre>
+<p><img src="/post/2019-03-21-networks-or-graphs_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>
+pogo_graph %&gt;%
+  activate(edges) %&gt;%
+  filter(color==&quot;red&quot;) %&gt;%
+  plot(edge.color=&quot;red&quot;, layout=layout_in_circle, vertex.shape = &quot;none&quot;, edge.arrow.size=0.3, edge.curved=0.1)</code></pre>
+<p><img src="/post/2019-03-21-networks-or-graphs_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>For the <a href="https://silph.gg/tempest-cup">temptest cup</a></p>
+<pre class="r"><code>pogo_graph %&gt;%
+  activate(nodes) %&gt;%
+  filter(name %in% c(&quot;Electric&quot;, &quot;Ice&quot;, &quot;Flying&quot;, &quot;Ground&quot;)) %&gt;%
+  plot(layout=layout_in_circle, vertex.shape = &quot;none&quot;, edge.arrow.size=0.3, edge.curved=0.1)</code></pre>
+<p><img src="/post/2019-03-21-networks-or-graphs_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>For the <a href="https://silph.gg/kingdom-cup">kingdom cup</a></p>
+<pre class="r"><code>pogo_graph %&gt;%
+  activate(nodes) %&gt;%
+  filter(name %in% c(&quot;Fire&quot;, &quot;Ice&quot;, &quot;Dragon&quot;, &quot;Steel&quot;)) %&gt;%
+  plot(layout=layout_in_circle, vertex.shape = &quot;none&quot;, edge.arrow.size=0.3, edge.curved=0.1)</code></pre>
+<p><img src="/post/2019-03-21-networks-or-graphs_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>These are all static graphs, we’re online and we have JavaScript.</p>
+<p>Using visNetwork:</p>
+<pre class="r"><code>nodes &lt;- tibble(id = unique(pogo_type_effectiveness$from),
+                label=id)
+
+edges &lt;- pogo_type_effectiveness %&gt;%
+  filter(!is.na(value)) %&gt;%
+  mutate(color = case_when(
+    value&lt;0.6 ~ &quot;maroon&quot;,
+    value &lt; 1 ~ &quot;red&quot;,
+    TRUE ~ &quot;green&quot;
+  )) %&gt;%
+  mutate(arrows=&quot;to&quot;) %&gt;%
+  select(-value)
+
+visNetwork(nodes, edges) %&gt;%
+  visInteraction(navigationButtons = TRUE)</code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"nodes":{"id":["Normal","Fighting","Flying","Poison","Ground","Rock","Bug","Ghost","Steel","Fire","Water","Grass","Electric","Psychic","Ice","Dragon","Dark","Fairy"],"label":["Normal","Fighting","Flying","Poison","Ground","Rock","Bug","Ghost","Steel","Fire","Water","Grass","Electric","Psychic","Ice","Dragon","Dark","Fairy"]},"edges":{"from":["Fighting","Ghost","Flying","Rock","Bug","Psychic","Dark","Fairy","Fighting","Ground","Rock","Bug","Grass","Electric","Ice","Fighting","Poison","Ground","Bug","Grass","Psychic","Fairy","Poison","Rock","Water","Grass","Electric","Ice","Normal","Fighting","Flying","Poison","Ground","Steel","Fire","Water","Grass","Fighting","Flying","Ground","Rock","Fire","Grass","Normal","Fighting","Poison","Bug","Dark","Normal","Fighting","Poison","Ground","Rock","Bug","Ghost","Steel","Fire","Grass","Psychic","Ice","Dragon","Fairy","Ground","Rock","Bug","Steel","Fire","Water","Grass","Ice","Fairy","Steel","Fire","Water","Grass","Electric","Ice","Flying","Poison","Ground","Bug","Fire","Water","Grass","Electric","Ice","Flying","Ground","Steel","Electric","Fighting","Bug","Ghost","Psychic","Dark","Fighting","Rock","Steel","Fire","Ice","Fire","Water","Grass","Electric","Ice","Dragon","Fairy","Fighting","Bug","Ghost","Psychic","Dark","Fairy","Fighting","Poison","Bug","Steel","Dragon","Dark"],"to":["Normal","Normal","Fighting","Fighting","Fighting","Fighting","Fighting","Fighting","Flying","Flying","Flying","Flying","Flying","Flying","Flying","Poison","Poison","Poison","Poison","Poison","Poison","Poison","Ground","Ground","Ground","Ground","Ground","Ground","Rock","Rock","Rock","Rock","Rock","Rock","Rock","Rock","Rock","Bug","Bug","Bug","Bug","Bug","Bug","Ghost","Ghost","Ghost","Ghost","Ghost","Steel","Steel","Steel","Steel","Steel","Steel","Steel","Steel","Steel","Steel","Steel","Steel","Steel","Steel","Fire","Fire","Fire","Fire","Fire","Fire","Fire","Fire","Fire","Water","Water","Water","Water","Water","Water","Grass","Grass","Grass","Grass","Grass","Grass","Grass","Grass","Grass","Electric","Electric","Electric","Electric","Psychic","Psychic","Psychic","Psychic","Psychic","Ice","Ice","Ice","Ice","Ice","Dragon","Dragon","Dragon","Dragon","Dragon","Dragon","Dragon","Dark","Dark","Dark","Dark","Dark","Dark","Fairy","Fairy","Fairy","Fairy","Fairy","Fairy"],"color":["green","maroon","green","red","red","green","red","green","red","maroon","green","red","red","green","green","red","red","green","red","red","green","red","red","red","green","green","maroon","green","red","green","red","red","green","green","red","green","green","red","green","red","green","green","red","maroon","maroon","red","red","green","red","green","maroon","green","red","red","green","red","green","red","red","red","red","red","green","green","red","red","red","green","red","red","red","red","red","red","green","green","red","green","green","red","green","green","red","red","red","green","red","green","red","red","red","green","green","red","green","green","green","green","green","red","red","red","red","red","green","green","green","green","green","red","maroon","red","green","red","green","red","green","maroon","red"],"arrows":["to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to","to"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot"},"manipulation":{"enabled":false},"interaction":{"navigationButtons":true}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":null,"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
+<p>You can move this one around!</p>
+<p>Or in networkD3:</p>
+<p>No. I didn’t get networkD3 working.</p>
+</div>
+<div id="collatz-conjecture" class="section level2">
+<h2>Collatz Conjecture</h2>
+<p>XKCD references the Collatz Conjecture:</p>
+<div class="figure">
+<img src="https://imgs.xkcd.com/comics/collatz_conjecture.png" alt="Collatz Conjecture" />
+<p class="caption">Collatz Conjecture</p>
+</div>
+<p>and it makes me think every time I wear the shirt of it. Both the comic and the shirt have a directed graph, so let’s have a play.</p>
+<p>First we need a function that takes an integer 2 or larger to the next number in the sequence. 1 can be the end of the sequence so I don’t get (directed) loops.</p>
+<pre class="r"><code>collatz &lt;- function(n){
+  stopifnot(n == round(n, 0), n&gt;1) #Type forcing means our integers might have become floats.
+  
+  case_when(
+    n %% 2 == 0 ~ n/2,
+    TRUE ~ 3*n+1
+  )
+}</code></pre>
+<p>At this point I’ve discovered ggraph, so I’m doing different graphs to earlier.</p>
+<pre class="r"><code>set_graph_style(plot_margin = margin(1,1,1,1))
+
+collatz_graph &lt;- tibble(from=2:250, to=collatz(from)) %&gt;%
+  as_tbl_graph() 
+
+components &lt;- components(collatz_graph) #Try to keep only the ones who have already mapped to 1
+component_1 &lt;- names(components$membership[components$membership==1] ) %&gt;%
+  as.numeric()
+
+collatz_graph %&gt;%
+  activate(nodes) %&gt;%
+  filter(name %in% component_1) %&gt;%
+  ggraph() + geom_edge_link(arrow = arrow(length = unit(1, &#39;mm&#39;)), 
+                  start_cap = circle(1, &#39;mm&#39;),
+                  end_cap = circle(1, &#39;mm&#39;)) + geom_node_text(aes(label=name))</code></pre>
+<p><img src="/post/2019-03-21-networks-or-graphs_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>This scales, but not well:</p>
+<pre class="r"><code>
+plot_collatz &lt;- function(upper_bound){
+  collatz_graph &lt;- tibble(from=2:upper_bound, to=collatz(from)) %&gt;%
+    as_tbl_graph() 
+  
+  components &lt;- components(collatz_graph) #Try to keep only the ones who have already mapped to 1
+  component_1 &lt;- names(components$membership[components$membership==1] ) %&gt;%
+    as.numeric()
+  
+  collatz_graph %&gt;%
+    activate(nodes) %&gt;%
+    filter(name %in% component_1) %&gt;%
+    ggraph() + geom_edge_link(arrow = arrow(length = unit(1, &#39;mm&#39;)), 
+                    start_cap = circle(1, &#39;mm&#39;),
+                    end_cap = circle(1, &#39;mm&#39;)) + geom_node_text(aes(label=name))
+}
+
+plot_collatz(1000)</code></pre>
+<p><img src="/post/2019-03-21-networks-or-graphs_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<pre class="r"><code>plot_collatz(1e5)</code></pre>
+<p><img src="/post/2019-03-21-networks-or-graphs_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
