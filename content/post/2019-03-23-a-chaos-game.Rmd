@@ -1,7 +1,7 @@
 ---
 title: A chaos game
 author: James Riley
-date: '2019-03-23'
+date: '2019-03-25'
 slug: a-chaos-game
 categories: []
 tags:
@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 library("tidyverse")
 library("here")
 
-set.seed(17978)
+set.seed(17980)
 
 theme <- ggthemes::theme_few()
 scale <- ggthemes::scale_colour_few()
