@@ -1,0 +1,201 @@
+---
+title: A chaos game
+author: James Riley
+date: '2019-03-23'
+slug: a-chaos-game
+categories: []
+tags:
+  - ggplot
+  - chaos
+  - fractal
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+---
+
+
+
+<p>The Sierpinski Triangle is cool, and <a href="https://lucidmanager.org/sierpinski-triangle/">another blog</a> gave a construction of it as a <a href="https://en.wikipedia.org/wiki/Chaos_game">chaos game</a>.</p>
+<p>The other games look very do-able, let’s have a play.</p>
+<p>Generally we need to start with a regular n-gon in the plane. Might as well make a function via the parameterisation of the circle as <span class="math inline">\(\sin(\theta),\cos(\theta)\)</span>.</p>
+<p>Scrap that, this whole thing works better in Complex arithmetic.</p>
+<pre class="r"><code>
+plot_complex_points  &lt;- function(z){
+  tibble(Re=Re(z),Im=Im(z)) %&gt;%
+    ggplot(aes(x=Re,y=Im)) + scale + theme + geom_point(shape = &quot;.&quot;) + coord_equal()
+}
+
+poly &lt;- function(n){ #n roots of unity
+  complex(modulus = 1, argument = seq(0, 2*pi, length.out = n+1))[-1] #removing the first element to stop double-counting 1+0i.
+}
+
+poly(5) %&gt;%
+  plot_complex_points()</code></pre>
+<p><img src="/post/2019-03-23-a-chaos-game_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>I like the look of rule:</p>
+<blockquote>
+<p>A point inside a pentagon repeatedly jumps half of the distance towards a randomly chosen vertex, but the currently chosen vertex cannot be the same as the previously chosen vertex.</p>
+</blockquote>
+<p>‘Half the distance to’, in the complex plane, is just taking the average. This is nice.</p>
+<p>Not choosing the same vertex 2ce is just as simple of numbering the other vertices 1:4.</p>
+<pre class="r"><code>
+number_of_points &lt;- 1e6
+
+pentagon &lt;- poly(5)
+
+points &lt;- rep(0i, number_of_points) #slightly better than always extending the lists.
+
+chosen_vertex &lt;- sample(0:3, number_of_points, replace = T)
+
+for(i in 2:number_of_points){
+
+  
+  chosen_vertex[i] &lt;- ((chosen_vertex[i-1] + chosen_vertex[i]) %% 5) + 1
+  
+  this_vertex &lt;- pentagon[chosen_vertex[i]]
+  
+  points[i] &lt;- (points[i-1] + this_vertex)/2
+}
+
+
+plot_complex_points(points[2:1e4])</code></pre>
+<p><img src="/post/2019-03-23-a-chaos-game_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>
+
+plot_complex_points(points[2:1e5])</code></pre>
+<p><img src="/post/2019-03-23-a-chaos-game_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre class="r"><code>
+
+plot_complex_points(points)</code></pre>
+<p><img src="/post/2019-03-23-a-chaos-game_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p>
+<p>About 1e5 points seems to be the sweet spot.</p>
+<p>Let’s call the Chaos Game without restrictions ‘normal’ and make a function for the normal chaos game on the n-gon.</p>
+<pre class="r"><code>
+normal_chaos_game &lt;- function(n_gon, number_of_points=1e5){
+  
+  polygon &lt;- poly(n_gon)
+  
+  points &lt;- rep(0i, number_of_points) #slightly better than always extending the lists.
+  
+  chosen_vertex &lt;- sample(seq_len(n_gon), number_of_points, replace = T)
+  
+  for(i in 2:number_of_points){
+  
+    this_vertex &lt;- polygon[chosen_vertex[i]]
+    
+    points[i] &lt;- (points[i-1] + this_vertex)/2
+  }
+  
+  return(points)
+}
+
+normal_chaos_game(3) %&gt;%
+  plot_complex_points()</code></pre>
+<p><img src="/post/2019-03-23-a-chaos-game_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>
+
+normal_chaos_game(5) %&gt;%
+  plot_complex_points()</code></pre>
+<p><img src="/post/2019-03-23-a-chaos-game_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<pre class="r"><code>
+
+normal_chaos_game(6) %&gt;% #An interesting case, roll a normal die every time!
+  plot_complex_points()</code></pre>
+<p><img src="/post/2019-03-23-a-chaos-game_files/figure-html/unnamed-chunk-3-3.png" width="672" /></p>
+<p>Wiki notes that the square doesn’t work in the normal case, but what about the net of the tetrahedron, or a triangle with another vertex in the middle.</p>
+<pre class="r"><code>
+tetrahedron &lt;- c(poly(3), 0i)
+
+points &lt;- rep(0.1i, number_of_points) #slightly better than always extending the lists.
+  
+chosen_vertex &lt;- sample(1:4, number_of_points, replace = T)
+  
+for(i in 2:number_of_points){
+  
+    this_vertex &lt;- tetrahedron[chosen_vertex[i]]
+    
+    points[i] &lt;- (points[i-1] + this_vertex)/2
+}
+
+plot_complex_points(points)</code></pre>
+<p><img src="/post/2019-03-23-a-chaos-game_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>This… confuses me. It’s very Escher.</p>
+<p>If the rule is “not the last one”, then we can get some more.</p>
+<pre class="r"><code>
+not_last &lt;- function(n_gon, number_of_points=1e5){
+  
+  polygon &lt;- poly(n_gon)
+  
+  points &lt;- rep(0i, number_of_points) #slightly better than always extending the lists.
+  
+  chosen_vertex &lt;- sample(0:(n_gon-2), number_of_points, replace = T)
+
+  chosen_vertex[1] &lt;- chosen_vertex[1] + 1
+  for(i in 2:number_of_points){
+    chosen_vertex[i] &lt;- ((chosen_vertex[i-1] + chosen_vertex[i]) %% n_gon) + 1
+
+    this_vertex &lt;- polygon[chosen_vertex[i]]
+    
+    points[i] &lt;- (points[i-1] + this_vertex)/2
+  }
+
+  return(points)
+}
+
+not_last(3) %&gt;%
+  plot_complex_points()</code></pre>
+<p><img src="/post/2019-03-23-a-chaos-game_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>
+not_last(4) %&gt;% 
+  plot_complex_points()</code></pre>
+<p><img src="/post/2019-03-23-a-chaos-game_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<pre class="r"><code>
+
+not_last(5) %&gt;% 
+  plot_complex_points()</code></pre>
+<p><img src="/post/2019-03-23-a-chaos-game_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
+<pre class="r"><code>
+
+
+not_last(6) %&gt;% 
+  plot_complex_points()</code></pre>
+<p><img src="/post/2019-03-23-a-chaos-game_files/figure-html/unnamed-chunk-5-4.png" width="672" /></p>
+<p>Wiki also shows off some where the rule is “not adjacent to the the last 2 choices (but the same is AOK)”. I’m going to abandon efficency of code running, and make a loop with dice rolls.</p>
+<pre class="r"><code>
+not_adjacent_last_two &lt;- function(n_gon, number_of_points=1e5){
+  
+  polygon &lt;- poly(n_gon)
+  
+  points &lt;- rep(0i, number_of_points) #slightly better than always extending the lists.
+  
+  chosen_vertex &lt;- rep(1, number_of_points)
+  
+  ##Handle the first 2 points specially
+  points[2] &lt;- (points[1] + polygon[chosen_vertex[1]])/2
+  
+  
+  for(i in 3:number_of_points){
+    bad_choices &lt;- c(chosen_vertex[i-1] + 1,
+                     chosen_vertex[i-1] - 1,
+                     chosen_vertex[i-2] + 1,
+                     chosen_vertex[i-2] - 1) #map might have been more robust, but this is easier to read.
+    
+    bad_choices &lt;- ((bad_choices - 1) %% n_gon) + 1 ## Really should have considered 0-indexing polygon points
+    
+    good_choices &lt;- setdiff(seq_len(n_gon), bad_choices)
+    chosen_vertex[i] &lt;- sample(good_choices, 1)
+    
+    this_vertex &lt;- polygon[chosen_vertex[i]]
+    
+    points[i] &lt;- (points[i-1] + this_vertex)/2
+
+  }
+  return(points)
+}
+
+not_adjacent_last_two(6) %&gt;%
+  plot_complex_points()</code></pre>
+<p><img src="/post/2019-03-23-a-chaos-game_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Wow.</p>
