@@ -1,0 +1,100 @@
+---
+title: Neural net-based AI
+author: James Riley
+date: '2019-06-05'
+slug: neural-net-based-ai
+categories:
+  - python
+tags:
+  - neural networks
+  - google colab
+  - gpt-2
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+This one's been brewing a while, and there's a _lot_ of wasted computer time on this project. _A lot._
+
+First of all, thanks to [Janelle Shane/AI weirdness](https://aiweirdness.com/) for showing us a lot of cool examples of AIs learning to write in a particular style. I've spent a decent amount of time running smaller deep neural nets on my PC, but nothing compares to [GPT2](https://github.com/minimaxir/gpt-2-simple). That Google Colab notebook is:
+
+1. Way more powerful than my PC.
+2. Way simpler to get started than R/keras/plaidml on my PC. (Forget Tensorflow. I ended up giving up somewhere around the point I crashed my X server.)
+
+I've run 3 models from that notebook.
+
+For a bit of background, the base model was trained on _months_ of Reddit posts that had enough upvotes. I feel a little bad for the poor baby.
+
+# 1: @POTUS, robots are coming for your job
+
+Can GPT2 (small, 117M synapses)[^1] imitate Trump? Or at least, his Tweeting? I didn't even have to dig into the Twitter API, there's already [people who believe in archiving politicians' tweets](https://github.com/bpb27/trump_tweet_data_archive). 
+
+I feel like I've entered the text version of the Uncanny Valley.
+
+* ...The people of West Virginia are tired of the politicians who talk about keeping drugs out of our border. We need our laws. Only one ticket: keep our borders secure!
+* It is “vaccine ready.”  This is a last resort and should be ended immediately.
+
+(Did it learn anti-vax from Trump, or from Reddit?)
+
+* Yesterday I was meeting with Members of the House and Senate hearings on Intelligence. Our meeting was very productive, both in terms of…
+* Iran’s nuclear program has blown up, and the so-called Non-Proliferation Treaty has proved unanimously to be a horrible and costly mistake. WE will soon terminate the MIDDLE!
+* The United States has a proven nuclear program from START to Nuke (it’s nuclear stranding just ending). All countries take NO on nuclear because they are working for MONUMENT/MINUTE! The world is watching!
+
+(I'm starting to regret the Skynet-based title to this post.)
+
+* Wonderful how the Pope was just Pope around the world. I greatly appreciate what he has prepared us for 2.0.
+* Remember, the Pope was just nominated for “Best Pope of All-Time by the Economist World List.” Very good news.
+
+(At least Skynet's Catholic?)
+
+One artifact I'm amused with is how it learned the url shortener[^2]. There's a lot of generated tweets with what looks like a shorturl, but isn't linked to anything.
+
+* Now China is ripping us off on trade http://t.co/mdO6ikIj2 @BarackObama uses BS economic thinking and no-treats trade like we should. Work to be done!
+* Join me LIVE for the Republican National Convention in Cleveland, Ohio! Hosted by the great Governor @JohnHeyman at: https://t.co/kFyuN0lleW
+* We have a duty to our veterans, to our police officers, to our veterans. We must do everything possible to secure our borders. During my administration, we have begun to secure everything we carry in our pockets. I want our veterans secure. #MAGA https://t.co/NuPxF8ZT5vn
+
+Quite a few of the samples are "#MAGA"or some variant of. If you want to dig further, [here's 1MB of generated text.](GPT-2-samples/Trump.txt)
+ 
+# 2: Electronic Monk
+
+When I noticed that the Trump tweet archive was approximately the size of the Bible, I fed another copy of GPT-2 a KJV Bible, and asked it to continue writing the sentence "Thou shalt not". So, what commandments did it come up with.
+
+
+## Thou shalt not:
+
+*  say, I bring thee to the priest: it is too little for thee.
+*  tell it to thy son, or to thy son's son to thy son.
+* hate.
+* fall.
+*  be sold, thou shalt drink of his wine, thou shalt not eat his meat.
+* give heed unto the son of Adam, neither shalt thou eat the flesh of ox, nor have drink the blood of reproach ox.
+* look to thy neighbor when he is anointed with oil.
+* give thy son to be a potter, nor thou shalt make thy husband to be a tinkler, nor the maker of thine oxen to dishonour thee: for it is good for thy household, and for thine oxen, that thou dost eat of them alone, and dost not drink of their blood.
+* die yet! (Thou shalt eat the flesh of thine enemies, and the flesh of thy servants, and the flesh of thy goats, and the flesh of thy goats, and the flesh of thy kid, and the flesh of thy ass, and the flesh of thy kine, and the flesh of your kid:)
+* die.
+* do.
+* go to the grave.
+* eat the flesh of men, nor eat the flesh of beasts; neither shalt thou eat of any of the grape, until thou be waxed old, as an oak.
+* fail?
+* do this thing.
+* touch this.
+
+It really, really, likes the new commandment "Thou shalt not die". 
+
+I then let it start from the start.
+
+## In the beginning...
+
+* came his disciples, having heard from the church that Jesus of Nazareth had suffered circumcision.
+
+The rest weren't particularly amusing.
+
+# Conclusion
+
+Go play with the GPT-2 workbook, connect text from the web, [Project Gutenberg](http://www.gutenberg.org/wiki/Main_Page) always needs more love. Load text from your Google Drive. Break things. Learn to fix them. Cackle manically as you make a fledgling AI read all of Trump's tweets. 
+
+[^1]: [Wiki](https://en.wikipedia.org/wiki/Neuron#Connectivity) believes that the human neuron has about 7000 synapses, so this would be somewhere around 17k neurons. Except I've overstretched the comparison between tensor operations and neurons.
+[^2]: I know I'm asking for trouble leaving links to nothing up in a post.

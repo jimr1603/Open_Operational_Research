@@ -1,0 +1,102 @@
+---
+title: Neural net-based AI
+author: James Riley
+date: '2019-06-05'
+slug: neural-net-based-ai
+categories:
+  - python
+tags:
+  - neural networks
+  - google colab
+  - gpt-2
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+
+
+<p>This one’s been brewing a while, and there’s a <em>lot</em> of wasted computer time on this project. <em>A lot.</em></p>
+<p>First of all, thanks to <a href="https://aiweirdness.com/">Janelle Shane/AI weirdness</a> for showing us a lot of cool examples of AIs learning to write in a particular style. I’ve spent a decent amount of time running smaller deep neural nets on my PC, but nothing compares to <a href="https://github.com/minimaxir/gpt-2-simple">GPT2</a>. That Google Colab notebook is:</p>
+<ol style="list-style-type: decimal">
+<li>Way more powerful than my PC.</li>
+<li>Way simpler to get started than R/keras/plaidml on my PC. (Forget Tensorflow. I ended up giving up somewhere around the point I crashed my X server.)</li>
+</ol>
+<p>I’ve run 3 models from that notebook.</p>
+<p>For a bit of background, the base model was trained on <em>months</em> of Reddit posts that had enough upvotes. I feel a little bad for the poor baby.</p>
+<div id="potus-robots-are-coming-for-your-job" class="section level1">
+<h1>1: <span class="citation">@POTUS</span>, robots are coming for your job</h1>
+<p>Can GPT2 (small, 117M synapses)<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> imitate Trump? Or at least, his Tweeting? I didn’t even have to dig into the Twitter API, there’s already <a href="https://github.com/bpb27/trump_tweet_data_archive">people who believe in archiving politicians’ tweets</a>.</p>
+<p>I feel like I’ve entered the text version of the Uncanny Valley.</p>
+<ul>
+<li>…The people of West Virginia are tired of the politicians who talk about keeping drugs out of our border. We need our laws. Only one ticket: keep our borders secure!</li>
+<li>It is “vaccine ready.” This is a last resort and should be ended immediately.</li>
+</ul>
+<p>(Did it learn anti-vax from Trump, or from Reddit?)</p>
+<ul>
+<li>Yesterday I was meeting with Members of the House and Senate hearings on Intelligence. Our meeting was very productive, both in terms of…</li>
+<li>Iran’s nuclear program has blown up, and the so-called Non-Proliferation Treaty has proved unanimously to be a horrible and costly mistake. WE will soon terminate the MIDDLE!</li>
+<li>The United States has a proven nuclear program from START to Nuke (it’s nuclear stranding just ending). All countries take NO on nuclear because they are working for MONUMENT/MINUTE! The world is watching!</li>
+</ul>
+<p>(I’m starting to regret the Skynet-based title to this post.)</p>
+<ul>
+<li>Wonderful how the Pope was just Pope around the world. I greatly appreciate what he has prepared us for 2.0.</li>
+<li>Remember, the Pope was just nominated for “Best Pope of All-Time by the Economist World List.” Very good news.</li>
+</ul>
+<p>(At least Skynet’s Catholic?)</p>
+<p>One artifact I’m amused with is how it learned the url shortener<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>. There’s a lot of generated tweets with what looks like a shorturl, but isn’t linked to anything.</p>
+<ul>
+<li>Now China is ripping us off on trade <a href="http://t.co/mdO6ikIj2" class="uri">http://t.co/mdO6ikIj2</a> <span class="citation">@BarackObama</span> uses BS economic thinking and no-treats trade like we should. Work to be done!</li>
+<li>Join me LIVE for the Republican National Convention in Cleveland, Ohio! Hosted by the great Governor <span class="citation">@JohnHeyman</span> at: <a href="https://t.co/kFyuN0lleW" class="uri">https://t.co/kFyuN0lleW</a></li>
+<li>We have a duty to our veterans, to our police officers, to our veterans. We must do everything possible to secure our borders. During my administration, we have begun to secure everything we carry in our pockets. I want our veterans secure. #MAGA <a href="https://t.co/NuPxF8ZT5vn" class="uri">https://t.co/NuPxF8ZT5vn</a></li>
+</ul>
+<p>Quite a few of the samples are “#MAGA”or some variant of. If you want to dig further, <a href="GPT-2-samples/Trump.txt">here’s 1MB of generated text.</a></p>
+</div>
+<div id="electronic-monk" class="section level1">
+<h1>2: Electronic Monk</h1>
+<p>When I noticed that the Trump tweet archive was approximately the size of the Bible, I fed another copy of GPT-2 a KJV Bible, and asked it to continue writing the sentence “Thou shalt not”. So, what commandments did it come up with.</p>
+<div id="thou-shalt-not" class="section level2">
+<h2>Thou shalt not:</h2>
+<ul>
+<li>say, I bring thee to the priest: it is too little for thee.</li>
+<li>tell it to thy son, or to thy son’s son to thy son.</li>
+<li>hate.</li>
+<li>fall.</li>
+<li>be sold, thou shalt drink of his wine, thou shalt not eat his meat.</li>
+<li>give heed unto the son of Adam, neither shalt thou eat the flesh of ox, nor have drink the blood of reproach ox.</li>
+<li>look to thy neighbor when he is anointed with oil.</li>
+<li>give thy son to be a potter, nor thou shalt make thy husband to be a tinkler, nor the maker of thine oxen to dishonour thee: for it is good for thy household, and for thine oxen, that thou dost eat of them alone, and dost not drink of their blood.</li>
+<li>die yet! (Thou shalt eat the flesh of thine enemies, and the flesh of thy servants, and the flesh of thy goats, and the flesh of thy goats, and the flesh of thy kid, and the flesh of thy ass, and the flesh of thy kine, and the flesh of your kid:)</li>
+<li>die.</li>
+<li>do.</li>
+<li>go to the grave.</li>
+<li>eat the flesh of men, nor eat the flesh of beasts; neither shalt thou eat of any of the grape, until thou be waxed old, as an oak.</li>
+<li>fail?</li>
+<li>do this thing.</li>
+<li>touch this.</li>
+</ul>
+<p>It really, really, likes the new commandment “Thou shalt not die”.</p>
+<p>I then let it start from the start.</p>
+</div>
+<div id="in-the-beginning" class="section level2">
+<h2>In the beginning…</h2>
+<ul>
+<li>came his disciples, having heard from the church that Jesus of Nazareth had suffered circumcision.</li>
+</ul>
+<p>The rest weren’t particularly amusing.</p>
+</div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>Go play with the GPT-2 workbook, connect text from the web, <a href="http://www.gutenberg.org/wiki/Main_Page">Project Gutenberg</a> always needs more love. Load text from your Google Drive. Break things. Learn to fix them. Cackle manically as you make a fledgling AI read all of Trump’s tweets.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://en.wikipedia.org/wiki/Neuron#Connectivity">Wiki</a> believes that the human neuron has about 7000 synapses, so this would be somewhere around 17k neurons. Except I’ve overstretched the comparison between tensor operations and neurons.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>I know I’m asking for trouble leaving links to nothing up in a post.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
