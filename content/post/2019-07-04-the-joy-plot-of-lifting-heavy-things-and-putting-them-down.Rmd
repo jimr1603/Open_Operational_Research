@@ -1,0 +1,140 @@
+---
+title: The joy (plot) of lifting heavy things and putting them down
+author: ''
+date: '2019-07-04'
+slug: the-joy-plot-of-lifting-heavy-things-and-putting-them-down
+categories: [R]
+tags: 
+  - tidyverse
+  - Open Powerlifting
+  - DYEL
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+library("tidyverse")
+library("ggridges")
+library("here")
+
+set.seed(18081)
+
+theme <- ggthemes::theme_few()
+scale <- ggthemes::scale_colour_few()
+```
+
+## 
+
+A shoutout to [Matthew Analytics](https://mathewanalytics.com/2019/07/01/powerlytics-impact-of-age-gender-and-weight-on-total-weight-lifted-in-powerlifting-meets/) (via R-Bloggers) for linking to the [Open Powerlifting Data](https://www.openpowerlifting.org/data). 
+
+I've started looking at distributions of the lifts (squat, bench, deadlift) that have been performed at meets, and already submitted a bug report on the data. (They were slightly overzealous on matching records with the same name and ended up with _strong_ babies.)
+
+I've also been looking for a reason to use [ggridges](https://cran.r-project.org/web/packages/ggridges/vignettes/gallery.html) so there's this, below:
+
+```{r}
+powerlifting_data <- read_csv(here("static", "data", "Open Powerlifting", "openpowerlifting-2019-06-19.csv"))
+```
+
+```{r}
+powerlifting_data %>%
+  filter(Sex=="M", !is.na(AgeClass)) %>%
+  mutate(AgeClass = replace(AgeClass, AgeClass=="5-12", "05-12")) %>% #Cheap way to make them line up in order
+  select(Sex, AgeClass,
+         Bench    = Best3BenchKg,
+         Squat    = Best3SquatKg,
+         Deadlift = Best3DeadliftKg) %>%
+  gather(lift, kg, Bench, Squat, Deadlift) %>% # Make long or 'tidy'
+  filter(!is.na(kg)) %>%
+  filter(kg>0) %>% # Failed lifts are logged as negative
+  ggplot(aes(x=kg, y=AgeClass)) + geom_density_ridges2(aes(rel_min_height=0.005)) + facet_wrap(~lift) + theme_ridges()
+```
+
+```{r}
+
+powerlifting_data %>%
+  filter(Sex=="F", !is.na(AgeClass)) %>%
+  mutate(AgeClass = replace(AgeClass, AgeClass=="5-12", "05-12")) %>% #Cheap way to make them line up in order
+  select(Sex, AgeClass,
+         Bench    = Best3BenchKg,
+         Squat    = Best3SquatKg,
+         Deadlift = Best3DeadliftKg) %>%
+  gather(lift, kg, Bench, Squat, Deadlift) %>% # Make long or 'tidy'
+  filter(!is.na(kg)) %>%
+  filter(kg>0) %>% # Failed lifts are logged as negative
+  ggplot(aes(x=kg, y=AgeClass)) + geom_density_ridges2(aes(rel_min_height=0.005)) + facet_wrap(~lift) + theme_ridges() 
+```
+
+Instagram has chosen to remind me that Eddie Hall is defending his 500 kg world record deadlift. Density plots with thresholds don't really handle single-points, but I could look up his age and add a special labelled point for him.
+
+## Does James even lift?
+
+```{r}
+comparison_data <- powerlifting_data %>%
+  filter(Sex=="M", AgeClass == "24-34") %>%
+   select(
+         Bench    = Best3BenchKg,
+         Squat    = Best3SquatKg,
+         Deadlift = Best3DeadliftKg) %>%
+  gather(lift, kg, Bench, Squat, Deadlift) %>% # Make long or 'tidy'
+  filter(!is.na(kg)) %>%
+  filter(kg>0) 
+
+lift_to_percentile <- function(lift_name, weight){
+  
+comparison_data %>%
+  filter(lift==lift_name) %>%
+  arrange(kg) %>%
+  mutate(row = row_number()) %>%
+  mutate(percentage = row/max(row)) %>%
+  filter(kg == weight) %>%
+  summarise(from = min(percentage) * 100, to=max(percentage)*100)
+}
+
+lift_to_percentile("Bench", 80)
+
+```
+
+So somewhere around the 1st percentile for bench :)
+
+```{r}
+lift_to_percentile("Deadlift", 145)
+```
+And about the 1st percentile for deadlift. I see a pattern.
+
+```{r}
+lift_to_percentile("Squat", 130)
+```
+Trend broken! 2nd percentile for squat. 
+
+This discrepancy makes me want to look at ratioes of personal best squats to deadlifts...
+
+## Squat to deadlift ratio
+
+```{r}
+powerlifting_data %>%
+  group_by(Name) %>%
+  summarise(squat_pr = max(Best3SquatKg), deadlift_pr = max(Best3DeadliftKg)) %>%
+  mutate(squat_to_deadlift = deadlift_pr/squat_pr) %>%
+  filter(squat_to_deadlift > 0) %>%
+  ggplot(aes(x=squat_to_deadlift)) + geom_density() + theme_ridges()
+```
+
+That's a loooooong tail, let's zoom in.
+
+```{r}
+powerlifting_data %>%
+  group_by(Name) %>%
+  summarise(squat_pr = max(Best3SquatKg), deadlift_pr = max(Best3DeadliftKg)) %>%
+  mutate(squat_to_deadlift = deadlift_pr/squat_pr) %>%
+  filter(squat_to_deadlift > 0, squat_to_deadlift < 2.5) %>%
+  ggplot(aes(x=squat_to_deadlift)) + geom_density() + theme_ridges()
+```
+
+I like the little peak at 1.0. 

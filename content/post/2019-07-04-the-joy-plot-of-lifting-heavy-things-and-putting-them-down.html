@@ -1,0 +1,114 @@
+---
+title: The joy (plot) of lifting heavy things and putting them down
+author: ''
+date: '2019-07-04'
+slug: the-joy-plot-of-lifting-heavy-things-and-putting-them-down
+categories: [R]
+tags: 
+  - tidyverse
+  - Open Powerlifting
+  - DYEL
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+---
+
+
+
+<div id="section" class="section level2">
+<h2></h2>
+<p>A shoutout to <a href="https://mathewanalytics.com/2019/07/01/powerlytics-impact-of-age-gender-and-weight-on-total-weight-lifted-in-powerlifting-meets/">Matthew Analytics</a> (via R-Bloggers) for linking to the <a href="https://www.openpowerlifting.org/data">Open Powerlifting Data</a>.</p>
+<p>I’ve started looking at distributions of the lifts (squat, bench, deadlift) that have been performed at meets, and already submitted a bug report on the data. (They were slightly overzealous on matching records with the same name and ended up with <em>strong</em> babies.)</p>
+<p>I’ve also been looking for a reason to use <a href="https://cran.r-project.org/web/packages/ggridges/vignettes/gallery.html">ggridges</a> so there’s this, below:</p>
+<pre class="r"><code>powerlifting_data &lt;- read_csv(here(&quot;static&quot;, &quot;data&quot;, &quot;Open Powerlifting&quot;, &quot;openpowerlifting-2019-06-19.csv&quot;))</code></pre>
+<pre class="r"><code>powerlifting_data %&gt;%
+  filter(Sex==&quot;M&quot;, !is.na(AgeClass)) %&gt;%
+  mutate(AgeClass = replace(AgeClass, AgeClass==&quot;5-12&quot;, &quot;05-12&quot;)) %&gt;% #Cheap way to make them line up in order
+  select(Sex, AgeClass,
+         Bench    = Best3BenchKg,
+         Squat    = Best3SquatKg,
+         Deadlift = Best3DeadliftKg) %&gt;%
+  gather(lift, kg, Bench, Squat, Deadlift) %&gt;% # Make long or &#39;tidy&#39;
+  filter(!is.na(kg)) %&gt;%
+  filter(kg&gt;0) %&gt;% # Failed lifts are logged as negative
+  ggplot(aes(x=kg, y=AgeClass)) + geom_density_ridges2(aes(rel_min_height=0.005)) + facet_wrap(~lift) + theme_ridges()</code></pre>
+<p><img src="/post/2019-07-04-the-joy-plot-of-lifting-heavy-things-and-putting-them-down_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>
+powerlifting_data %&gt;%
+  filter(Sex==&quot;F&quot;, !is.na(AgeClass)) %&gt;%
+  mutate(AgeClass = replace(AgeClass, AgeClass==&quot;5-12&quot;, &quot;05-12&quot;)) %&gt;% #Cheap way to make them line up in order
+  select(Sex, AgeClass,
+         Bench    = Best3BenchKg,
+         Squat    = Best3SquatKg,
+         Deadlift = Best3DeadliftKg) %&gt;%
+  gather(lift, kg, Bench, Squat, Deadlift) %&gt;% # Make long or &#39;tidy&#39;
+  filter(!is.na(kg)) %&gt;%
+  filter(kg&gt;0) %&gt;% # Failed lifts are logged as negative
+  ggplot(aes(x=kg, y=AgeClass)) + geom_density_ridges2(aes(rel_min_height=0.005)) + facet_wrap(~lift) + theme_ridges() </code></pre>
+<p><img src="/post/2019-07-04-the-joy-plot-of-lifting-heavy-things-and-putting-them-down_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>Instagram has chosen to remind me that Eddie Hall is defending his 500 kg world record deadlift. Density plots with thresholds don’t really handle single-points, but I could look up his age and add a special labelled point for him.</p>
+</div>
+<div id="does-james-even-lift" class="section level2">
+<h2>Does James even lift?</h2>
+<pre class="r"><code>comparison_data &lt;- powerlifting_data %&gt;%
+  filter(Sex==&quot;M&quot;, AgeClass == &quot;24-34&quot;) %&gt;%
+   select(
+         Bench    = Best3BenchKg,
+         Squat    = Best3SquatKg,
+         Deadlift = Best3DeadliftKg) %&gt;%
+  gather(lift, kg, Bench, Squat, Deadlift) %&gt;% # Make long or &#39;tidy&#39;
+  filter(!is.na(kg)) %&gt;%
+  filter(kg&gt;0) 
+
+lift_to_percentile &lt;- function(lift_name, weight){
+  
+comparison_data %&gt;%
+  filter(lift==lift_name) %&gt;%
+  arrange(kg) %&gt;%
+  mutate(row = row_number()) %&gt;%
+  mutate(percentage = row/max(row)) %&gt;%
+  filter(kg == weight) %&gt;%
+  summarise(from = min(percentage) * 100, to=max(percentage)*100)
+}
+
+lift_to_percentile(&quot;Bench&quot;, 80)
+## # A tibble: 1 x 2
+##    from    to
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1 0.948  1.22</code></pre>
+<p>So somewhere around the 1st percentile for bench :)</p>
+<pre class="r"><code>lift_to_percentile(&quot;Deadlift&quot;, 145)
+## # A tibble: 1 x 2
+##    from    to
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  1.28  1.42</code></pre>
+<p>And about the 1st percentile for deadlift. I see a pattern.</p>
+<pre class="r"><code>lift_to_percentile(&quot;Squat&quot;, 130)
+## # A tibble: 1 x 2
+##    from    to
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  2.27  2.68</code></pre>
+<p>Trend broken! 2nd percentile for squat.</p>
+<p>This discrepancy makes me want to look at ratioes of personal best squats to deadlifts…</p>
+</div>
+<div id="squat-to-deadlift-ratio" class="section level2">
+<h2>Squat to deadlift ratio</h2>
+<pre class="r"><code>powerlifting_data %&gt;%
+  group_by(Name) %&gt;%
+  summarise(squat_pr = max(Best3SquatKg), deadlift_pr = max(Best3DeadliftKg)) %&gt;%
+  mutate(squat_to_deadlift = deadlift_pr/squat_pr) %&gt;%
+  filter(squat_to_deadlift &gt; 0) %&gt;%
+  ggplot(aes(x=squat_to_deadlift)) + geom_density() + theme_ridges()</code></pre>
+<p><img src="/post/2019-07-04-the-joy-plot-of-lifting-heavy-things-and-putting-them-down_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>That’s a loooooong tail, let’s zoom in.</p>
+<pre class="r"><code>powerlifting_data %&gt;%
+  group_by(Name) %&gt;%
+  summarise(squat_pr = max(Best3SquatKg), deadlift_pr = max(Best3DeadliftKg)) %&gt;%
+  mutate(squat_to_deadlift = deadlift_pr/squat_pr) %&gt;%
+  filter(squat_to_deadlift &gt; 0, squat_to_deadlift &lt; 2.5) %&gt;%
+  ggplot(aes(x=squat_to_deadlift)) + geom_density() + theme_ridges()</code></pre>
+<p><img src="/post/2019-07-04-the-joy-plot-of-lifting-heavy-things-and-putting-them-down_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>I like the little peak at 1.0.</p>
+</div>
