@@ -1,0 +1,154 @@
+---
+title: My Fitocracy data
+author: James Riley
+date: '2019-09-11'
+slug: my-fitocracy-data
+categories:
+  - R
+tags:
+  - DYEL
+  - json
+  - Fitocracy
+  - fitness
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+library("tidyverse")
+library("here")
+library("lubridate")
+library("plotly")
+
+set.seed(18150)
+
+JR_fito_data <- read_csv(here("..", "analyse_fito", "JR fito.csv"))
+
+```
+
+Previously, I compared my "big 3" lifts to various competition records. I first got interested in getting fit for a few reasons:
+
+- ![The connection between exercise and levelling up](https://xkcd.com/189/)
+- Being fit enough to run around a field in metal or leather armour for a weekend, or LARPing.[^0]
+
+I managed to get an invite to [Fitocracy](http://ftcy.me/peXFQt) [^1] somewhere around Jan 2012, the first workout appears to be logged for 2012-1-10. [^2] Weight training is relatively recent, since gyms are expensive and full of other people. 
+
+I used [this Python3 script](https://github.com/luketurner/fitocracy-export) to grab my entire Fitocracy log as a pile of json. I dug around it a while, and managed to wrangle it into a sensible data.frame. As with the Spotify data post, you're not getting the raw data, but some summary stats are cool.
+
+This isn't my first time playing with the Fito json dump - one year Heroes (premium users) were given a end of year summary, then the next year they weren't. [I tried writing a script to generate the same stats (link to GitHub)](https://github.com/jimr1603/fitoEndOfYear). It failed in some edge cases, and another Hero wrote a script that actually worked.
+
+First item of curiosity: what activities have given me the most XP.[^3]
+
+```{r}
+JR_fito_data %>%
+  group_by(name) %>%
+  summarise(points = sum(points)) %>%
+  top_n(10, points) %>%
+  arrange(-points) %>%
+  knitr::kable()
+
+```
+
+By 'SCA Heavy Combat' I mean "LARPing". It once was listed as an alias in the tracking page, but not any more. It makes me happy that most of my fitness XP is from RPGs. 
+
+Pull-Ups are basically the same thing as Chin-Ups, and OHP is essentially the same thing as Military Press, but I'm not tidying this dataset by what's too similar to other stuff.
+
+Least points?
+
+```{r}
+JR_fito_data %>%
+  group_by(name) %>%
+  summarise(points = sum(points)) %>%
+  top_n(-10, points) %>%
+  arrange(points) %>%
+  knitr::kable()
+
+```
+
+The negative points are comedy entries - squat rack is for squatting, not for curls. My Zombie survival RPG [ZOINKS](https://www.fitocracy.com/group/8905/?chatter) has a choose-your-own-adventure where you log that to represent 'damage'. Similar for shake weight.
+
+The rest is incredibly poor scoring activities that I did a very small number of times before progressing to better stuff. (incline push-up -> push-up -> decline push-up)
+
+Looking at the calendar
+
+```{r}
+JR_fito_data %>%
+  mutate(week=week(actiondate), year=year(actiondate)) %>%
+  group_by(week,year) %>%
+  summarise(points=sum(points)) %>%
+  ungroup() %>%
+  ggplot(aes(x=week,y=year,fill=points)) + geom_tile() + ggthemes::theme_few() + scale_y_continuous(breaks = 2012:2019) + ggtitle("Fitocracy XP by week") + scale_fill_continuous(type = "viridis")
+
+```
+
+So apparently around this time of year I tend to stop working out. This is approximately the time of year I get a seasonal slump. The big gap around 2017-2019 relates to an episode of sciatica.
+
+2012-2016 was my PhD, and I bought 3 years of uni gym. Initially for the swimming, then for the weights and rowing machine. Mostly I didn't get my money's worth from it. _shrug_.
+
+Points aren't really connected to how good a workout is. FRED [^4] really, really likes it when we lift something near our personal best, 1ce. He begrudginly gives extra points for cardio if we log a heart rate that is at least compatible with life. [^5]. So maybe looking at days where anything was logged is also useful.
+
+```{r}
+JR_fito_data %>%
+  select(actiondate) %>%
+  distinct() %>%
+  mutate(week=week(actiondate), year=year(actiondate)) %>%
+  group_by(week,year) %>%
+  summarise(n = n()) %>%
+  ungroup() %>%
+  ggplot(aes(x=week,y=year,fill=n)) + geom_tile() + ggthemes::theme_few() + scale_y_continuous(breaks = 2012:2019) + ggtitle("Number of workouts per week") + scale_fill_continuous(type = "viridis")
+```
+
+7 workouts/week is *bad*, bodies need rest. I'm happier with how this year looks than how 2013-14 looks.
+
+I'm interested in Personal Records (PRs), and their progress over time. Fito isn't great at graphing these in the site - the x-axis doesn't really scale with time.
+
+```{r}
+## A couple of helper functions.
+
+extract_kg <- function(string){ # Plucks the kg measurement out of the dataset
+  str_extract(string, "[0-9]+ kg") %>%
+    str_extract("[0-9]+") %>% #I know this could be rewritten as 1 regex, but I find this easier to read.
+    as.numeric()
+}
+
+extract_PRs <- function(data, activity){ 
+  data %>%
+    filter(name==activity) %>% 
+    arrange(actiondate) %>% 
+    mutate(kg = extract_kg(string_metric)) %>% 
+    mutate(PR = cummax(kg)) %>% # which kg are bigger than any before?
+    filter(kg==PR) # Keeping only entries that are PRs
+}
+
+plot_ly_PR <- function(data, activity){
+  extract_PRs(data, activity) %>%
+    plot_ly(x=~actiondate, y=~kg) %>%
+      add_lines(line=list(shape="hv")) %>%
+      layout(title=paste(activity, "PRs"))
+}
+
+plot_ly_PR(JR_fito_data, "Barbell Bench Press")
+```
+
+Oh, that long period from 2014-recently that I didn't have access to a bench. This one illustrates a problem with user-submitted data - I believe that 2014 "Bench Press" was half-repped. 
+
+[^0]: Live (Action) Role Play Games. Think Dungeons & Dragons, but in costume, and with foam weapons instead of dice. Or improv theatre, without an audience. Or cross-country pantomime. 
+
+[^1]: This is my affiliate link. I'll get 1 month of 'hero' if 10 people sign up. I don't value 'hero', I'm just curious if anyone follows the link.
+
+[^2]: Y-M-D makes sense. We write one hundred and twenty three as 123, not 321. 
+
+[^3]: Fito calls them 'points' now, but it'll always be XP to me.
+
+[^4]: Their mascot who appears when submitting your workout log. We blame this robot for most weird stuff on the site.
+
+[^5]: Note to self, do something with the epic amounts of data your Mii Band has been generating.

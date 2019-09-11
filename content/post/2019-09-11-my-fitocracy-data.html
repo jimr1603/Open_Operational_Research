@@ -1,0 +1,156 @@
+---
+title: My Fitocracy data
+author: James Riley
+date: '2019-09-11'
+slug: my-fitocracy-data
+categories:
+  - R
+tags:
+  - DYEL
+  - json
+  - Fitocracy
+  - fitness
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+
+
+<p>Previously, I compared my “big 3” lifts to various competition records. I first got interested in getting fit for a few reasons:</p>
+<ul>
+<li><img src="https://xkcd.com/189/" alt="The connection between exercise and levelling up" /></li>
+<li>Being fit enough to run around a field in metal or leather armour for a weekend, or LARPing.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></li>
+</ul>
+<p>I managed to get an invite to <a href="http://ftcy.me/peXFQt">Fitocracy</a> <a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> somewhere around Jan 2012, the first workout appears to be logged for 2012-1-10. <a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> Weight training is relatively recent, since gyms are expensive and full of other people.</p>
+<p>I used <a href="https://github.com/luketurner/fitocracy-export">this Python3 script</a> to grab my entire Fitocracy log as a pile of json. I dug around it a while, and managed to wrangle it into a sensible data.frame. As with the Spotify data post, you’re not getting the raw data, but some summary stats are cool.</p>
+<p>This isn’t my first time playing with the Fito json dump - one year Heroes (premium users) were given a end of year summary, then the next year they weren’t. <a href="https://github.com/jimr1603/fitoEndOfYear">I tried writing a script to generate the same stats (link to GitHub)</a>. It failed in some edge cases, and another Hero wrote a script that actually worked.</p>
+<p>First item of curiosity: what activities have given me the most XP.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<pre class="r"><code>JR_fito_data %&gt;%
+  group_by(name) %&gt;%
+  summarise(points = sum(points)) %&gt;%
+  top_n(10, points) %&gt;%
+  arrange(-points) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">name</th>
+<th align="right">points</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">SCA Heavy Combat</td>
+<td align="right">120061</td>
+</tr>
+<tr class="even">
+<td align="left">Pull-Up</td>
+<td align="right">115617</td>
+</tr>
+<tr class="odd">
+<td align="left">Barbell Deadlift</td>
+<td align="right">57529</td>
+</tr>
+<tr class="even">
+<td align="left">Chin-Up</td>
+<td align="right">35614</td>
+</tr>
+<tr class="odd">
+<td align="left">Barbell Bench Press</td>
+<td align="right">33935</td>
+</tr>
+<tr class="even">
+<td align="left">Barbell Squat</td>
+<td align="right">31933</td>
+</tr>
+<tr class="odd">
+<td align="left">Cycling</td>
+<td align="right">30065</td>
+</tr>
+<tr class="even">
+<td align="left">Standing Barbell Shoulder Press (OHP)</td>
+<td align="right">27493</td>
+</tr>
+<tr class="odd">
+<td align="left">Ring Dip</td>
+<td align="right">25284</td>
+</tr>
+<tr class="even">
+<td align="left">Standing Military Press</td>
+<td align="right">17832</td>
+</tr>
+</tbody>
+</table>
+<p>By ‘SCA Heavy Combat’ I mean “LARPing”. It once was listed as an alias in the tracking page, but not any more. It makes me happy that most of my fitness XP is from RPGs.</p>
+<p>Pull-Ups are basically the same thing as Chin-Ups, and OHP is essentially the same thing as Military Press, but I’m not tidying this dataset by what’s too similar to other stuff.</p>
+<p>Least points?</p>
+<pre class="r"><code>JR_fito_data %&gt;%
+  group_by(name) %&gt;%
+  summarise(points = sum(points)) %&gt;%
+  top_n(-10, points) %&gt;%
+  arrange(points) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">name</th>
+<th align="right">points</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Curls in the Squat Rack</td>
+<td align="right">-50</td>
+</tr>
+<tr class="even">
+<td align="left">Shake Weight</td>
+<td align="right">-1</td>
+</tr>
+<tr class="odd">
+<td align="left">Toe Touches</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">Band Windmill</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">Incline Push-Up</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">Seated Hamstring Stretch</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">Meditation</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">Concentration Curls</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">Half Push-Up</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="left">Band Trap Raise</td>
+<td align="right">9</td>
+</tr>
+</tbody>
+</table>
+<p>The negative points are comedy entries - squat rack is for squatting, not for curls. My Zombie survival RPG <a href="https://www.fitocracy.com/group/8905/?chatter">ZOINKS</a></p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Live (Action) Role Play Games. Think Dungeons &amp; Dragons, but in costume, and with foam weapons instead of dice. Or improv theatre, without an audience. Or cross-country pantomime.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>This is my affiliate link. I’ll get 1 month of ‘hero’ if 10 people sign up. I don’t value ‘hero’, I’m just curious if anyone follows the link.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p>Y-M-D makes sense. We write one hundred and twenty three as 123, not 321.<a href="#fnref3" class="footnote-back">↩</a></p></li>
+<li id="fn4"><p>Fito calls them ‘points’ now, but it’ll always be XP to me.<a href="#fnref4" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
