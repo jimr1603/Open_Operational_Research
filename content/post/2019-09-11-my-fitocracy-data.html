@@ -1,0 +1,417 @@
+---
+title: My Fitocracy data
+author: James Riley
+date: '2019-09-11'
+slug: my-fitocracy-data
+categories:
+  - R
+tags:
+  - DYEL
+  - json
+  - Fitocracy
+  - fitness
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/plotly-binding/plotly.js"></script>
+<script src="/rmarkdown-libs/typedarray/typedarray.min.js"></script>
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<link href="/rmarkdown-libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/crosstalk/js/crosstalk.min.js"></script>
+<link href="/rmarkdown-libs/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/plotly-main/plotly-latest.min.js"></script>
+<link href="/rmarkdown-libs/leaflet/leaflet.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/leaflet/leaflet.js"></script>
+<link href="/rmarkdown-libs/leafletfix/leafletfix.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/Proj4Leaflet/proj4-compressed.js"></script>
+<script src="/rmarkdown-libs/Proj4Leaflet/proj4leaflet.js"></script>
+<link href="/rmarkdown-libs/rstudio_leaflet/rstudio_leaflet.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/leaflet-binding/leaflet.js"></script>
+
+
+<p>Previously, I compared my “big 3” lifts to various competition records. I first got interested in getting fit for a few reasons:</p>
+<ul>
+<li><img src="https://xkcd.com/189/" alt="The connection between exercise and levelling up" /></li>
+<li>Being fit enough to run around a field in metal or leather armour for a weekend, or LARPing.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></li>
+</ul>
+<p>I managed to get an invite to <a href="http://ftcy.me/peXFQt">Fitocracy</a> <a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> somewhere around Jan 2012, the first workout appears to be logged for 2012-1-10. <a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> Weight training is relatively recent, since gyms are expensive and full of other people.</p>
+<p>I used <a href="https://github.com/luketurner/fitocracy-export">this Python3 script</a> to grab my entire Fitocracy log as a pile of json. I dug around it a while, and managed to wrangle it into a sensible data.frame. As with the Spotify data post, you’re not getting the raw data, but some summary stats are cool.</p>
+<p>This isn’t my first time playing with the Fito json dump - one year Heroes (premium users) were given a end of year summary, then the next year they weren’t. <a href="https://github.com/jimr1603/fitoEndOfYear">I tried writing a script to generate the same stats (link to GitHub)</a>. It failed in some edge cases, and another Hero wrote a script that actually worked.</p>
+<p>First item of curiosity: what activities have given me the most XP.<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
+<pre class="r"><code>JR_fito_data %&gt;%
+  group_by(name) %&gt;%
+  summarise(points = sum(points)) %&gt;%
+  top_n(10, points) %&gt;%
+  arrange(-points) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">name</th>
+<th align="right">points</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">SCA Heavy Combat</td>
+<td align="right">120061</td>
+</tr>
+<tr class="even">
+<td align="left">Pull-Up</td>
+<td align="right">115617</td>
+</tr>
+<tr class="odd">
+<td align="left">Barbell Deadlift</td>
+<td align="right">57529</td>
+</tr>
+<tr class="even">
+<td align="left">Chin-Up</td>
+<td align="right">35614</td>
+</tr>
+<tr class="odd">
+<td align="left">Barbell Bench Press</td>
+<td align="right">33935</td>
+</tr>
+<tr class="even">
+<td align="left">Barbell Squat</td>
+<td align="right">31933</td>
+</tr>
+<tr class="odd">
+<td align="left">Cycling</td>
+<td align="right">30065</td>
+</tr>
+<tr class="even">
+<td align="left">Standing Barbell Shoulder Press (OHP)</td>
+<td align="right">27493</td>
+</tr>
+<tr class="odd">
+<td align="left">Ring Dip</td>
+<td align="right">25284</td>
+</tr>
+<tr class="even">
+<td align="left">Standing Military Press</td>
+<td align="right">17832</td>
+</tr>
+</tbody>
+</table>
+<p>By ‘SCA Heavy Combat’ I mean “LARPing”. It once was listed as an alias in the tracking page, but not any more. It makes me happy that most of my fitness XP is from RPGs.</p>
+<p>Pull-Ups are basically the same thing as Chin-Ups, and OHP is essentially the same thing as Military Press, but I’m not tidying this dataset by what’s too similar to other stuff.</p>
+<p>Least points?</p>
+<pre class="r"><code>JR_fito_data %&gt;%
+  group_by(name) %&gt;%
+  summarise(points = sum(points)) %&gt;%
+  top_n(-10, points) %&gt;%
+  arrange(points) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">name</th>
+<th align="right">points</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Curls in the Squat Rack</td>
+<td align="right">-50</td>
+</tr>
+<tr class="even">
+<td align="left">Shake Weight</td>
+<td align="right">-1</td>
+</tr>
+<tr class="odd">
+<td align="left">Toe Touches</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">Band Windmill</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">Incline Push-Up</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">Seated Hamstring Stretch</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">Meditation</td>
+<td align="right">7</td>
+</tr>
+<tr class="even">
+<td align="left">Concentration Curls</td>
+<td align="right">8</td>
+</tr>
+<tr class="odd">
+<td align="left">Half Push-Up</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="left">Band Trap Raise</td>
+<td align="right">9</td>
+</tr>
+</tbody>
+</table>
+<p>The negative points are comedy entries - squat rack is for squatting, not for curls. My Zombie survival RPG <a href="https://www.fitocracy.com/group/8905/?chatter">ZOINKS</a> has a choose-your-own-adventure where you log that to represent ‘damage’. Similar for shake weight.</p>
+<p>The rest is incredibly poor scoring activities that I did a very small number of times before progressing to better stuff. (incline push-up -&gt; push-up -&gt; decline push-up)</p>
+<p>Looking at the calendar</p>
+<pre class="r"><code>JR_fito_data %&gt;%
+  mutate(week=week(actiondate), year=year(actiondate)) %&gt;%
+  group_by(week,year) %&gt;%
+  summarise(points=sum(points)) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x=week,y=year,fill=points)) + geom_tile() + ggthemes::theme_few() + scale_y_continuous(breaks = 2012:2019) + ggtitle(&quot;Fitocracy XP by week&quot;) + scale_fill_continuous(type = &quot;viridis&quot;)</code></pre>
+<p><img src="/post/2019-09-11-my-fitocracy-data_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>So apparently around this time of year I tend to stop working out. This is approximately the time of year I get a seasonal slump. The big gap around 2017-2019 relates to an episode of sciatica.</p>
+<p>2012-2016 was my PhD, and I bought 3 years of uni gym. Initially for the swimming, then for the weights and rowing machine. Mostly I didn’t get my money’s worth from it. <em>shrug</em>.</p>
+<p>Points aren’t really connected to how good a workout is. FRED <a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a> really, really likes it when we lift something near our personal best, 1ce. He begrudgingly gives extra points for cardio if we log a heart rate that is at least compatible with life. <a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>. So maybe looking at days where anything was logged is also useful.</p>
+<pre class="r"><code>JR_fito_data %&gt;%
+  select(actiondate) %&gt;%
+  distinct() %&gt;%
+  mutate(week=week(actiondate), year=year(actiondate)) %&gt;%
+  group_by(week,year) %&gt;%
+  summarise(n = n()) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x=week,y=year,fill=n)) + geom_tile() + ggthemes::theme_few() + scale_y_continuous(breaks = 2012:2019) + ggtitle(&quot;Number of workouts per week&quot;) + scale_fill_continuous(type = &quot;viridis&quot;)</code></pre>
+<p><img src="/post/2019-09-11-my-fitocracy-data_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>7 workouts/week is <em>bad</em>, bodies need rest. I’m happier with how this year looks than how 2013-14 looks.</p>
+<p>I’m interested in Personal Records (PRs), and their progress over time. Fito isn’t great at graphing these in the site - the x-axis doesn’t really scale with time.</p>
+<pre class="r"><code>## A couple of helper functions.
+
+extract_kg &lt;- function(string){ # Plucks the kg measurement out of the dataset
+  str_extract(string, &quot;[0-9]+\\.?[0-9]* kg&quot;) %&gt;%
+    str_remove(&quot;kg&quot;) %&gt;% #I know this could be rewritten as 1 regex, but I find this easier to read.
+    as.numeric()
+}
+
+extract_PRs &lt;- function(data, activity){ 
+  data %&gt;%
+    filter(name==activity) %&gt;% 
+    arrange(actiondate) %&gt;% 
+    mutate(kg = extract_kg(string_metric)) %&gt;% 
+    mutate(PR = cummax(kg)) %&gt;% # which kg are bigger than any before?
+    filter(kg==PR) # Keeping only entries that are PRs
+}
+
+plot_ly_PR &lt;- function(data, activity){
+  extract_PRs(data, activity) %&gt;%
+    plot_ly(x=~actiondate, y=~kg) %&gt;%
+      add_lines(line=list(shape=&quot;hv&quot;)) %&gt;%
+      layout(title=paste(activity, &quot;PRs&quot;))
+}
+
+plot_ly_PR(JR_fito_data, &quot;Barbell Bench Press&quot;)</code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"75a9575afdca":["function () ","plotlyVisDat"]},"cur_data":"75a9575afdca","attrs":{"75a9575afdca":{"x":{},"y":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","line":{"shape":"hv"},"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Barbell Bench Press PRs","xaxis":{"domain":[0,1],"automargin":true,"title":"actiondate"},"yaxis":{"domain":[0,1],"automargin":true,"title":"kg"},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":["2014-02-25","2014-02-25","2014-02-26","2014-02-26","2014-02-26","2014-02-26","2014-02-26","2014-02-26","2014-02-26","2014-02-26","2014-02-26","2014-03-02","2014-03-02","2014-03-02","2014-03-02","2014-03-02","2014-03-02","2014-03-02","2014-03-03","2014-03-03","2014-03-03","2014-03-03","2014-03-06","2014-03-06","2014-03-06","2014-03-06","2014-03-06","2014-03-06","2014-03-10","2014-03-10","2014-03-10","2014-03-28","2014-03-28","2014-03-28","2014-03-28","2014-03-28","2014-03-28","2014-03-31","2014-03-31","2014-03-31","2014-03-31","2014-04-02","2014-04-02","2014-04-02","2014-04-02","2014-04-02","2014-04-02","2014-06-01","2014-06-03","2014-06-03","2014-06-03","2014-06-06","2014-06-06","2014-06-06","2014-06-06","2014-06-06","2014-06-06","2019-05-16","2019-06-06","2019-06-06","2019-07-13","2019-07-13","2019-07-30"],"y":[20,40,40,50,60,60,60,60,60,60,60,60,60,60,60,65,65,65,65,65,65,65,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,70,75,75,77.5,77.5,80,80,80,80,80,80,80,80,80,80,80,80,85,85,90,90],"type":"scatter","mode":"lines","line":{"color":"rgba(31,119,180,1)","shape":"hv"},"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>
+plot_ly_PR(JR_fito_data, &quot;Standing Barbell Shoulder Press (OHP)&quot;)</code></pre>
+<div id="htmlwidget-2" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2">{"x":{"visdat":{"75a98090d21":["function () ","plotlyVisDat"]},"cur_data":"75a98090d21","attrs":{"75a98090d21":{"x":{},"y":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","line":{"shape":"hv"},"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Standing Barbell Shoulder Press (OHP) PRs","xaxis":{"domain":[0,1],"automargin":true,"title":"actiondate"},"yaxis":{"domain":[0,1],"automargin":true,"title":"kg"},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":["2014-06-13","2014-06-13","2014-06-13","2014-06-13","2014-06-13","2014-06-13","2014-06-13","2014-06-13","2014-06-13","2014-06-13","2014-10-20","2014-10-20","2014-10-20","2014-10-20","2014-10-20","2014-10-24","2014-10-24","2014-10-24","2014-10-24","2014-10-24","2014-10-24","2014-10-28","2014-10-28","2014-10-28","2014-10-28","2014-10-28","2014-11-03","2014-11-03","2014-11-03","2014-11-03","2014-11-03","2014-11-07","2014-11-07","2014-11-07","2014-11-07","2014-11-07","2014-11-11","2014-11-11","2014-11-11","2014-11-11","2014-11-11","2014-11-17","2014-11-17","2014-11-17","2014-11-17","2014-11-17","2014-11-21","2014-11-21","2014-11-21","2014-11-21","2014-11-26","2014-11-26","2014-11-26","2014-11-26","2015-03-11","2019-05-19","2019-07-03","2019-07-15","2019-07-21","2019-08-20"],"y":[19,19,19,19,19,19,19,19,19,19,32,32,32,32,32,32,34.5,34.5,34.5,34.5,34.5,37,37,37,37,37,39.5,39.5,39.5,39.5,39.5,42,42,42,42,42,44.5,44.5,44.5,44.5,44.5,47,47,47,47,47,47,47,47,47,47,47,47,47,47,52,60,60,60,60],"type":"scatter","mode":"lines","line":{"color":"rgba(31,119,180,1)","shape":"hv"},"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>Oh, that long period from 2014-recently that I didn’t have access to a bench. This one illustrates a problem with user-submitted data - I believe that 2014 “Bench Press” was half-repped.</p>
+<p>Anyhow, how do some other PR graphs look?</p>
+<pre class="r"><code>plot_ly_PR(JR_fito_data, &quot;Barbell Deadlift&quot;)</code></pre>
+<div id="htmlwidget-3" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3">{"x":{"visdat":{"75a91ff489a3":["function () ","plotlyVisDat"]},"cur_data":"75a91ff489a3","attrs":{"75a91ff489a3":{"x":{},"y":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","line":{"shape":"hv"},"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Barbell Deadlift PRs","xaxis":{"domain":[0,1],"automargin":true,"title":"actiondate"},"yaxis":{"domain":[0,1],"automargin":true,"title":"kg"},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":["2014-02-26","2014-02-26","2014-02-26","2014-02-27","2014-02-27","2014-02-27","2014-03-02","2014-03-02","2014-03-02","2014-03-31","2014-03-31","2015-05-27","2019-05-08","2019-06-05","2019-06-05","2019-06-05","2019-06-05","2019-07-04","2019-07-04","2019-07-04","2019-07-22","2019-07-22","2019-08-31"],"y":[60,80,80,80,80,100,100,105,105,105,105,105,105,105,115,120,130,130,140,145,150,155,160],"type":"scatter","mode":"lines","line":{"color":"rgba(31,119,180,1)","shape":"hv"},"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>
+plot_ly_PR(JR_fito_data, &quot;Barbell Squat&quot;)</code></pre>
+<div id="htmlwidget-4" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4">{"x":{"visdat":{"75a9570fef61":["function () ","plotlyVisDat"]},"cur_data":"75a9570fef61","attrs":{"75a9570fef61":{"x":{},"y":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","line":{"shape":"hv"},"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Barbell Squat PRs","xaxis":{"domain":[0,1],"automargin":true,"title":"actiondate"},"yaxis":{"domain":[0,1],"automargin":true,"title":"kg"},"hovermode":"closest","showlegend":false},"source":"A","config":{"showSendToCloud":false},"data":[{"x":["2012-01-24","2012-01-28","2012-02-04","2012-02-16","2012-02-16","2012-02-16","2013-01-30","2013-03-25","2014-02-25","2014-02-25","2014-02-25","2014-02-25","2014-02-25","2014-02-25","2014-02-25","2014-02-27","2014-02-27","2014-03-02","2014-03-02","2014-03-02","2014-03-02","2014-03-02","2014-03-10","2014-03-10","2014-03-31","2014-03-31","2014-03-31","2014-03-31","2014-03-31","2019-04-02","2019-04-14","2019-04-24","2019-04-24","2019-06-08","2019-06-08","2019-06-08","2019-07-02","2019-07-02","2019-07-08","2019-07-08","2019-08-01","2019-08-18","2019-08-18","2019-08-18"],"y":[55,55,55,55,55,55,58,58,60,60,60,60,60,60,60,60,60,60,80,80,80,80,80,80,87,87,87,87,87,90,90,95,100,100,110,120,120,130,130,135,140,140,145,150],"type":"scatter","mode":"lines","line":{"color":"rgba(31,119,180,1)","shape":"hv"},"marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>With some different helpers, I can look at cumulative distance travelled.</p>
+<pre class="r"><code>## A couple of helper functions.
+
+extract_km &lt;- function(string){ # Plucks the kg measurement out of the dataset
+  string &lt;- str_extract(string, &quot;[0-9]+\\.?[0-9]* k?m&quot;)
+  meters &lt;- !str_detect(string, &quot;k&quot;)
+  
+  result &lt;-  str_remove(string, &quot;k?m&quot;) %&gt;% #I know this could be rewritten as 1 regex, but I find this easier to read.
+    as.numeric() 
+  
+  if_else(meters, result / 1000, result)
+}
+
+extract_cumulative_distance &lt;- function(data, activity){ 
+  data %&gt;%
+    filter(name==activity) %&gt;% 
+    arrange(actiondate) %&gt;% 
+    mutate(km = extract_km(string_metric)) %&gt;% 
+    mutate(cumulative_km = cumsum(km)) 
+}
+
+ggplot_dist &lt;- function(data, activity){
+  extract_cumulative_distance(data, activity) %&gt;%
+    ggplot(aes(x=actiondate,y=cumulative_km)) + geom_line() + 
+    ggthemes::theme_few()  + 
+    ggtitle(paste(&quot;Total Distance&quot;, activity))
+}
+
+
+ggplot_dist(JR_fito_data, &quot;Cycling&quot;)</code></pre>
+<p><img src="/post/2019-09-11-my-fitocracy-data_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Running surprises me, given that I really dislike jogging, and have done the start of C25K a couple of times.</p>
+<pre class="r"><code>ggplot_dist(JR_fito_data, &quot;Running&quot;)</code></pre>
+<p><img src="/post/2019-09-11-my-fitocracy-data_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>ggplot_dist(JR_fito_data, &quot;Swimming&quot;)</code></pre>
+<p><img src="/post/2019-09-11-my-fitocracy-data_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>Yeah, I’ve not been swimming for a while.</p>
+<p>Let’s grab the cycling total:</p>
+<pre class="r"><code>cycling_total_km &lt;- extract_cumulative_distance(JR_fito_data, &quot;Cycling&quot;) %&gt;%
+  top_n(1) %&gt;%
+  pull(cumulative_km)</code></pre>
+<p>Taking the dates of first and last cycling workouts logged (2012-09-13 and 2019-09-10), then on average, I’ve been travelling at 774 km per <code>days(ymd(&quot;2019-09-10&quot;)-ymd(&quot;2012-09-13&quot;)) %&gt;% str_extract(&quot;^[0-9]+&quot;)</code> days, or about 300m/day, or 13m/hour. (Approximately a snail’s pace!)</p>
+<p>Looking at a map, if I started from work-ish (Leeds City Centre), then how far would I have reached?</p>
+<pre class="r"><code>leaflet() %&gt;%
+  addTiles() %&gt;%
+  addCircles(lat = 53.798250, lng = -1.532112, radius = 1000*cycling_total_km) </code></pre>
+<div id="htmlwidget-5" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addCircles","args":[53.79825,-1.532112,773900,null,null,{"interactive":true,"className":"","stroke":true,"color":"#03F","weight":5,"opacity":0.5,"fill":true,"fillColor":"#03F","fillOpacity":0.2},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null,null]}],"limits":{"lat":[53.79825,53.79825],"lng":[-1.532112,-1.532112]}},"evals":[],"jsHooks":[]}</script>
+<p>So, a fast snail going in a straight line from Leeds-Norway, over 7 years, ignoring sleep and my inability to cycle on water! <a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a></p>
+<p>Some of the ‘challenges’ we’ve had for fun on the site involve lifting as much volume as possible - defined by reps * weight. So 1 kg lifted 50 times is the same volume as 50 kg lifted 1ce. We have sometimes named these like “can you deadlift a blue whale?” (No, not all at once, but if you break it into enough pieces and give us enough time…)</p>
+<p>Another helper function. At this point I wish I used package <code>glue</code> and saved the regex that plucks a decimal number. EDIT TO ADD: there was a typo in this which would have been easier to fix if I used <code>glue</code> in the first place.</p>
+<pre class="r"><code>volume &lt;- function(string){
+  kg &lt;- str_extract(string, &quot;[0-9]+\\.?[0-9]* kg&quot;) %&gt;%
+    str_remove(&quot;kg&quot;) %&gt;%
+    as.numeric()
+  reps &lt;- str_extract(string, &quot;[0-9]+\\.?[0-9]* reps&quot;) %&gt;%
+    str_remove(&quot;reps&quot;) %&gt;%
+    as.numeric()
+  
+  kg * reps
+}
+
+JR_fito_data %&gt;%
+  mutate(volume = volume(string_metric)) %&gt;%
+  filter(!is.na(volume)) %&gt;%
+  group_by( name) %&gt;%
+  summarise(volume=sum(volume)) %&gt;%
+  ungroup() %&gt;%
+  top_n(10, volume) %&gt;%
+  arrange(desc(volume)) %&gt;%
+  mutate(volume = scales::comma(volume)) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">name</th>
+<th align="left">volume</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Barbell Deadlift</td>
+<td align="left">271,843</td>
+</tr>
+<tr class="even">
+<td align="left">Barbell Squat</td>
+<td align="left">176,003</td>
+</tr>
+<tr class="odd">
+<td align="left">Barbell Bench Press</td>
+<td align="left">163,547</td>
+</tr>
+<tr class="even">
+<td align="left">Standing Barbell Shoulder Press (OHP)</td>
+<td align="left">80,300</td>
+</tr>
+<tr class="odd">
+<td align="left">Standing Military Press</td>
+<td align="left">61,210</td>
+</tr>
+<tr class="even">
+<td align="left">Front Barbell Squat</td>
+<td align="left">58,914</td>
+</tr>
+<tr class="odd">
+<td align="left">Dumbbell Bench Press</td>
+<td align="left">32,476</td>
+</tr>
+<tr class="even">
+<td align="left">Pendlay Row</td>
+<td align="left">32,116</td>
+</tr>
+<tr class="odd">
+<td align="left">Dumbbell Deadlift</td>
+<td align="left">27,700</td>
+</tr>
+<tr class="even">
+<td align="left">Dumbbell Bicep Curl</td>
+<td align="left">24,002</td>
+</tr>
+</tbody>
+</table>
+<p>Analogous to the total distance cycled would be total kg-reps lifted over time:</p>
+<pre class="r"><code>
+volume_graph &lt;- function(data, activity){
+  data %&gt;%
+    filter(name==activity) %&gt;%
+    mutate(volume = volume(string_metric)) %&gt;%
+    filter(!is.na(volume)) %&gt;%
+    arrange(actiondate) %&gt;%
+    mutate(volume=cumsum(volume)) %&gt;%
+    ggplot(aes(x=actiondate,y=volume)) + geom_line() + ggthemes::theme_few() + 
+      ggtitle(str_c(&quot;Total Volume Over Time: &quot;, activity)) + ylab(&quot;Volume (kg-reps)&quot;) + scale_y_continuous(labels = scales::comma)
+}
+
+volume_graph(JR_fito_data, &quot;Barbell Deadlift&quot;)</code></pre>
+<p><img src="/post/2019-09-11-my-fitocracy-data_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<pre class="r"><code>
+volume_graph(JR_fito_data, &quot;Barbell Squat&quot;)</code></pre>
+<p><img src="/post/2019-09-11-my-fitocracy-data_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<pre class="r"><code>
+volume_graph(JR_fito_data, &quot;Ring Pull-Up&quot;)</code></pre>
+<p><img src="/post/2019-09-11-my-fitocracy-data_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p>The units for volume is really kilogram-reps. Or we can drop a comma and look at tonne-reps. 272 tonnes is approximately the mass of a blue whale <a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>, so since 2014 I’ve done lifts that add up to a whale. Cut into many, many pieces, and probably very rotten.</p>
+<p>A totally useless graph of the volume of everything, but it’s sometimes funny throwing way too many factors at a graph. I’ve removed the legend, because otherwise the whole graph was legend!</p>
+<pre class="r"><code>cumulative_volume &lt;- JR_fito_data %&gt;%
+  mutate(volume = volume(string_metric)) %&gt;%
+  filter(!is.na(volume)) %&gt;%
+  mutate(actiondate=floor_date(actiondate, &quot;week&quot;)) 
+
+
+missing_values &lt;- cross_df(list(
+  name=unique(cumulative_volume$name),
+  actiondate=as.character(unique(cumulative_volume$actiondate))
+)) %&gt;%
+  mutate(actiondate=ymd(actiondate)) %&gt;%
+  anti_join(cumulative_volume) %&gt;%
+  mutate(volume=0)
+
+bind_rows(cumulative_volume, missing_values) %&gt;%
+  group_by(name, actiondate) %&gt;%
+  summarise(volume = sum(volume)) %&gt;%
+  arrange(actiondate) %&gt;%
+  mutate(volume = cumsum(volume)) %&gt;%
+  ungroup() %&gt;%
+  arrange(volume) %&gt;%
+  mutate(name=as_factor(name)) %&gt;%
+  ggplot(aes(x=actiondate, y=volume, fill=name)) + geom_area() + ggthemes::theme_few() + theme(legend.position = &quot;none&quot;) + scale_y_continuous(labels = scales::comma) + 
+  ggtitle(&quot;Cumulative volume, activity highlighted&quot;) + scale_fill_viridis_d()</code></pre>
+<p><img src="/post/2019-09-11-my-fitocracy-data_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>I’m interested in that calendar graph again.</p>
+<pre class="r"><code>cumulative_volume %&gt;%
+  group_by(actiondate) %&gt;%
+  summarise(volume=sum(volume)) %&gt;%
+  mutate(week=week(actiondate), year=year(actiondate)) %&gt;%
+  ggplot(aes(x=week,y=year,fill=volume)) + geom_tile() + ggthemes::theme_few() + scale_y_continuous(breaks = 2012:2019) + ggtitle(&quot;Volume by week&quot;) + scale_fill_continuous(type = &quot;viridis&quot;)</code></pre>
+<p><img src="/post/2019-09-11-my-fitocracy-data_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>What the heck happened that week in 2014? I’ve looked at the data. A lot of dummbell stuff, as well as the biggest lifts I did for a long time. The current stretch I’m in is certainly more consistent than any previous one!</p>
+<p>There’s a few cases where this is flat out wrong - the time I was doing assisted pull ups will be logging the assisted weight as volume. But I could spend all day chasing increasingly rare edge cases.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Live (Action) Role Play Games. Think Dungeons &amp; Dragons, but in costume, and with foam weapons instead of dice. Or improv theatre, without an audience. Or cross-country pantomime.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p>This is my affiliate link. I’ll get 1 month of ‘hero’ if 10 people sign up. I don’t value ‘hero’, I’m just curious if anyone follows the link.<a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p>Y-M-D makes sense. We write one hundred and twenty three as 123, not 321.<a href="#fnref3" class="footnote-back">↩</a></p></li>
+<li id="fn4"><p>Fito calls them ‘points’ now, but it’ll always be XP to me.<a href="#fnref4" class="footnote-back">↩</a></p></li>
+<li id="fn5"><p>Their mascot who appears when submitting your workout log. We blame this robot for most weird stuff on the site.<a href="#fnref5" class="footnote-back">↩</a></p></li>
+<li id="fn6"><p>Note to self, do something with the epic amounts of data your Mii Band has been generating.<a href="#fnref6" class="footnote-back">↩</a></p></li>
+<li id="fn7"><p>Deploy the decoy snail.<a href="#fnref7" class="footnote-back">↩</a></p></li>
+<li id="fn8"><p>Cue the QI klaxon.<a href="#fnref8" class="footnote-back">↩</a></p></li>
+</ol>
+</div>
