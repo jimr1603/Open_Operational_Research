@@ -35,7 +35,7 @@ JR_fito_data <- read_csv(here::here("..", "analyse_fito", "JR fito.csv"))
 
 Previously, I compared my "big 3" lifts to various competition records. I first got interested in getting fit for a few reasons:
 
-- ![The connection between exercise and levelling up](https://xkcd.com/189/)
+- [The connection between exercise and levelling up](https://xkcd.com/189/)
 - Being fit enough to run around a field in metal or leather armour for a weekend, or LARPing.[^0]
 
 I managed to get an invite to [Fitocracy](http://ftcy.me/peXFQt) [^1] somewhere around Jan 2012, the first workout appears to be logged for 2012-1-10. [^2] Weight training is relatively recent, since gyms are expensive and full of other people. 
