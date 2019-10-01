@@ -1,0 +1,244 @@
+---
+title: Chaos Butterfly
+author: James Riley
+date: '2019-10-01'
+slug: chaos-butterfly
+categories:
+  - R
+tags:
+  - simulation
+  - visulisation
+  - plotly
+  - odin
+  - chaos
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+library("tidyverse")
+library("lubridate")
+library("gganimate")
+library("plotly")
+set.seed(18159)
+```
+
+# Odin
+
+Package [Odin](https://cran.r-project.org/web/packages/odin/index.html) has gone live on CRAN with version 1. It makes some stuff with deSolve a little easier:
+- Defining a set of ODEs looks a bit easier
+- it's easier to change parameters
+- it can write its own C code for when you've got a massive set of ODEs and the efficiency helps.
+
+Also, it's a great punny name.
+
+# Lorentz's Butterfly
+
+Lorentz was trying to study a very simplified weather model with early computers. It's easily described in 3 dimensions with respect to time - [Link to his paper](https://journals.ametsoc.org/doi/abs/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2). At least skim it for the pictures, this is 1960's fractal art! The 3 dimensions don't seem to have simple interpretations once they've gone into this form.
+
+It's incredibly sensitive to initial conditions, he had problems trying to resume a simulation from a printout that only had 3 decimals, but the computer held more in memory.
+
+```{r}
+library(odin)
+library(GGally)
+
+lorentz <- odin({
+  deriv(y1) <- sigma * (y2 - y1)
+  deriv(y2) <- R * y1 - y2 - y1 * y3
+  deriv(y3) <- -b * y3 + y1 * y2
+  
+  initial(y1) <- start_y_1
+  initial(y2) <- start_y_2
+  initial(y3) <- start_y_3
+  
+  start_y_1 <- user(10)
+  start_y_2 <- user(1)
+  start_y_3 <- user(1)
+  
+  ## These are the classical parameters:
+  sigma <- 10
+  R <- 28
+  b <-  8 / 3
+})
+
+model <- lorentz()
+
+tt <- seq(0, 100, by=1e-3)
+
+model_result <- model$run(tt,method="lsode" ) %>%
+  as_tibble() %>%
+  mutate_all(as.numeric) 
+
+
+path <- function(data, mapping){
+  ggplot(data=data, mapping=mapping) + 
+    geom_path( aes(colour=t)) + 
+    scale_color_viridis_c(option = "C") +
+    ggthemes::theme_tufte()
+}
+
+self <- function(data, mapping){
+  ggplot(data=data, mapping=mapping) + geom_point(aes(y=t), size=0.1,alpha=0.1) + coord_flip()
+}
+
+model_result %>%
+  ggpairs(columns =c("y1","y2","y3"),
+          upper=list(continuous=path), 
+          diag=list(continuous=self),
+          lower=list(continuous=path)) + ggthemes::theme_tufte()
+```
+
+It has 3 spatial dimensions, and 1 dimension of time, so let's throw it at more stuff.
+
+```{r}
+model_result %>%
+  mutate(s=round(t,0)) %>%
+  plot_ly(x=~y1,y=~y2,z=~y3, color=~t) %>%
+  add_paths()
+
+```
+
+# And if a butterfly flaps its wings
+
+If I give the system a slight nudge in its starting conditions, then it ends up in a totally different bit of its phase space.
+
+```{r}
+butterfly <- 1e-6
+
+interfering_butterfly <- lorentz(start_y_1 = 10+butterfly, start_y_2 = 1+butterfly, start_y_3 = 1+butterfly) 
+
+interfering_butterfly <- interfering_butterfly$run(tt)%>%
+  as_tibble() %>%
+  mutate_all(as.numeric) %>%
+  mutate(model="butterfly")
+
+model_result <- mutate(model_result, model="original")
+
+path <- function(data, mapping){
+  ggplot(data=data, mapping=mapping) + 
+    geom_path( aes(colour=model)) + 
+    ggthemes::theme_tufte()
+}
+
+self <- function(data, mapping){
+  ggplot(data=data, mapping=mapping) + geom_point(aes(y=t, colour=model), size=0.1,alpha=0.1) + coord_flip()
+}
+
+bind_rows(model_result, interfering_butterfly) %>%
+  filter(between(t,90, 100)) %>%
+  ggpairs(columns =c("y1","y2","y3"),
+          upper=list(continuous=path), 
+          diag=list(continuous=self),
+          lower=list(continuous=path)) + ggthemes::theme_tufte()
+
+```
+
+
+I think the original story involves a printout to 3 decimals, so it's nice to see them disagree quickly for a difference in 6 decimals.
+```{r}
+bind_rows(model_result, interfering_butterfly) %>%
+  plot_ly(x=~y1,y=~y2,z=~y3, split=~model) %>%
+  add_paths()
+```
+
+# Bonus content - double pendulum
+
+If I'm doing ODEs and chaos, I need a double pendulum.
+
+With thanks to [Schocastics](http://blog.schochastics.net/post/beautiful-chaos-the-double-pendulum/) for making the ODEs for the double pendulum make sense.
+
+```{r}
+time <- 10 #seconds
+framerate <- 40 #fps
+
+nframes <- time*framerate
+
+double_pendulum <- odin({
+  G  <-  9.807  # acceleration due to gravity, in m/s^2
+  L1 <-  user(1.0)    # length of pendulum 1 (m)
+  L2 <-  user(1.0)    # length of pendulum 2 (m)
+  M1 <-  user(1.0)    # mass of pendulum 1 (kg)
+  M2 <-  user(1.0)    # mass of pendulum 2 (kg)
+  
+  pi <- 3.1415926535897
+  
+
+  
+  # initial conditions
+  th1 <-  user(20.0)  # initial angle theta of pendulum 1 (degree)
+  w1  <-  user(0.0)   # initial angular velocity of pendulum 1 (degrees per second)
+  th2 <-  user(180.0) # initial angle theta of pendulum 2 (degree)
+  w2  <-  user(0.0)   # initial angular velocity of pendulum 2 (degrees per second)
+
+  initial(theta1) <- th1*pi/180
+  initial(y1) <- w1*pi/180
+  initial(theta2) <- th2*pi/180
+  initial(y2) <- w2*pi/180
+  
+  
+  deriv(theta1) <-  y1
+  
+  del_ <-  theta2 - theta1
+  den1 <-  (M1 + M2)*L1 - M2*L1*cos(del_)*cos(del_)
+  deriv(y1)  <-  (M2*L1*y1*theta2*sin(del_)*cos(del_) +
+               M2*G*sin(theta2)*cos(del_) +
+               M2*L2*y2*y2*sin(del_) -
+               (M1 + M2)*G*sin(theta1))/den1
+  
+  deriv(theta2) <-  y2
+  
+  den2 <-  (L2/L1)*den1
+  deriv(y2)  <-  (-M2*L2*y2*y2*sin(del_)*cos(del_) +
+               (M1 + M2)*G*sin(theta1)*cos(del_) -
+               (M1 + M2)*L1*y1*y1*sin(del_) -
+               (M1 + M2)*G*sin(theta2))/den2
+  
+})
+
+L1 <- 1
+L2 <- 1/2
+M1 <- 1
+M2 <- 3
+
+double_pen <- double_pendulum(L1=L1, L2=L2, M1 = M1,M2=M2,
+                              th1=90,th2=90)
+
+tt <- seq(0, time, length.out = nframes )
+
+double_pen <- double_pen$run(tt) %>%
+  as_tibble() %>%
+  mutate_all(as.numeric) %>%
+  mutate(x1 = L1 * sin(theta1), y1 = -L1 * cos(theta1)) %>%
+  mutate(x2 = x1 + L2*sin(theta2), y2 = y1  -L2*cos(theta2)) 
+
+x <- double_pen %>%
+  select(t, x1, x2) %>%
+  mutate(x0=0)  %>%
+  pivot_longer(starts_with("x"), names_prefix = "^.", values_to="x")  
+
+y <- double_pen %>%
+  select(t, y1, y2) %>%
+  mutate(y0=0)  %>%
+  pivot_longer(starts_with("y"), names_prefix = "^.", values_to="y")
+
+p <- left_join(x, y) %>%
+  group_by(t) %>%
+  arrange(name) %>%
+  mutate(size = c(0,M1,M2)) %>%
+  ungroup() %>%
+  ggplot(aes(x=x,y=y)) + geom_path() + geom_point(aes(size=size)) + transition_manual(frames=t) + ggraph::theme_graph() + theme(legend.position = "none")
+
+animate(p, nframes=nframes, fps = framerate)
+
+```
+
+  
