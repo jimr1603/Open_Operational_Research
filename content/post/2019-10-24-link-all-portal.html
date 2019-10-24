@@ -1,0 +1,89 @@
+---
+title: '[LINK] [ALL] [PORTAL]'
+author: James Riley
+date: '2019-10-24'
+slug: link-all-field
+categories:
+  - R
+tags:
+  - Ingress
+  - devtools
+  - GliphR
+  - Graph theory
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+
+
+<div id="the-world-is-not-as-it-seems" class="section level1">
+<h1>The world is not as it seems…</h1>
+<p>Niantic (of Pokemon Go and Harry Potter Wizards Unite) have <a href="https://ingress.com/">Ingress</a> as their first game. Gameplay is very basic compared to the other games, which goes a long way to explaining why I put Ingress down for a long time when Pokemon Go started.</p>
+<p>I’ve hit a slump in Po Go, and picked Ingress back up. I might come back and talk about the lore, but for the purposes of this post:</p>
+<ul>
+<li>The ‘Shapers’ are pan-dimensional beings that throw ‘exotic matter’ into our universe through portals, and we react to this by bulding points of interest there.</li>
+<li>The green team (Enlightened) believe that the Shapers want to be our friends.</li>
+<li>The blue team (Resistance) believe that the Shapers are sinister.</li>
+<li>We play the game by physically walking to a portal and interacting with it on our phones.</li>
+<li>There’s a minigame that’s approximately Simon Says with alien glyphs that make certain messages.</li>
+</ul>
+<p>I’m trying to get better at remembering the glyphs, so I’ve been looking up lists of glyphs and stuff. <a href="http://gm9.github.io/ingress-glyph-tools/">This Javascript example</a> has been handy, but I’ve got a few ideas floating around for playing with glyphs, and a whole bunch of them rely on a sensible glyph package. I grabbed their JS encoding of the glyphs, it needs a bit more cleanup before I’d call it a final version, but it’ll work for today.</p>
+<p>Also, Hadley is an</p>
+</div>
+<div id="enter-gliphr" class="section level1">
+<h1>Enter GliphR</h1>
+<p>Unusually for me, most of the actual code for this post is tucked away somewhere else, since I put a basic version of GliphR together today - <a href="https://github.com/jimr1603/GlyphR">GitHub</a>.</p>
+<pre class="r"><code>glyphs %&gt;%
+  filter(names==&quot;Link&quot;) %&gt;%
+  distinct() %&gt;% #2 copies of the same thing :( Must do cleanup 
+  pull(edgelist) %&gt;%
+  edgelist_to_tbl() %&gt;%
+  glyph_graph() %&gt;%
+  GlyphR:::ggliph()  + # Need to go back and export this fn
+   geom_edge_link() + geom_node_point() + ggtitle(&quot;Link&quot;) + coord_fixed()</code></pre>
+<p><img src="/post/2019-10-24-link-all-portal_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>glyphs %&gt;%
+  filter(names==&quot;All&quot;) %&gt;%
+  distinct() %&gt;% #2 copies of the same thing :( Must do cleanup 
+  pull(edgelist) %&gt;%
+  edgelist_to_tbl() %&gt;%
+  glyph_graph() %&gt;%
+  GlyphR:::ggliph()  + # Need to go back and export this fn
+   geom_edge_link() + geom_node_point() + ggtitle(&quot;All&quot;) + coord_fixed()</code></pre>
+<p><img src="/post/2019-10-24-link-all-portal_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>glyphs %&gt;%
+  filter(str_detect(names,&quot;Portal&quot;)) %&gt;%
+  distinct() %&gt;% #2 copies of the same thing :( Must do cleanup 
+  pull(edgelist) %&gt;%
+  edgelist_to_tbl() %&gt;%
+  glyph_graph() %&gt;%
+  GlyphR:::ggliph()  + # Need to go back and export this fn
+   geom_edge_link() + geom_node_point() + ggtitle(&quot;Field&quot;) + coord_fixed()</code></pre>
+<p><img src="/post/2019-10-24-link-all-portal_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="github-issues-as-todo-list" class="section level1">
+<h1>GitHub Issues as todo list</h1>
+<p>I’m finding problems as I’m trying to use the library, and adding them to my <a href="https://github.com/jimr1603/GlyphR/issues">GitHub Issues</a> as I go. It’s a nice way of dealing with stuff.</p>
+</div>
+<div id="building-on-top-of-existing" class="section level1">
+<h1>Building on top of existing</h1>
+<p>Those are ggplots/tidygraphs, I can play with how they’re displayed.</p>
+<pre class="r"><code>
+entry &lt;-glyphs %&gt;%
+  filter(str_starts(names, &quot;Chaos&quot;))%&gt;%
+  distinct() 
+  
+  entry %&gt;% #2 copies of the same thing :( Must do cleanup 
+  pull(edgelist) %&gt;%
+  edgelist_to_tbl() %&gt;%
+  glyph_graph() %&gt;%
+  GlyphR:::ggliph()  + # Need to go back and export this fn
+   geom_edge_link(aes(colour=sample(1:7, 7) %&gt;% as.factor())) + geom_node_point(aes(colour=sample(1:11, 11) %&gt;% as.factor)) + ggtitle(entry$names) + coord_fixed() +
+    scale_color_hue() + theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="/post/2019-10-24-link-all-portal_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Yes, I deliberately made the ugliest graph I could.</p>
+</div>

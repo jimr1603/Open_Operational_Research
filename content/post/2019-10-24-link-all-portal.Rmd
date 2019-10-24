@@ -1,0 +1,122 @@
+---
+title: '[LINK] [ALL] [PORTAL]'
+author: James Riley
+date: '2019-10-24'
+slug: link-all-field
+categories:
+  - R
+tags:
+  - Ingress
+  - devtools
+  - GliphR
+  - Graph theory
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+library("tidyverse")
+library("GlyphR")
+library("tidygraph")
+library("ggraph")
+library("here")
+
+set.seed(18193)
+
+set_graph_style(plot_margin = margin(1,1,1,1))
+
+```
+
+
+
+# The world is not as it seems...
+
+Niantic (of Pokemon Go and Harry Potter Wizards Unite) have [Ingress](https://ingress.com/) as their first game. Gameplay is very basic compared to the other games, which goes a long way to explaining why I put Ingress down for a long time when Pokemon Go started.
+
+I've hit a slump in Po Go, and picked Ingress back up. I might come back and talk about the lore, but for the purposes of this post:
+
+* The 'Shapers' are pan-dimensional beings that throw 'exotic matter' into our universe through portals, and we react to this by bulding points of interest there. 
+* The green team (Enlightened) believe that the Shapers want to be our friends.
+* The blue team (Resistance) believe that the Shapers are sinister.
+* We play the game by physically walking to a portal and interacting with it on our phones.
+* There's a minigame that's approximately Simon Says with alien glyphs that make certain messages. 
+
+I'm trying to get better at remembering the glyphs, so I've been looking up lists of glyphs and stuff. [This Javascript example](http://gm9.github.io/ingress-glyph-tools/) has been handy, but I've got a few ideas floating around for playing with glyphs, and a whole bunch of them rely on a sensible glyph package. I grabbed their JS encoding of the glyphs, it needs a bit more cleanup before I'd call it a final version, but it'll work for today.
+
+Also, Hadley is an 
+
+# Enter GliphR
+
+Unusually for me, most of the actual code for this post is tucked away somewhere else, since I put a basic version of GliphR together today - [GitHub](https://github.com/jimr1603/GlyphR). 
+
+```{r}
+glyphs %>%
+  filter(names=="Link") %>%
+  distinct() %>% #2 copies of the same thing :( Must do cleanup 
+  pull(edgelist) %>%
+  edgelist_to_tbl() %>%
+  glyph_graph() %>%
+  GlyphR:::ggliph()  + # Need to go back and export this fn
+   geom_edge_link() + geom_node_point() + ggtitle("Link") + coord_fixed()
+```
+
+```{r}
+glyphs %>%
+  filter(names=="All") %>%
+  distinct() %>% #2 copies of the same thing :( Must do cleanup 
+  pull(edgelist) %>%
+  edgelist_to_tbl() %>%
+  glyph_graph() %>%
+  GlyphR:::ggliph()  + # Need to go back and export this fn
+   geom_edge_link() + geom_node_point() + ggtitle("All") + coord_fixed()
+
+```
+
+```{r}
+glyphs %>%
+  filter(str_detect(names,"Portal")) %>%
+  distinct() %>% #2 copies of the same thing :( Must do cleanup 
+  pull(edgelist) %>%
+  edgelist_to_tbl() %>%
+  glyph_graph() %>%
+  GlyphR:::ggliph()  + # Need to go back and export this fn
+   geom_edge_link() + geom_node_point() + ggtitle("Field") + coord_fixed()
+
+```
+
+# GitHub Issues as todo list
+
+I'm finding problems as I'm trying to use the library, and adding them to my [GitHub Issues](https://github.com/jimr1603/GlyphR/issues) as I go. It's a nice way of dealing with stuff.
+
+# Building on top of existing
+
+Those are ggplots/tidygraphs, I can play with how they're displayed. 
+
+```{r}
+
+entry <-glyphs %>%
+  filter(str_starts(names, "Chaos"))%>%
+  distinct() 
+  
+  entry %>% #2 copies of the same thing :( Must do cleanup 
+  pull(edgelist) %>%
+  edgelist_to_tbl() %>%
+  glyph_graph() %>%
+  GlyphR:::ggliph()  + # Need to go back and export this fn
+   geom_edge_link(aes(colour=sample(1:7, 7) %>% as.factor())) + geom_node_point(aes(colour=sample(1:11, 11) %>% as.factor)) + ggtitle(entry$names) + coord_fixed() +
+    scale_color_hue() + theme(legend.position = "none")
+
+
+```
+
+Yes, I deliberately made the ugliest graph I could. 
