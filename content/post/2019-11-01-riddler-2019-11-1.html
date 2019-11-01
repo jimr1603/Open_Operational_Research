@@ -1,0 +1,129 @@
+---
+title: Riddler 2019-11-1
+author: James Riley
+date: '2019-11-01'
+slug: riddler-2019-11-1
+categories:
+  - R
+tags:
+  - Riddler
+  - monte carlo
+  - probability
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+
+
+<div id="five-thirty-eightriddler" class="section level1">
+<h1>Five-Thirty-Eight/Riddler</h1>
+<p>I recognised <a href="https://fivethirtyeight.com/features/how-long-is-the-snails-slimy-trail/">today’s Riddler problem</a> and recognised that it’s reasonably easy to attack by Monte Carlo testing rather than my (weak) probability/combinatorics.</p>
+<p>I’m going to look at solutions of the form “the Sultan’s daughter looks at the first N candidates and chooses the next candidate better than all of them, or else the last candidate”. There are other forms, but this is approximately what I remember from some book.</p>
+<pre class="r"><code>n_scenarios &lt;- 1e5
+
+candidates &lt;- 1:10 #Say 10 is the best, 1 is the worst.
+
+shuffle &lt;- function(vector){ #Useful to randomise the order of the suitors. 
+  sample(vector, length(vector))
+}
+
+test_scenarios &lt;- map_dfr(seq_len(n_scenarios), function(x){
+  tibble(suitor = shuffle(candidates),
+  scenario=x,
+  order = 1:10)
+})</code></pre>
+<p>Having set up <code>n_scenarios</code> scenarios I can write a function that takes a scenario and how many candidates she observes before deciding to choose the first one better than any of them, and returns a score from 1 to 10 for how good the suitor is.</p>
+<pre class="r"><code>
+score_strategy_once &lt;- function(data, N){ 
+  data %&gt;%
+    mutate(observed = suitor * (order &lt;= N)) %&gt;% # It&#39;s easiest to take the max observed suitor when the unobserved score 0
+    mutate(best_observation = max(observed)) %&gt;%
+    filter(order &gt; N) %&gt;% # The ones who can be selected
+    filter(suitor &gt; best_observation  | order == 10) %&gt;% # The ones who score better than the &#39;dating&#39; period, or the last one.
+    top_n(-1, order) %&gt;% # The first one, since rejects can&#39;t be returned to.
+    select(suitor, scenario, best_observation)
+}</code></pre>
+<pre class="r"><code>
+score_strategy &lt;- function(data, N){
+  data %&gt;%
+    group_by(scenario) %&gt;%
+    score_strategy_once(N) %&gt;%
+    ungroup() %&gt;%
+    mutate(strategy=N)
+}
+
+monte_carlo_tbl &lt;- map_dfr(0:9, ~(score_strategy(test_scenarios, .x)))
+
+monte_carlo_tbl %&gt;%
+    group_by(strategy) %&gt;%
+    summarise(mean.score=mean(suitor)) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">strategy</th>
+<th align="right">mean.score</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0</td>
+<td align="right">5.50444</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">7.70283</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">8.07327</td>
+</tr>
+<tr class="even">
+<td align="right">3</td>
+<td align="right">7.98399</td>
+</tr>
+<tr class="odd">
+<td align="right">4</td>
+<td align="right">7.70229</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="right">7.33290</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="right">6.91709</td>
+</tr>
+<tr class="even">
+<td align="right">7</td>
+<td align="right">6.46119</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="right">5.98481</td>
+</tr>
+<tr class="even">
+<td align="right">9</td>
+<td align="right">5.50191</td>
+</tr>
+</tbody>
+</table>
+<p>Sanity check - strategy 0 is “accept the first suitor”, which has an expected value of 5.5 (uniform distribution 1:10).</p>
+<p>Based on mean score, look at the first 2, select the best one after that which averages about suitor 8.</p>
+<pre class="r"><code>
+monte_carlo_tbl %&gt;%
+  rename(score=suitor) %&gt;%
+  mutate(score=as_factor(score)) %&gt;%
+  mutate(strategy = as.character(strategy)) %&gt;%
+  group_by(strategy, score) %&gt;%
+  summarise(n=n()) %&gt;%
+  mutate(p = n/sum(n)) %&gt;%
+  
+  ggplot(aes(x=score,y=strategy, fill=p)) + geom_tile() + scale_fill_viridis_c(option = &quot;B&quot;, label=scales::percent) + ggthemes::theme_tufte()</code></pre>
+<p><img src="/post/2019-11-01-riddler-2019-11-1_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>While 2 has the best mean, 3 seems to have the best chance of hitting the best suitor.</p>
+</div>
