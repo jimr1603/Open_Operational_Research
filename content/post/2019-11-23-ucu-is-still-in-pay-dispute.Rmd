@@ -9,7 +9,6 @@ tags:
   - inflation
   - simple graphs
   - ggplot
-  - plotly
 description: ''
 featured: ''
 featuredalt: ''
@@ -37,9 +36,9 @@ In my short time in [UCU](https://www.ucu.org.uk/) we entered a pay dispute that
 
 I was a little complicated - I was still a member of [NUS](https://www.nus.org.uk) who had condemned the strikes. I joined UCU as a postgraduate tutor, and was automatically in NUS as a postgraduate student. I ended up on picket lines on my non-tutoring days because timetables are random and UCU decided on random 1 days.
 
-Anyway, I left for the Public Sector, but I have mates in UCU. Despite [UCEA](https://www.ucea.ac.uk) promising to resolve the issues and re-open good-faith negotations, UCU have felt it necessary to vote for industrial action.
+Anyway, I left for the Public Sector, but I have mates in UCU. Despite [UCEA](https://www.ucea.ac.uk) promising to resolve the issues and re-open good-faith negotiations, UCU have felt it necessary to vote for industrial action.
 
-I've offered to graph the real-terms cuts to University salaries for one of these mates, and since this blog is [Creative Commons Licenced]() anyone else can grab the graphs
+I've offered to graph the real-terms cuts to University salaries for one of these mates, and since this blog is [Creative Commons Licenced](http://creativecommons.org/licenses/by-nc/4.0/) anyone else can grab the graphs
 
 ## Data
 
