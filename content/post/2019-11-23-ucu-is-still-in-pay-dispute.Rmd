@@ -1,0 +1,125 @@
+---
+title: UCU is still in pay dispute
+author: James Riley
+date: '2019-11-23'
+slug: ucu-is-still-in-pay-dispute
+categories:
+  - R
+tags:
+  - inflation
+  - simple graphs
+  - ggplot
+  - plotly
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+library("tidyverse")
+library("plotly")
+set.seed(18223)
+```
+
+
+## The Background
+
+In my short time in [UCU](https://www.ucu.org.uk/) we entered a pay dispute that lead to a series of strike actions. The dispute boiled down to "inflation is eroding our wages, at least pay us as much  *in real terms* as we were worth a few years ago". 
+
+I was a little complicated - I was still a member of [NUS](https://www.nus.org.uk) who had condemned the strikes. I joined UCU as a postgraduate tutor, and was automatically in NUS as a postgraduate student. I ended up on picket lines on my non-tutoring days because timetables are random and UCU decided on random 1 days.
+
+Anyway, I left for the Public Sector, but I have mates in UCU. Despite [UCEA](https://www.ucea.ac.uk) promising to resolve the issues and re-open good-faith negotations, UCU have felt it necessary to vote for industrial action.
+
+I've offered to graph the real-terms cuts to University salaries for one of these mates, and since this blog is [Creative Commons Licenced]() anyone else can grab the graphs
+
+## Data
+
+UCEA [already have commissioned an independent analysis of the real-terms pay cuts](https://www.ucea.ac.uk/library/stakeholder-briefings/newjnchespaypointsrealterms.pdf). I'm going with [CPIH](https://www.ons.gov.uk/economy/inflationandpriceindices/methodologies/consumerpriceinflationincludesall3indicescpihcpiandrpiqmi) as it looks at a standard bucket of living costs including housing, and ONS recommend it and I sit next to a Statistician at work.
+
+I plucked the relevant table into a spreadsheet, giving all values in 2008-09 pounds:
+
+```{r}
+pay_data <- read_csv(here::here("static/data/UCU/paycuts.csv"))
+
+pound <- function(x) scales::dollar(x, prefix = "£")
+
+pay_data %>%
+  mutate(`Spine Point` = as.character(`Spine Point`)) %>%
+  mutate_if(is.numeric, pound) %>%
+  knitr::kable()
+
+```
+
+As simple line graphs:
+
+```{r}
+parse_year <- function(year) str_extract(year, "^[0-9]+") %>% paste0("-01-01") %>% lubridate::ymd()
+
+pay_data %>%
+  pivot_longer(-`Spine Point`, names_to = "year", values_to = "pay") %>%
+  mutate(`Spine Point` = as_factor(`Spine Point`)) %>%
+  mutate(year =parse_year(year)) %>% #Quick function to turn year into something ggplot recognises as a year
+  ggplot(aes(x=year,y=pay, colour=`Spine Point`)) + geom_line() + geom_point() +   ggthemes::theme_tufte() +
+  scale_y_continuous(labels=pound) + 
+  labs(title="All University Pay Bands have seen real cuts")
+
+
+```
+
+As percentages:
+
+```{r}
+pay_data %>%
+ mutate(`Spine Point` = as_factor(`Spine Point`)) %>%
+  pivot_longer(-`Spine Point`) %>%
+  group_by(`Spine Point`) %>%
+  mutate(value = value/first(value)-1) %>%
+  ungroup() %>%
+  mutate(year = parse_year(name)) %>%
+  ggplot(aes(x=year, y=value, colour=`Spine Point`)) + geom_line() + scale_y_continuous(labels = scales::percent) + ggthemes::theme_tufte() + ggthemes::scale_color_few() + labs("Almost everyone is 8% worse off")
+
+```
+
+Spine Point 3 saw less cut than the rest, a quick eyeballing suggests that this is because min wage went up, so I'm re-doing the above graph without SP 3 just in case.
+
+
+```{r}
+pay_data %>%
+  filter(`Spine Point`!=3) %>%
+  mutate(`Spine Point` = as_factor(`Spine Point`)) %>%
+  pivot_longer(-`Spine Point`) %>%
+  group_by(`Spine Point`) %>%
+  mutate(value = value/first(value)-1) %>%
+  ungroup() %>%
+  mutate(year = parse_year(name)) %>%
+  ggplot(aes(x=year, y=value, colour=`Spine Point`)) + geom_line() + scale_y_continuous(labels = scales::percent) + ggthemes::theme_tufte() + ggthemes::scale_color_few() + labs("Almost everyone is 8% worse off")
+
+```
+
+As a table:
+
+```{r}
+pay_data %>%
+  mutate(`Spine Point` = as_factor(`Spine Point`)) %>%
+  rename(base = `2008-9`) %>%
+  pivot_longer(-c(`Spine Point`, base)) %>%
+  mutate(value = value/base-1) %>%
+  select(`Spine Point`, year=name, value) %>%
+  mutate(value = scales::percent(value)) %>%
+  pivot_wider(names_from = year, values_from = value) %>%
+  knitr::kable()
+
+```
+
+As a time comparison - 8% of a 40-hour week is about 3.2 hours, or half a day. "About half a day" holds as long as they're on a 5-day week, which definitely isn't universal in Uni. (If >40 hours then each day is longer, and half a day is longer.)
+
+Or compared against 10 years ago, most folk in Universities are effectively working for free for half of Friday.

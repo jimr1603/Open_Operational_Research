@@ -1,0 +1,189 @@
+---
+title: UCU is still in pay dispute
+author: James Riley
+date: '2019-11-23'
+slug: ucu-is-still-in-pay-dispute
+categories:
+  - R
+tags:
+  - inflation
+  - simple graphs
+  - ggplot
+  - plotly
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+
+
+<div id="the-background" class="section level2">
+<h2>The Background</h2>
+<p>In my short time in <a href="https://www.ucu.org.uk/">UCU</a> we entered a pay dispute that lead to a series of strike actions. The dispute boiled down to “inflation is eroding our wages, at least pay us as much <em>in real terms</em> as we were worth a few years ago”.</p>
+<p>I was a little complicated - I was still a member of <a href="https://www.nus.org.uk">NUS</a> who had condemned the strikes. I joined UCU as a postgraduate tutor, and was automatically in NUS as a postgraduate student. I ended up on picket lines on my non-tutoring days because timetables are random and UCU decided on random 1 days.</p>
+<p>Anyway, I left for the Public Sector, but I have mates in UCU. Despite <a href="https://www.ucea.ac.uk">UCEA</a> promising to resolve the issues and re-open good-faith negotations, UCU have felt it necessary to vote for industrial action.</p>
+<p>I’ve offered to graph the real-terms cuts to University salaries for one of these mates, and since this blog is <a href="">Creative Commons Licenced</a> anyone else can grab the graphs</p>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>UCEA <a href="https://www.ucea.ac.uk/library/stakeholder-briefings/newjnchespaypointsrealterms.pdf">already have commissioned an independent analysis of the real-terms pay cuts</a>. I’m going with <a href="https://www.ons.gov.uk/economy/inflationandpriceindices/methodologies/consumerpriceinflationincludesall3indicescpihcpiandrpiqmi">CPIH</a> as it looks at a standard bucket of living costs including housing, and ONS recommend it and I sit next to a Statistician at work.</p>
+<p>I plucked the relevant table into a spreadsheet, giving all values in 2008-09 pounds:</p>
+<pre class="r"><code>pay_data &lt;- read_csv(here::here(&quot;static/data/UCU/paycuts.csv&quot;))
+
+pound &lt;- function(x) scales::dollar(x, prefix = &quot;£&quot;)
+
+pay_data %&gt;%
+  mutate(`Spine Point` = as.character(`Spine Point`)) %&gt;%
+  mutate_if(is.numeric, pound) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Spine Point</th>
+<th align="left">2008-9</th>
+<th align="left">2013-14</th>
+<th align="left">2018-19</th>
+<th align="left">2019-20</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">£16,858</td>
+<td align="left">£15,525</td>
+<td align="left">£16,146</td>
+<td align="left">£16,458</td>
+</tr>
+<tr class="even">
+<td align="left">11</td>
+<td align="left">£20,818</td>
+<td align="left">£19,133</td>
+<td align="left">£19,202</td>
+<td align="left">£19,286</td>
+</tr>
+<tr class="odd">
+<td align="left">21</td>
+<td align="left">£27,836</td>
+<td align="left">£25,526</td>
+<td align="left">£25,482</td>
+<td align="left">£25,510</td>
+</tr>
+<tr class="even">
+<td align="left">31</td>
+<td align="left">£37,408</td>
+<td align="left">£34,249</td>
+<td align="left">£34,189</td>
+<td align="left">£34,226</td>
+</tr>
+<tr class="odd">
+<td align="left">41</td>
+<td align="left">£50,276</td>
+<td align="left">£45,972</td>
+<td align="left">£45,892</td>
+<td align="left">£45,942</td>
+</tr>
+<tr class="even">
+<td align="left">51</td>
+<td align="left">£67,567</td>
+<td align="left">£61,726</td>
+<td align="left">£61,618</td>
+<td align="left">£61,684</td>
+</tr>
+</tbody>
+</table>
+<p>As simple line graphs:</p>
+<pre class="r"><code>parse_year &lt;- function(year) str_extract(year, &quot;^[0-9]+&quot;) %&gt;% paste0(&quot;-01-01&quot;) %&gt;% lubridate::ymd()
+
+pay_data %&gt;%
+  pivot_longer(-`Spine Point`, names_to = &quot;year&quot;, values_to = &quot;pay&quot;) %&gt;%
+  mutate(`Spine Point` = as_factor(`Spine Point`)) %&gt;%
+  mutate(year =parse_year(year)) %&gt;% #Quick function to turn year into something ggplot recognises as a year
+  ggplot(aes(x=year,y=pay, colour=`Spine Point`)) + geom_line() + geom_point() +   ggthemes::theme_tufte() +
+  scale_y_continuous(labels=pound) + 
+  labs(title=&quot;All University Pay Bands have seen real cuts&quot;)</code></pre>
+<p><img src="/post/2019-11-23-ucu-is-still-in-pay-dispute_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>As percentages:</p>
+<pre class="r"><code>pay_data %&gt;%
+ mutate(`Spine Point` = as_factor(`Spine Point`)) %&gt;%
+  pivot_longer(-`Spine Point`) %&gt;%
+  group_by(`Spine Point`) %&gt;%
+  mutate(value = value/first(value)-1) %&gt;%
+  ungroup() %&gt;%
+  mutate(year = parse_year(name)) %&gt;%
+  ggplot(aes(x=year, y=value, colour=`Spine Point`)) + geom_line() + scale_y_continuous(labels = scales::percent) + ggthemes::theme_tufte() + ggthemes::scale_color_few() + labs(&quot;Almost everyone is 8% worse off&quot;)</code></pre>
+<p><img src="/post/2019-11-23-ucu-is-still-in-pay-dispute_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>Spine Point 3 saw less cut than the rest, a quick eyeballing suggests that this is because min wage went up, so I’m re-doing the above graph without SP 3 just in case.</p>
+<pre class="r"><code>pay_data %&gt;%
+  filter(`Spine Point`!=3) %&gt;%
+  mutate(`Spine Point` = as_factor(`Spine Point`)) %&gt;%
+  pivot_longer(-`Spine Point`) %&gt;%
+  group_by(`Spine Point`) %&gt;%
+  mutate(value = value/first(value)-1) %&gt;%
+  ungroup() %&gt;%
+  mutate(year = parse_year(name)) %&gt;%
+  ggplot(aes(x=year, y=value, colour=`Spine Point`)) + geom_line() + scale_y_continuous(labels = scales::percent) + ggthemes::theme_tufte() + ggthemes::scale_color_few() + labs(&quot;Almost everyone is 8% worse off&quot;)</code></pre>
+<p><img src="/post/2019-11-23-ucu-is-still-in-pay-dispute_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>As a table:</p>
+<pre class="r"><code>pay_data %&gt;%
+  mutate(`Spine Point` = as_factor(`Spine Point`)) %&gt;%
+  rename(base = `2008-9`) %&gt;%
+  pivot_longer(-c(`Spine Point`, base)) %&gt;%
+  mutate(value = value/base-1) %&gt;%
+  select(`Spine Point`, year=name, value) %&gt;%
+  mutate(value = scales::percent(value)) %&gt;%
+  pivot_wider(names_from = year, values_from = value) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Spine Point</th>
+<th align="left">2013-14</th>
+<th align="left">2018-19</th>
+<th align="left">2019-20</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">-7.91%</td>
+<td align="left">-4.22%</td>
+<td align="left">-2.37%</td>
+</tr>
+<tr class="even">
+<td align="left">11</td>
+<td align="left">-8.09%</td>
+<td align="left">-7.76%</td>
+<td align="left">-7.36%</td>
+</tr>
+<tr class="odd">
+<td align="left">21</td>
+<td align="left">-8.30%</td>
+<td align="left">-8.46%</td>
+<td align="left">-8.36%</td>
+</tr>
+<tr class="even">
+<td align="left">31</td>
+<td align="left">-8.44%</td>
+<td align="left">-8.61%</td>
+<td align="left">-8.51%</td>
+</tr>
+<tr class="odd">
+<td align="left">41</td>
+<td align="left">-8.56%</td>
+<td align="left">-8.72%</td>
+<td align="left">-8.62%</td>
+</tr>
+<tr class="even">
+<td align="left">51</td>
+<td align="left">-8.64%</td>
+<td align="left">-8.80%</td>
+<td align="left">-8.71%</td>
+</tr>
+</tbody>
+</table>
+<p>As a time comparison - 8% of a 40-hour week is about 3.2 hours, or half a day. “About half a day” holds as long as they’re on a 5-day week, which definitely isn’t universal in Uni. (If &gt;40 hours then each day is longer, and half a day is longer.)</p>
+<p>Or compared against 10 years ago, most folk in Universities are effectively working for free for half of Friday.</p>
+</div>
