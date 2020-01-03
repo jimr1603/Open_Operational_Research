@@ -1,0 +1,94 @@
+---
+title: xkcd-2165
+author: James Riley
+date: '2020-01-03'
+slug: xkcd-2165
+categories:
+  - R
+tags:
+  - wikidata
+  - Parliament
+  - Elections
+  - xkcd
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+library("tidyverse")
+library("lubridate")
+
+set.seed(18264)
+
+```
+
+## There's always an XKCD for that...
+
+![](https://imgs.xkcd.com/comics/millennials.png)
+
+## Generation divides, the news, Parliament
+
+I can't find the one I'm thinking of that pokes fun at newscasters being confused that non-boomers are getting elected. Today's news on a [Lib Dem MP coming out as pansexual](https://www.pinknews.co.uk/2020/01/02/layla-moran-liberal-democrats-mp-coming-our-pansexual-girlfriend-exclusive-interview/) had an article on BBC that was frankly confused about some of the main terms and the trans* umbrella. This is knowledge that could act as a [shibboleth](https://en.wikipedia.org/wiki/Shibboleth) in my social bubble, so I wondered if this was a generational thing. 
+
+Wikipedia believes [Layla Moran](https://en.wikipedia.org/wiki/Layla_Moran) was born 1982, so let's say Gen X. The natural question then is the age of every other MP.
+
+The *evil* thing to do would be to scrape Wikipedia for each MPs age. This is explicitly against Wiki's terms of service, but Wiki are nice and have provided [Wikidata](https://query.wikidata.org/#SELECT%20%3FMember_of_the_58th_Parliament_of_the_United_Kingdom%20%3FMember_of_the_58th_Parliament_of_the_United_KingdomLabel%20%3Fdate_of_birth%20WHERE%20%7B%0A%20%20SERVICE%20wikibase%3Alabel%20%7B%20bd%3AserviceParam%20wikibase%3Alanguage%20%22%5BAUTO_LANGUAGE%5D%2Cen%22.%20%7D%0A%20%20%3FMember_of_the_58th_Parliament_of_the_United_Kingdom%20wdt%3AP39%20wd%3AQ77685926.%0A%20%20OPTIONAL%20%7B%20%3FMember_of_the_58th_Parliament_of_the_United_Kingdom%20wdt%3AP569%20%3Fdate_of_birth.%20%7D%0A%7D) which means that it's fairly easy to grab the current set of MPs, their names and their DOB. (Seriously, click the link, the query is built into the link.)
+
+I already downloaded the data, so let's load it.
+
+```{r}
+mp_dob <- read_csv(here::here("/static/data/Wiki/MP DOB.csv")) 
+```
+
+```{r}
+mp_dob %>%
+  ggplot(aes(x=date_of_birth)) + geom_density() + ggthemes::theme_tufte() +
+  ggtitle("Density plot of dates of birth of current MPs")
+
+```
+
+```{r}
+mp_dob %>%
+ggplot( aes(y=date_of_birth)) + geom_boxplot() + coord_flip() +
+  ggthemes::theme_tufte() + 
+  ggtitle("Boxplot of same")
+```
+
+So from the graphs, about 50% of MPs are Boomers, but we'd have to be fuzzy on the boundary to call that!
+
+```{r}
+mp_dob %>%
+  summarise(`median date of birth` = median(date_of_birth, na.rm = T)) %>%
+  knitr::kable()
+```
+
+Slightly to the right of some of the boundaries of Boom.
+
+```{r}
+mp_dob %>%
+  mutate(generation = case_when(
+    date_of_birth < ymd("1965-1-1") ~ "Boomer",
+    date_of_birth < ymd("1985-1-1") ~ "Gen X",
+    date_of_birth < ymd("2000-1-1") ~ "Milennial",
+    TRUE ~ "UNKNOWN"
+  )) %>%
+  ggplot(aes(x=generation)) + geom_bar() + ggthemes::theme_tufte()
+```
+
+The Unknowns are quite big, but Gen X almost has a majority in the Commons.
+
+## Conclusion
+
+Gen X are reasonably justified in feeling like the generation that the media have forgotten.
+
+I'm going to come back to this to look at how many PMs or Cabinet Ministers are/have been PPE @ Oxbridge grads, or maybe Etonians. 
