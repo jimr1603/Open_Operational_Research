@@ -1,0 +1,146 @@
+---
+title: '#GarageGymCompetition'
+author: James Riley
+date: '2020-01-20'
+slug: garagegymcompetition
+categories:
+  - R
+tags:
+  - DYEL
+  - tidyverse
+  - Fitocracy
+  - fitness
+  - GarageGymCompetiton2020
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+library("tidyverse")
+
+garagegym  <- read_csv(here::here("static/data/GarageGym/garagegym2019 - Sheet1.csv"))
+```
+
+
+
+
+Previously: I found the [OpenPowerlifting dataset and made some comparisons.](https://openor.blog/post/my-fitocracy-data/). Since Sept last year I've put 10kg on my bench press, 10kg on my deadlift and 20kg on my squat. 
+
+There's going to be the 3rd annual [Garage Gym Competiton](https://www.instagram.com/garagegymcompetition/). (Why you ask, Reddit I reply.) Partially so I can feel like I'm not going to collect the wooden spoon I've grabbed the [2019 results](https://graymatterlifting.wordpress.com/garagegymcompetition-2-2019-results/) and thrown them into a spreadsheet. 
+
+There's a couple of bad values, and Gray Matter thinks in lbs so I'll turn his table into kg.
+
+```{r}
+James <- tribble(
+  ~Handle, ~Squat, ~Bench, ~Deadlift,
+  "James", 170, 100, 170
+) %>%
+  mutate(Total = Squat + Bench + Deadlift) %>%
+  pivot_longer(-`Handle`, values_to = "Weight")
+
+garagegym <- garagegym %>%
+  filter_if(is.numeric, ~!is.na(.x)) %>%
+  rename(Handle = `G Handle`) %>%
+  select(`Handle`, Gender, Squat, Bench, Deadlift, Total) %>%
+  pivot_longer(-c(Handle, Gender), values_to = "Weight") %>%
+  mutate(Weight = Weight / 2.2) 
+```
+
+Some messing around with ggplot2:
+
+First, density plotting everyone's total, excluding me since I didn't take part, but including a vertical line where I am.
+
+```{r}
+garagegym %>%
+  filter(name=="Total") %>%
+  ggplot(aes(x=Weight)) + geom_density() + geom_vline(data=filter(James, name=="Total"), aes(xintercept = Weight)) +
+  ggthemes::theme_tufte() + 
+  labs(
+    title="Density plot of all 2019 competitors, JR highlighted",
+    x="Weight (kg)"
+  )
+```
+
+
+Facet wrapping the above for the other plots
+
+```{r}
+garagegym %>%
+  ggplot(aes(x=Weight)) + geom_density() + geom_vline(data=(James), aes(xintercept = Weight)) +
+  ggthemes::theme_tufte() + facet_wrap(~name, scales = "free") +
+  labs(
+    title="Density plots of all 2019 competitors, JR highlighted",
+    x="Weight (kg)"
+  )
+  
+```
+
+The comp has no age categories, but there is self-submitted Gender, so comparing male with me:
+
+```{r}
+garagegym %>%
+  filter(Gender=="Male") %>%
+  ggplot(aes(x=Weight)) + geom_density() + geom_vline(data=(James), aes(xintercept = Weight)) +
+  ggthemes::theme_tufte() + facet_wrap(~name, scales = "free") +
+  labs(
+    title="Density plots of all male 2019 competitors, JR highlighted",
+    x="Weight (kg)"
+  )
+  
+
+```
+
+Very similar, 163 male competitors to 41 female competitors.
+
+Out of interest, what were the female numbers like:
+
+```{r}
+
+garagegym %>%
+  filter(Gender=="Female") %>%
+  ggplot(aes(x=Weight)) + geom_density() +
+  ggthemes::theme_tufte() + facet_wrap(~name, scales = "free") +
+  labs(
+    title="Density plots of all female 2019 competitors",
+    x="Weight (kg)"
+  )
+```
+
+
+Anyway, in this dataset my everything is just below the mode, except squat. What sort of ranking would I be looking at?
+
+(ha, I thought insta handle would be a unique identifier. I was wrong. I want my data wide again and can't do it. Need to reload the data.)
+
+```{r}
+James <-pivot_wider(James, names_from = name, values_from = Weight)
+
+
+garagegym  <- read_csv(here::here("static/data/GarageGym/garagegym2019 - Sheet1.csv")) %>%
+  select(Handle = `G Handle`, Squat, Bench, Deadlift, Total) %>%
+  filter_if(is.numeric, ~!is.na(.x)) %>%
+  mutate_if(is.numeric, ~(.x/2.2))
+
+garagegym <- bind_rows(James, garagegym)
+```
+
+
+Then I've worked out my percentiles if my current 1RMs were in last year's competition.
+
+```{r}
+garagegym %>%
+  mutate_if(is.numeric, ~percent_rank(.x)) %>%
+  filter(Handle=="James") %>%
+  mutate_if(is.numeric, scales::percent) %>%
+  knitr::kable()
+```
+
+
+
