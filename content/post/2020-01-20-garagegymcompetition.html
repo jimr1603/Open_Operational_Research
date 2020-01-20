@@ -1,0 +1,118 @@
+---
+title: '#GarageGymCompetition'
+author: James Riley
+date: '2020-01-20'
+slug: garagegymcompetition
+categories:
+  - R
+tags:
+  - DYEL
+  - tidyverse
+  - Fitocracy
+  - fitness
+  - GarageGymCompetiton2020
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+
+
+<p>Previously: I found the <a href="https://openor.blog/post/my-fitocracy-data/">OpenPowerlifting dataset and made some comparisons.</a>. Since Sept last year I’ve put 10kg on my bench press, 10kg on my deadlift and 20kg on my squat.</p>
+<p>There’s going to be the 3rd annual <a href="https://www.instagram.com/garagegymcompetition/">Garage Gym Competiton</a>. (Why you ask, Reddit I reply.) Partially so I can feel like I’m not going to collect the wooden spoon I’ve grabbed the <a href="https://graymatterlifting.wordpress.com/garagegymcompetition-2-2019-results/">2019 results</a> and thrown them into a spreadsheet.</p>
+<p>There’s a couple of bad values, and Gray Matter thinks in lbs so I’ll turn his table into kg.</p>
+<pre class="r"><code>James &lt;- tribble(
+  ~Handle, ~Squat, ~Bench, ~Deadlift,
+  &quot;James&quot;, 170, 100, 170
+) %&gt;%
+  mutate(Total = Squat + Bench + Deadlift) %&gt;%
+  pivot_longer(-`Handle`, values_to = &quot;Weight&quot;)
+
+garagegym &lt;- garagegym %&gt;%
+  filter_if(is.numeric, ~!is.na(.x)) %&gt;%
+  rename(Handle = `G Handle`) %&gt;%
+  select(`Handle`, Gender, Squat, Bench, Deadlift, Total) %&gt;%
+  pivot_longer(-c(Handle, Gender), values_to = &quot;Weight&quot;) %&gt;%
+  mutate(Weight = Weight / 2.2) </code></pre>
+<p>Some messing around with ggplot2:</p>
+<p>First, density plotting everyone’s total, excluding me since I didn’t take part, but including a vertical line where I am.</p>
+<pre class="r"><code>garagegym %&gt;%
+  filter(name==&quot;Total&quot;) %&gt;%
+  ggplot(aes(x=Weight)) + geom_density() + geom_vline(data=filter(James, name==&quot;Total&quot;), aes(xintercept = Weight)) +
+  ggthemes::theme_tufte() + 
+  labs(
+    title=&quot;Density plot of all 2019 competitors, JR highlighted&quot;,
+    x=&quot;Weight (kg)&quot;
+  )</code></pre>
+<p><img src="/post/2020-01-20-garagegymcompetition_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Facet wrapping the above for the other plots</p>
+<pre class="r"><code>garagegym %&gt;%
+  ggplot(aes(x=Weight)) + geom_density() + geom_vline(data=(James), aes(xintercept = Weight)) +
+  ggthemes::theme_tufte() + facet_wrap(~name, scales = &quot;free&quot;) +
+  labs(
+    title=&quot;Density plots of all 2019 competitors, JR highlighted&quot;,
+    x=&quot;Weight (kg)&quot;
+  )</code></pre>
+<p><img src="/post/2020-01-20-garagegymcompetition_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>The comp has no age categories, but there is self-submitted Gender, so comparing male with me:</p>
+<pre class="r"><code>garagegym %&gt;%
+  filter(Gender==&quot;Male&quot;) %&gt;%
+  ggplot(aes(x=Weight)) + geom_density() + geom_vline(data=(James), aes(xintercept = Weight)) +
+  ggthemes::theme_tufte() + facet_wrap(~name, scales = &quot;free&quot;) +
+  labs(
+    title=&quot;Density plots of all male 2019 competitors, JR highlighted&quot;,
+    x=&quot;Weight (kg)&quot;
+  )</code></pre>
+<p><img src="/post/2020-01-20-garagegymcompetition_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Very similar, 163 male competitors to 41 female competitors.</p>
+<p>Out of interest, what were the female numbers like:</p>
+<pre class="r"><code>
+garagegym %&gt;%
+  filter(Gender==&quot;Female&quot;) %&gt;%
+  ggplot(aes(x=Weight)) + geom_density() +
+  ggthemes::theme_tufte() + facet_wrap(~name, scales = &quot;free&quot;) +
+  labs(
+    title=&quot;Density plots of all female 2019 competitors&quot;,
+    x=&quot;Weight (kg)&quot;
+  )</code></pre>
+<p><img src="/post/2020-01-20-garagegymcompetition_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Anyway, in this dataset my everything is just below the mode, except squat. What sort of ranking would I be looking at?</p>
+<p>(ha, I thought insta handle would be a unique identifier. I was wrong. I want my data wide again and can’t do it. Need to reload the data.)</p>
+<pre class="r"><code>James &lt;-pivot_wider(James, names_from = name, values_from = Weight)
+
+
+garagegym  &lt;- read_csv(here::here(&quot;static/data/GarageGym/garagegym2019 - Sheet1.csv&quot;)) %&gt;%
+  select(Handle = `G Handle`, Squat, Bench, Deadlift, Total) %&gt;%
+  filter_if(is.numeric, ~!is.na(.x)) %&gt;%
+  mutate_if(is.numeric, ~(.x/2.2))
+
+garagegym &lt;- bind_rows(James, garagegym)</code></pre>
+<p>Then I’ve worked out my percentiles if my current 1RMs were in last year’s competition.</p>
+<pre class="r"><code>garagegym %&gt;%
+  mutate_if(is.numeric, ~percent_rank(.x)) %&gt;%
+  filter(Handle==&quot;James&quot;) %&gt;%
+  mutate_if(is.numeric, scales::percent) %&gt;%
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Handle</th>
+<th align="left">Squat</th>
+<th align="left">Bench</th>
+<th align="left">Deadlift</th>
+<th align="left">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">James</td>
+<td align="left">62%</td>
+<td align="left">33%</td>
+<td align="left">39%</td>
+<td align="left">42%</td>
+</tr>
+</tbody>
+</table>
