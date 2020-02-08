@@ -1,0 +1,150 @@
+---
+title: Open Coffee Map Part 4
+author: James Riley
+date: '2020-02-08'
+slug: open-coffee-map-part-4
+categories:
+  - R
+tags:
+  - OpenStreetMap
+  - geospatial
+  - coffee
+  - Graph theory
+  - XML
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+
+
+set.seed(18300)
+
+```
+
+# Statement of Problem
+
+I continue to require coffee at lunch time. If I was doing a Multi-Criteria Decision Analysis I'd throw in some requirements:
+
+* Be able to get to the coffee and back within a 30-60 minute lunch.
+* Be reasonably priced.
+* Taste good.
+* Preference for independent coffee shops. Cost/bucks &c. might be acting _legally_ when they minimise their tax bill, but I can take a stand on the _ethics_ of it by preferring local.
+* Getting a reasonable number of steps in is a nice-to-have. If it's not raining.
+
+# Previous Solutions
+
+I looked at this with bits of Python towards the start of this blog, and there's been some developments in R packages for spatial work, interacting with the OpenStreetMap API, and network theory/graph theory.
+
+Currently they're not brilliant at talking to each other! But for these purposes it's not _terrible_ in computing time to load the data twice into different libraries to look at it from different angles - once as geography and once as a network connected by "can walk from A-B". 
+
+# Today's Solution
+
+Normally I put my library calls in the hidden bit at the top, but the serious work is being done by the libraries, so they're going in the main post today:
+
+```{r}
+library(tidyverse)
+library(sf)
+library(osmdata)
+library(osmar)
+library(tidygraph)
+library(tmap)
+
+```
+
+First, I grabbed a sensible bounding box and all the cafes inside that box:
+
+```{r}
+
+
+bbox <- c(-1.5853357315063479,53.78906626347749,-1.513667106628418,53.81142134499526)
+
+cafe <- opq(bbox = bbox) %>%
+  add_osm_feature(key = 'amenity', value="cafe") %>%
+  osmdata_sf()
+
+tmap_mode("view")
+tm_shape(cafe$osm_points) + tm_dots()
+```
+
+So far so good, just need to trim this down to what can be feasibly reached in a lunch break.
+
+```{r}
+
+# Grab footpaths
+opq(bbox=bbox) %>% 
+  add_osm_feature(key="highway") %>%
+  osmdata_xml(here::here("static", "data", "OSM", "footpaths.osm"))
+
+# This step is computationally expensive and I didn't want to do it every time something lower down went wrong.
+expensive_parse <- xmlParse(here::here("static", "data", "OSM", "footpaths.osm")) %>%
+  as_osmar() 
+
+footpaths <- expensive_parse %>%
+  as_igraph() %>% 
+  as_tbl_graph() %>% # Footpaths are now in graph representation
+  activate(nodes) %>%
+  arrange(name!="5506378727") %>% # Manual work to make a node near the enterance to work the first node
+  mutate(dist = bfs_dist(root=1)) %>% # Every node labelled with its footpath distance
+  as_tibble() # We no longer need the representation as a graph.
+
+# We do need the coordinates of each node to find which paths are near which coffee shops.
+nodes <- expensive_parse$nodes$attrs %>% 
+  st_as_sf(coords = c("lon", "lat")) %>%
+  select(id)
+
+# We get a tibble of coordinates and the shortest walking path distance to them.
+path_distance <- nodes %>%
+  mutate(name = as.character(id)) %>%
+  select(-id) %>%
+  left_join(footpaths) %>%
+  filter(!is.na(dist)) %>%
+  st_set_crs(4326)
+```
+
+
+As far as I can tell, `st_nearest_feature` doesn't like me asking "for every coffee shop what's the nearest footpath point", so I've resorted to a `map_dbl`. 
+
+```{r}
+
+cafe_distance <- function(index){
+  
+  st_nearest_feature( cafe$osm_points[index,] %>% st_transform(27700)
+                      , path_distance %>% st_transform(27700))  %>%
+    first() %>%
+    slice(path_distance, .) %>%
+    st_drop_geometry() %>%
+    select(dist) %>%
+    dplyr::pull()
+}
+
+cafes <- nrow(cafe$osm_points)
+
+cafe <- cafe$osm_points %>%
+  mutate(dist = map_dbl(seq_len(cafes), cafe_distance))
+
+
+```
+
+
+Finally, plot it!
+
+```{r}
+cafe %>%
+  select(name, everything()) %>% # Makes name the first column, makes name the mouseover text
+  tm_shape() + tm_dots( col="dist", palette = "viridis")
+  
+```
+
+# Next Steps
+
+If I could eliminate the little bits of manual work I put into this, I could roll it into a shiny app, or generate coffee maps for arbitary points. 
