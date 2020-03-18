@@ -1,0 +1,56 @@
+---
+title: Goodbye Dyson
+author: james riley
+date: '2020-03-18'
+slug: goodbye-dyson
+categories: []
+tags:
+  - Operational Research
+  - Physics
+  - rocket science
+  - efficency
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+# Freeman Dyson 1923-2020
+
+The world is down another polymath. Wiki lists his main fields as [[mathematics & physics](https://en.wikipedia.org/wiki/Freeman_Dyson) but [hackaday](https://hackaday.com/2020/03/09/the-legacy-of-one-of-sciences-brightest-stars-freeman-dyson/) points out his early work in the Air Force's Operational Research Section, which puts him at the start of OR.[^1]
+
+## A small tribute
+
+I'm not going to talk about the Dyson Sphere, [Kurzgesagt have done so much better than I could](https://www.youtube.com/watch?v=pP44EPBMb8A). But note one of the areas OR tends to excel - maximising efficiency, even if the solution uses an unexpected set of constraints! 
+
+Nope, the wiki article above connects him to [Project Orion](https://en.wikipedia.org/wiki/Project_Orion_(nuclear_propulsion)), a beautifully crazy bit of rocket science. The citations include [a paper he wrote on the subject](http://galileo.phys.virginia.edu/classes/109.jvn.spring00/nuc_rocket/Dyson.pdf) where you can see how pissed off he is with the inefficiency of chemical rockets! 
+
+The test ban treaty of 1967[^2] put a halt to testing of Orion prototypes[^3], along with the fact that you _really_ don't want to launch one from Earth.
+
+I know that you can take a shorter path if you have more energy available so we can take the distance travelled by chemical rockets to Mars as an upper bound on the distance an Orion would take. I only know this from playing Kerbal. So I've been to [Wikipedia](https://en.wikipedia.org/wiki/List_of_missions_to_Mars) looking for successful probes to Mars. [Mars Express](https://en.wikipedia.org/wiki/Mars_Express) managed it in 400 million km, so let's use that as an upper bound for our theoretical rocket.
+
+Sometimes Operational Research is saying "I don't know how to solve this problem, but I can look up a similar problem and use it to approximate this problem". 
+
+[Another site](https://spacetravel.simhub.online/) has a calculator (with an animation!) where you can put in a distance and a constant acceleration/braking. It says that we could cover that distance in about 4 or 5 days! 
+
+As a bonus, it has some numbers Dyson felt he had to be cagey about in his paper since H-bombs were very new at the time. A 25 tonne ship (approximately 5 [Apollo landing modules](https://en.wikipedia.org/wiki/Apollo_Lunar_Module)) could do this with 42 tonnes of H-bombs. 
+
+That's 1-way, let's add 42 tonnes of weight to the ship... 110 tonnes of bombs to get there, 42 tonnes of bombs to get back, call it 152 tonnes of fuel. A modern warhead seems to be about half a tonne, so about 300 bombs. 
+
+Or an order of magnitude less than either Russia or the USA has: ![chart of USA/Russia nuclear stockpiles showing both at approximately 5000 now.](/post/2020-03-10-goodbye-dyson_files/US_and_USSR_nuclear_stockpiles.svg) (Credit - Wikimedia)
+
+So the fuel/energy costs for an Orion ship aren't outrageous at this point - it's almost back-of-the-sofa stuff if you're in the UN Permanent Security Council. 
+
+We could drop the worrying about keeping a Big Brother household for 18 months, 12 of those months in microgravity. Though you'd probably want a permanent base on the _far_ side of the moon as the minimum safe distance for launching this thing. 
+
+### On Covid-19
+
+I started writing this post before Covid-19 became quite as big as it is today, and now feel like addressing that elephant in the room. I will not be blogging on it. I've even got some nice infectious disease modelling in the pipeline that has gone to the back of the half-started blogs folder. It's too close to the day job right now.
+
+However, the advice to work from home as much as possible releases approximately 8 hours a week for me in travel time. Today that means more blog. I aim to clear a bit of the half-started posts folder, but quite often a post spawns more than 1 idea for that folder!
+
+[^1]: at least, with that title. I might revisit some themes from this and apply them to Babbage.
+[^2]: NB: 2 years before a chemical rocket put men on the moon.
+[^3]: yes, they really tested this idea.
