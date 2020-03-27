@@ -1,0 +1,80 @@
+---
+title: "Standing on the Shoulders of Giants"
+author: james riley
+date: '2020-03-25'
+slug: maths-family-tree
+categories: [R]
+tags:
+
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+output:
+  blogdown::html_page:
+    dev: "svg"
+---
+
+
+
+<p>The mathematics geneology project is a nice side-project of the American Mathematical Society - record who supervised who for their PhD Thesis. Except the modern form of the PhD of ~3 years (or more…) with a clear end product and a clearly defined supervisor (or several) is quite modern and the definitions are very loose when you go backwards.</p>
+<p>I’ve got myself added to their database - <a href="https://www.genealogy.math.ndsu.nodak.edu/id.php?id=230731">me</a>, and asked the <code>rvest</code> package to trace my ‘ancestors’.</p>
+<p>This has gone wrong a few times. I’ve settled on storing everything in a sqlite database, and I’ve <code>pin</code>-ed it so it doesn’t get lost.</p>
+<p>I should connect my pinboard to my nextcloud for cross-device sync and getting into the daily remote backup.</p>
+<pre class="r"><code>connect &lt;- function(){
+  con &lt;-  DBI::dbConnect(RSQLite::SQLite(), dbname = pins::pin_get(&quot;maths-geneology&quot;))
+}
+disconnect &lt;- function(con){
+  DBI::dbDisconnect(con)
+}
+
+con &lt;- connect()
+
+relationships &lt;- tbl(con, &quot;relationship&quot;) %&gt;% 
+  rename(to=id_supervisor, from=id) %&gt;% 
+  collect() 
+
+JR_ancestors &lt;- as_tbl_graph(relationships) %&gt;% 
+  activate(nodes) %&gt;% 
+  arrange(name != &quot;230731&quot;) %&gt;% #Ugly hack I&#39;ve used before to make a specific item 1st...
+  mutate(distance = node_distance_from(1)) %&gt;% 
+  filter(is.finite(distance)) %&gt;% 
+  mutate(id=as.integer(name)) %&gt;% 
+  select(-name) %&gt;% 
+  left_join( tbl(con, &quot;researcher&quot;), copy=TRUE)</code></pre>
+<pre class="r"><code>set_graph_style(plot_margin = margin(1,1,1,1))
+ggraph(JR_ancestors, &quot;tree&quot;) + 
+  geom_edge_diagonal(aes(start_cap = label_rect(node1.name),
+                     end_cap = label_rect(node2.name)), strength=0.5) +
+  geom_node_label(aes(label=name)) </code></pre>
+<p><img src="/post/2020-03-23-maths-family-tree_files/figure-html/unnamed-chunk-2-1.svg" width="6912" /></p>
+<pre class="r"><code>
+relationships &lt;- tbl(con, &quot;relationship&quot;) %&gt;% 
+  rename(from=id_supervisor, to=id) %&gt;% 
+  collect() 
+
+descendants &lt;- function(id_number){
+  descendants &lt;- as_tbl_graph(relationships) %&gt;% 
+    activate(nodes) %&gt;%
+    mutate(id=as.integer(name)) %&gt;% 
+    select(-name) %&gt;% 
+    arrange(id != id_number) %&gt;% #Ugly hack I&#39;ve used before to make a specific item 1st...
+    mutate(distance = node_distance_from(1)) %&gt;% 
+    filter(is.finite(distance)) %&gt;% 
+    left_join( tbl(con, &quot;researcher&quot;), copy=TRUE)
+}
+John  &lt;- descendants(82577L)
+Barry &lt;- descendants(80788L)</code></pre>
+<p>Looking at the maths descendants of two of my supervisors, a <code>coord_flip</code> makes sense with how many people they directly supervised.</p>
+<pre class="r"><code>ggraph(John, &quot;tree&quot;) + 
+  geom_edge_diagonal(aes(start_cap = label_rect(node1.name),
+                     end_cap = label_rect(node2.name)), strength=0.5) +
+  geom_node_label(aes(label=name)) + coord_flip()</code></pre>
+<p><img src="/post/2020-03-23-maths-family-tree_files/figure-html/unnamed-chunk-4-1.svg" width="2304" /></p>
+<pre class="r"><code>ggraph(Barry) + 
+  geom_edge_diagonal(aes(start_cap = label_rect(node1.name),
+                     end_cap = label_rect(node2.name)), strength=0.5) +
+  geom_node_label(aes(label=name)) + coord_flip()</code></pre>
+<p><img src="/post/2020-03-23-maths-family-tree_files/figure-html/unnamed-chunk-5-1.svg" width="2304" /></p>
