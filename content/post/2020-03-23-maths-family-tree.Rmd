@@ -1,0 +1,119 @@
+---
+title: "Standing on the Shoulders of Giants"
+author: james riley
+date: '2020-03-25'
+slug: maths-family-tree
+categories: 
+  - R
+tags:
+  - Graph Theory
+  - Web Scraping
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+output:
+  blogdown::html_page:
+    dev: "svg"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE,
+	fig.ext="svg"
+)
+library("tidyverse")
+library("tidygraph")
+library("ggraph")
+
+set.seed(18344L)
+```
+
+The mathematics geneology project is a nice side-project of the American Mathematical Society - record who supervised who for their PhD Thesis. Except the modern form of the PhD of ~3 years (or more...) with a clear end product and a clearly defined supervisor (or several) is quite modern and the definitions are very loose when you go backwards.
+
+I've got myself added to their database - [me](https://www.genealogy.math.ndsu.nodak.edu/id.php?id=230731), and asked the ` rvest ` package to trace my 'ancestors'.
+
+This has gone wrong a few times. I've settled on storing everything in a sqlite database, and I've ` pin`-ed it so it doesn't get lost.
+
+I should connect my pinboard to my nextcloud for cross-device sync and getting into the daily remote backup.
+
+
+```{r}
+connect <- function(){
+  con <-  DBI::dbConnect(RSQLite::SQLite(), dbname = pins::pin_get("maths-geneology"))
+}
+disconnect <- function(con){
+  DBI::dbDisconnect(con)
+}
+
+con <- connect()
+
+relationships <- tbl(con, "relationship") %>% 
+  rename(to=id_supervisor, from=id) %>% 
+  collect() 
+
+JR_ancestors <- as_tbl_graph(relationships) %>% 
+  activate(nodes) %>% 
+  arrange(name != "230731") %>% #Ugly hack I've used before to make a specific item 1st...
+  mutate(distance = node_distance_from(1)) %>% 
+  filter(is.finite(distance)) %>% 
+  mutate(id=as.integer(name)) %>% 
+  select(-name) %>% 
+  left_join( tbl(con, "researcher"), copy=TRUE)
+
+```
+
+```{r, fig.height=72, fig.width=72, fig.ext="svg"}
+set_graph_style(plot_margin = margin(1,1,1,1))
+ggraph(JR_ancestors, "tree") + 
+  geom_edge_diagonal(aes(start_cap = label_rect(node1.name),
+                     end_cap = label_rect(node2.name)), strength=0.5) +
+  geom_node_label(aes(label=name)) 
+  
+```
+
+
+
+```{r}
+
+relationships <- tbl(con, "relationship") %>% 
+  rename(from=id_supervisor, to=id) %>% 
+  collect() 
+
+descendants <- function(id_number){
+  descendants <- as_tbl_graph(relationships) %>% 
+    activate(nodes) %>%
+    mutate(id=as.integer(name)) %>% 
+    select(-name) %>% 
+    arrange(id != id_number) %>% #Ugly hack I've used before to make a specific item 1st...
+    mutate(distance = node_distance_from(1)) %>% 
+    filter(is.finite(distance)) %>% 
+    left_join( tbl(con, "researcher"), copy=TRUE)
+}
+John  <- descendants(82577L)
+Barry <- descendants(80788L)
+
+```
+
+Looking at the maths descendants of two of my supervisors, a `coord_flip` makes sense with how many people they directly supervised.
+
+```{r, fig.width=24, fig.height=12}
+ggraph(John, "tree") + 
+  geom_edge_diagonal(aes(start_cap = label_rect(node1.name),
+                     end_cap = label_rect(node2.name)), strength=0.5) +
+  geom_node_label(aes(label=name)) + coord_flip()
+  
+```
+
+```{r, fig.width=24, fig.height=12}
+ggraph(Barry) + 
+  geom_edge_diagonal(aes(start_cap = label_rect(node1.name),
+                     end_cap = label_rect(node2.name)), strength=0.5) +
+  geom_node_label(aes(label=name)) + coord_flip()
+  
+```
