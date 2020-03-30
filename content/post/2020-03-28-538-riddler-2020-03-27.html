@@ -1,0 +1,377 @@
+---
+title: 538-Riddler 2020/03/27
+author: James Riley
+date: '2020-03-28'
+slug: 538-riddler-2020-03-27
+categories:
+  - R
+tags:
+  - Riddler
+  - Monte Carlo
+  - Probability
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+---
+
+
+
+<p>Sometimes I see a <a href="https://fivethirtyeight.com/features/can-you-get-the-gloves-out-of-the-box/">Riddler Classic</a> that makes me just want to go attack it with Monte Carlo analysis.</p>
+<p>Let’s make a die and roll it 6 times, recording the outcome:</p>
+<pre class="r"><code>die &lt;- 1:6
+
+faces &lt;- sample(seq_along(die), length(die), replace=T) # referring to the length of the die vector will help us if we do the extra credit
+
+die &lt;- die[faces]
+
+die
+## [1] 3 2 1 5 1 3</code></pre>
+<p>That’s 1 iteration. Loops will be necessary since I need the 2nd die to produce the 3rd die, so R’s clever vectorisation won’t help.</p>
+<p>I’d like to track a ‘score’ - how far we are from the target of all faces equal. Let’s say the score is the number of distinct numbers still on the die, and the target is a score of 1.</p>
+<pre class="r"><code>
+update_die &lt;- function(die){
+  
+  faces &lt;- sample(seq_along(die), length(die), replace=T) # referring to the length of the die vector will help us if we do the extra credit
+
+  die[faces]
+}
+update_score &lt;- function(die){
+  unique(die) %&gt;% 
+  length()
+}
+
+die &lt;- 1:6
+score &lt;- update_score(die)
+
+while(last(score) &gt;1){
+  die &lt;- update_die(die)
+  
+  score &lt;- c(score, update_score(die))
+}</code></pre>
+<p>Anything we can do 1ce, we can do many times.</p>
+<pre class="r"><code>simulate_1_game &lt;- function(index, size_of_die){
+  die &lt;- seq_len(size_of_die)
+  score &lt;- update_score(die)
+  
+  while(last(score) &gt;1){
+    die &lt;- update_die(die)
+    
+    score &lt;- c(score, update_score(die))
+  }
+  
+  games &lt;- seq_along(score)
+  tibble(index=index, score=score, game=games)
+}
+
+monte_carlo_d6 &lt;- map_dfr(seq_len(1e4), ~simulate_1_game(.x,6)) </code></pre>
+<pre class="r"><code>monte_carlo_d6 %&gt;% 
+    ggplot(aes(x=game, after_stat(density))) + geom_freqpoly(binwidth=1) + facet_wrap(~score, ncol=1, scales = &quot;free_y&quot;) +
+  theme + scale_y_continuous(labels=scales::percent)</code></pre>
+<p><img src="/post/2020-03-28-538-riddler-2020-03-27_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>monte_carlo_d6 %&gt;% 
+  tabyl(game, score) %&gt;% 
+  pivot_longer(-game, names_to = &quot;score&quot;) %&gt;% 
+
+  ggplot(aes(x=game,y=value,fill=score)) + geom_area() + theme + ggthemes::scale_fill_few()</code></pre>
+<p><img src="/post/2020-03-28-538-riddler-2020-03-27_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>monte_carlo_d6 %&gt;% 
+  group_by(index) %&gt;% 
+  summarise(games_until_win = max(game)) %&gt;% 
+  ggplot(aes(x=games_until_win, after_stat(density)))  + geom_freqpoly(binwidth = 1) + 
+    theme + scale_y_continuous(labels=scales::percent)</code></pre>
+<p><img src="/post/2020-03-28-538-riddler-2020-03-27_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>monte_carlo_d6 %&gt;% 
+  group_by(index) %&gt;% 
+  summarise(games_until_win = max(game)) %&gt;% 
+  tabyl(games_until_win) %&gt;% 
+  mutate(percent = scales::percent(percent)) %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">games_until_win</th>
+<th align="right">n</th>
+<th align="left">percent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">3</td>
+<td align="right">124</td>
+<td align="left">1.2%</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">499</td>
+<td align="left">5.0%</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">826</td>
+<td align="left">8.3%</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">979</td>
+<td align="left">9.8%</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">1018</td>
+<td align="left">10.2%</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">956</td>
+<td align="left">9.6%</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="right">823</td>
+<td align="left">8.2%</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">757</td>
+<td align="left">7.6%</td>
+</tr>
+<tr class="odd">
+<td align="right">11</td>
+<td align="right">660</td>
+<td align="left">6.6%</td>
+</tr>
+<tr class="even">
+<td align="right">12</td>
+<td align="right">555</td>
+<td align="left">5.6%</td>
+</tr>
+<tr class="odd">
+<td align="right">13</td>
+<td align="right">439</td>
+<td align="left">4.4%</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="right">407</td>
+<td align="left">4.1%</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="right">330</td>
+<td align="left">3.3%</td>
+</tr>
+<tr class="even">
+<td align="right">16</td>
+<td align="right">297</td>
+<td align="left">3.0%</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="right">229</td>
+<td align="left">2.3%</td>
+</tr>
+<tr class="even">
+<td align="right">18</td>
+<td align="right">179</td>
+<td align="left">1.8%</td>
+</tr>
+<tr class="odd">
+<td align="right">19</td>
+<td align="right">137</td>
+<td align="left">1.4%</td>
+</tr>
+<tr class="even">
+<td align="right">20</td>
+<td align="right">125</td>
+<td align="left">1.2%</td>
+</tr>
+<tr class="odd">
+<td align="right">21</td>
+<td align="right">100</td>
+<td align="left">1.0%</td>
+</tr>
+<tr class="even">
+<td align="right">22</td>
+<td align="right">85</td>
+<td align="left">0.8%</td>
+</tr>
+<tr class="odd">
+<td align="right">23</td>
+<td align="right">77</td>
+<td align="left">0.8%</td>
+</tr>
+<tr class="even">
+<td align="right">24</td>
+<td align="right">70</td>
+<td align="left">0.7%</td>
+</tr>
+<tr class="odd">
+<td align="right">25</td>
+<td align="right">56</td>
+<td align="left">0.6%</td>
+</tr>
+<tr class="even">
+<td align="right">26</td>
+<td align="right">43</td>
+<td align="left">0.4%</td>
+</tr>
+<tr class="odd">
+<td align="right">27</td>
+<td align="right">41</td>
+<td align="left">0.4%</td>
+</tr>
+<tr class="even">
+<td align="right">28</td>
+<td align="right">38</td>
+<td align="left">0.4%</td>
+</tr>
+<tr class="odd">
+<td align="right">29</td>
+<td align="right">23</td>
+<td align="left">0.2%</td>
+</tr>
+<tr class="even">
+<td align="right">30</td>
+<td align="right">23</td>
+<td align="left">0.2%</td>
+</tr>
+<tr class="odd">
+<td align="right">31</td>
+<td align="right">17</td>
+<td align="left">0.2%</td>
+</tr>
+<tr class="even">
+<td align="right">32</td>
+<td align="right">7</td>
+<td align="left">0.1%</td>
+</tr>
+<tr class="odd">
+<td align="right">33</td>
+<td align="right">13</td>
+<td align="left">0.1%</td>
+</tr>
+<tr class="even">
+<td align="right">34</td>
+<td align="right">15</td>
+<td align="left">0.2%</td>
+</tr>
+<tr class="odd">
+<td align="right">35</td>
+<td align="right">15</td>
+<td align="left">0.2%</td>
+</tr>
+<tr class="even">
+<td align="right">36</td>
+<td align="right">8</td>
+<td align="left">0.1%</td>
+</tr>
+<tr class="odd">
+<td align="right">37</td>
+<td align="right">2</td>
+<td align="left">0.0%</td>
+</tr>
+<tr class="even">
+<td align="right">38</td>
+<td align="right">4</td>
+<td align="left">0.0%</td>
+</tr>
+<tr class="odd">
+<td align="right">39</td>
+<td align="right">3</td>
+<td align="left">0.0%</td>
+</tr>
+<tr class="even">
+<td align="right">40</td>
+<td align="right">4</td>
+<td align="left">0.0%</td>
+</tr>
+<tr class="odd">
+<td align="right">41</td>
+<td align="right">2</td>
+<td align="left">0.0%</td>
+</tr>
+<tr class="even">
+<td align="right">42</td>
+<td align="right">3</td>
+<td align="left">0.0%</td>
+</tr>
+<tr class="odd">
+<td align="right">43</td>
+<td align="right">2</td>
+<td align="left">0.0%</td>
+</tr>
+<tr class="even">
+<td align="right">44</td>
+<td align="right">2</td>
+<td align="left">0.0%</td>
+</tr>
+<tr class="odd">
+<td align="right">45</td>
+<td align="right">1</td>
+<td align="left">0.0%</td>
+</tr>
+<tr class="even">
+<td align="right">46</td>
+<td align="right">2</td>
+<td align="left">0.0%</td>
+</tr>
+<tr class="odd">
+<td align="right">47</td>
+<td align="right">2</td>
+<td align="left">0.0%</td>
+</tr>
+<tr class="even">
+<td align="right">48</td>
+<td align="right">1</td>
+<td align="left">0.0%</td>
+</tr>
+<tr class="odd">
+<td align="right">50</td>
+<td align="right">1</td>
+<td align="left">0.0%</td>
+</tr>
+</tbody>
+</table>
+<div id="other-dice" class="section level1">
+<h1>Other dice</h1>
+<p>We’d like to keep track of the size of our dice, tweak the simulate function. Just going to track average games until win to save on memory.</p>
+<pre class="r"><code>rm(monte_carlo_d6)
+
+
+estimate_victory &lt;- function(size_of_die){
+
+  original_die &lt;- seq_len(size_of_die)
+  die &lt;- original_die
+  
+  dice_pool &lt;- sample(original_die, 1000*size_of_die, replace=T)
+  
+  play_1_game &lt;- function(...){
+    n=0L
+    score &lt;- 10 
+   
+    while(last(score) &gt; 1){
+      if(length(dice_pool) &lt; size_of_die){
+          dice_pool &lt;&lt;- sample(original_die, 100*size_of_die, replace=T)
+      }
+      
+      n &lt;- n+1L
+      die &lt;- die[dice_pool[original_die]] 
+      dice_pool &lt;&lt;- dice_pool[-original_die] #Pop 1:n from the dice pool.
+      score &lt;- c(score, update_score(die))
+    }   
+    return(n)
+  }
+  
+  map_int(1:1000, play_1_game) %&gt;% 
+    mean()
+    
+}
+
+results &lt;- future_map_dbl(1:100, estimate_victory)</code></pre>
+<p>Looks pretty much linear, and might end up more linear if I gave it more simulation time.</p>
+<pre class="r"><code>tibble(size_of_die = 1:100, result=results) %&gt;% 
+  ggplot(aes(x=size_of_die,y=result)) + theme + geom_line()</code></pre>
+<p><img src="/post/2020-03-28-538-riddler-2020-03-27_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>

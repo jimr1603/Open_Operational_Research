@@ -1,0 +1,180 @@
+---
+title: 538-Riddler 2020/03/27
+author: James Riley
+date: '2020-03-28'
+slug: 538-riddler-2020-03-27
+categories:
+  - R
+tags:
+  - Riddler
+  - Monte Carlo
+  - Probability
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+library("tidyverse")
+library("janitor")
+library("furrr")
+
+plan("multiprocess")
+set.seed(18349L)
+
+theme <- ggthemes::theme_few()
+```
+
+Sometimes I see a [Riddler Classic](https://fivethirtyeight.com/features/can-you-get-the-gloves-out-of-the-box/) that makes me just want to go attack it with Monte Carlo analysis.
+
+Let's make a die and roll it 6 times, recording the outcome:
+```{r}
+die <- 1:6
+
+faces <- sample(seq_along(die), length(die), replace=T) # referring to the length of the die vector will help us if we do the extra credit
+
+die <- die[faces]
+
+die
+```
+
+That's 1 iteration. Loops will be necessary since I need the 2nd die to produce the 3rd die, so R's clever vectorisation won't help. 
+
+I'd like to track a 'score' - how far we are from the target of all faces equal. Let's say the score is the number of distinct numbers still on the die, and the target is a score of 1.
+
+```{r}
+
+update_die <- function(die){
+  
+  faces <- sample(seq_along(die), length(die), replace=T) # referring to the length of the die vector will help us if we do the extra credit
+
+  die[faces]
+}
+update_score <- function(die){
+  unique(die) %>% 
+  length()
+}
+
+die <- 1:6
+score <- update_score(die)
+
+while(last(score) >1){
+  die <- update_die(die)
+  
+  score <- c(score, update_score(die))
+}
+
+```
+
+Anything we can do 1ce, we can do many times. 
+
+```{r}
+simulate_1_game <- function(index, size_of_die){
+  die <- seq_len(size_of_die)
+  score <- update_score(die)
+  
+  while(last(score) >1){
+    die <- update_die(die)
+    
+    score <- c(score, update_score(die))
+  }
+  
+  games <- seq_along(score)
+  tibble(index=index, score=score, game=games)
+}
+
+monte_carlo_d6 <- map_dfr(seq_len(1e4), ~simulate_1_game(.x,6)) 
+
+```
+
+```{r}
+monte_carlo_d6 %>% 
+    ggplot(aes(x=game, after_stat(density))) + geom_freqpoly(binwidth=1) + facet_wrap(~score, ncol=1, scales = "free_y") +
+  theme + scale_y_continuous(labels=scales::percent)
+
+```
+
+```{r}
+monte_carlo_d6 %>% 
+  tabyl(game, score) %>% 
+  pivot_longer(-game, names_to = "score") %>% 
+
+  ggplot(aes(x=game,y=value,fill=score)) + geom_area() + theme + ggthemes::scale_fill_few()
+
+```
+
+```{r}
+monte_carlo_d6 %>% 
+  group_by(index) %>% 
+  summarise(games_until_win = max(game)) %>% 
+  ggplot(aes(x=games_until_win, after_stat(density)))  + geom_freqpoly(binwidth = 1) + 
+    theme + scale_y_continuous(labels=scales::percent)
+
+
+```
+
+
+```{r}
+monte_carlo_d6 %>% 
+  group_by(index) %>% 
+  summarise(games_until_win = max(game)) %>% 
+  tabyl(games_until_win) %>% 
+  mutate(percent = scales::percent(percent)) %>% 
+  knitr::kable()
+
+```
+
+# Other dice
+
+We'd like to keep track of the size of our dice, tweak the simulate function. Just going to track average games until win to save on memory.
+
+```{r}
+rm(monte_carlo_d6)
+
+
+estimate_victory <- function(size_of_die){
+
+  original_die <- seq_len(size_of_die)
+  die <- original_die
+  
+  dice_pool <- sample(original_die, 1000*size_of_die, replace=T)
+  
+  play_1_game <- function(...){
+    n=0L
+    score <- 10 
+   
+    while(last(score) > 1){
+      if(length(dice_pool) < size_of_die){
+          dice_pool <<- sample(original_die, 100*size_of_die, replace=T)
+      }
+      
+      n <- n+1L
+      die <- die[dice_pool[original_die]] 
+      dice_pool <<- dice_pool[-original_die] #Pop 1:n from the dice pool.
+      score <- c(score, update_score(die))
+    }   
+    return(n)
+  }
+  
+  map_int(1:1000, play_1_game) %>% 
+    mean()
+    
+}
+
+results <- future_map_dbl(1:100, estimate_victory)
+```
+Looks pretty much linear, and might end up more linear if I gave it more simulation time.
+
+```{r}
+tibble(size_of_die = 1:100, result=results) %>% 
+  ggplot(aes(x=size_of_die,y=result)) + theme + geom_line()
+
+```
+
