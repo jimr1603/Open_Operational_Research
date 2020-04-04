@@ -1,0 +1,228 @@
+---
+title: The Geometry of Dungeons
+author: James Riley
+date: '2020-04-04'
+slug: the-geometry-of-dungeons
+categories:
+  - R
+tags:
+  - geometry
+  - gaming
+  - recreational mathematics
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+
+
+<p>Tabletop RPGs tend to make a simplification that the world exists in 5-foot squares, which is OK in one dimension:</p>
+<pre class="r"><code>tibble(x=c(0,120), label=c(&quot;Wizard&quot;, &quot;Person about \nto be on fire&quot;)) %&gt;% 
+  ggplot(aes(x=x,label=label,y=0)) + geom_label()</code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>But <em>diagonals</em> are an issue.</p>
+<p>Right now the default plot is an issue.</p>
+<pre class="r"><code>breaks &lt;- function(limits){
+  print(limits)
+  seq(from=limits[1], to=limits[2], by=5)
+}
+
+move_to_center &lt;- function(data){
+  data %&gt;% 
+    mutate(x=x+2.5, y=y+2.5)
+}
+tibble(x=c(0,120), y=0, label=c(&quot;Wizard&quot;, &quot;Person about \nto be on fire&quot;)) %&gt;%
+  move_to_center() %&gt;% 
+  ggplot(aes(x=x,y=y,colour=label)) + geom_point() + theme_linedraw()  +
+  scale_x_continuous(breaks=seq(0,120,by = 5), minor_breaks = NULL) +
+  scale_y_continuous(breaks=seq(0,5, by=5), minor_breaks = NULL, limits=c(0,5)) + coord_fixed()</code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Another modelling assumption in tabletop RPGs - a character fills their 5-foot square:</p>
+<pre class="r"><code>transform_to_rectangle &lt;- function(data){
+  data  %&gt;% 
+    mutate(xmin=x,ymin=y,xmax=xmin+5,ymax=ymin+5)
+}
+tibble(x=c(0,120), y=0, label=c(&quot;Wizard&quot;, &quot;Person about \nto be on fire&quot;)) %&gt;%
+  transform_to_rectangle() %&gt;% 
+  ggplot(aes(xmin=xmin,ymin=ymin,xmax=xmax,ymax=ymax, fill=label)) + geom_rect() + theme_linedraw()  +
+  scale_x_continuous(breaks=seq(0,120,by = 5), minor_breaks = NULL) +
+  scale_y_continuous(breaks=seq(0,5, by=5), minor_breaks = NULL, limits=c(0,5)) + coord_fixed()</code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>But sometimes the wizard wants to shoot someone who is diagonal to them on the grid.</p>
+<p>Euclid would say that our wizard can fire bolt someone inside this circle:</p>
+<pre class="r"><code>tibble(t = seq(0,2*pi,length.out = 1000), x=120*cos(t), y=120*sin(t)) %&gt;% 
+  select(-t) %&gt;% 
+  ggplot(aes(x=x,y=y)) + geom_path() + theme_linedraw()  +
+  scale_x_continuous(breaks=seq(-120,120,by = 20), minor_breaks = seq(-120,120,by = 5)) +
+  scale_y_continuous(breaks=seq(-120,120, by=20), minor_breaks = seq(-120,120,by = 5)) + coord_fixed() + geom_point(aes(x=2.5,y=2.5, colour=&quot;Wizard&quot;))</code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>120’ is too much to show the gap, so let’s move to our cleric with his 60’ Sacred Flame:</p>
+<pre class="r"><code>
+tibble(t = seq(0,2*pi,length.out = 1000), x=60*cos(t), y=60*sin(t)) %&gt;% 
+  select(-t) %&gt;% 
+  ggplot(aes(x=x,y=y)) + geom_path() + theme_linedraw()  +
+  scale_x_continuous(breaks=seq(-60,60,by = 20), minor_breaks = seq(-60,60,by = 5)) +
+  scale_y_continuous(breaks=seq(-60,60, by=20), minor_breaks = seq(-60,60,by = 5)) + coord_fixed() + geom_point(aes(x=2.5,y=2.5, colour=&quot;Cleric&quot;))</code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+The problem, more or less, is “is the monster in range?”:</p>
+<pre class="r"><code>tibble(t = seq(0,2*pi,length.out = 1000), x=60*cos(t), y=60*sin(t)) %&gt;% 
+  select(-t) %&gt;% 
+  ggplot(aes(x=x,y=y)) + geom_path() + theme_linedraw()  +
+  scale_x_continuous(breaks=seq(-60,60,by = 20), minor_breaks = seq(-60,60,by = 5)) +
+  scale_y_continuous(breaks=seq(-60,60, by=20), minor_breaks = seq(-60,60,by = 5)) + coord_fixed() + geom_point(aes(x=2.5,y=2.5, colour=&quot;Cleric&quot;)) + geom_point(aes(x=27.5,y=52.5, colour=&quot;Monster&quot;))</code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>If we say a monster is in range if the <em>center</em> of their tile is in range then this is our cleric’s range:</p>
+<pre class="r"><code>grid_cleric &lt;-
+  cross_df(list(x=seq(-70,70,by=5), y=seq(-70,70,by=5)))
+
+grid_cleric %&gt;% 
+  mutate(in_range = sqrt(x^2+y^2) &lt; 60) %&gt;% 
+  filter(in_range) %&gt;% 
+  mutate(in_range = &quot;about to be set on fire&quot;) %&gt;% 
+  transform_to_rectangle() %&gt;% 
+  ggplot(aes(xmin=xmin,ymin=ymin,xmax=xmax,ymax=ymax, fill=in_range)) + geom_rect() + theme_linedraw()  +
+  scale_x_continuous(breaks=seq(-70,70,by = 5), minor_breaks = NULL) +
+  scale_y_continuous(breaks=seq(-70,70, by=5), minor_breaks = NULL) + coord_fixed()</code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>Or for our fire-loving wizard:</p>
+<pre class="r"><code>grid_wizard &lt;-
+  cross_df(list(x=seq(-130,130,by=5), y=seq(-130,130,by=5)))
+
+grid_wizard %&gt;% 
+  mutate(in_range = sqrt(x^2+y^2) &lt; 120) %&gt;% 
+  filter(in_range) %&gt;% 
+  mutate(in_range = &quot;about to be set on fire&quot;) %&gt;% 
+  transform_to_rectangle() %&gt;% 
+  ggplot(aes(xmin=xmin,ymin=ymin,xmax=xmax,ymax=ymax, fill=in_range)) + geom_rect() + theme_linedraw()  +
+  scale_x_continuous(breaks=seq(-130,130,by = 20), minor_breaks = NULL) +
+  scale_y_continuous(breaks=seq(-130,130,by = 20), minor_breaks = NULL) + coord_fixed()</code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Aristotle believed that projectiles moved in straight lines with right angles, and we can force that geometry on our RPG. Then the distance from the origin is <code>abs(x) + abs(y)</code>. Because Manhattan NY is in that sort of grid this is sometimes called ‘taxicab geometry’.</p>
+<pre class="r"><code>
+grid_cleric %&gt;% 
+  mutate(distance = abs(x) + abs(y)) %&gt;% 
+  filter(distance &lt; 60) %&gt;% 
+  mutate(distance = &quot;Do you see that Radiant light above us?&quot;) %&gt;% 
+transform_to_rectangle() %&gt;% 
+  ggplot(aes(xmin=xmin,ymin=ymin,xmax=xmax,ymax=ymax, fill=distance)) + geom_rect() + theme_linedraw()  +
+  scale_x_continuous(breaks=seq(-70,70,by = 5), minor_breaks = NULL) +
+  scale_y_continuous(breaks=seq(-70,70, by=5), minor_breaks = NULL) + coord_fixed()</code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Though I now have this image of a fire bolt that refuses to move diagonally:</p>
+<pre class="r"><code>fire_bolt_frame &lt;- function(frame){
+  if(frame &lt; 60){
+    x_t&lt;-frame
+    y_t&lt;-0
+  }
+  else{
+    x_t=60
+    y_t=frame-60
+  }
+  tribble(
+    ~x, ~y, ~label,
+    0, 0, &quot;wizard&quot;,
+    60, 60, &quot;flammable object&quot;,
+    x_t, y_t, &quot;fire bolt&quot;
+  ) %&gt;% 
+    mutate(frame = frame)
+}
+map_dfr(0:120, fire_bolt_frame) %&gt;% 
+  move_to_center() %&gt;% 
+  ggplot(aes(x=x,y=y,colour=label)) + geom_point() + transition_manual(frames = frame ) + theme_linedraw()  +
+  scale_x_continuous(breaks=seq(-130,130,by = 5), minor_breaks = NULL) +
+  scale_y_continuous(breaks=seq(-130,130, by=5), minor_breaks = NULL) + coord_fixed()</code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-10-1.gif" /><!-- --></p>
+<p>Or like this:</p>
+<pre class="r"><code>fire_bolt_frame &lt;- function(frame){
+ x_t = ceiling(frame/2) * 5
+ y_t = floor(frame/2) * 5
+  tribble(
+    ~x, ~y, ~label,
+    0, 0, &quot;wizard&quot;,
+    60, 60, &quot;flammable object&quot;,
+    x_t, y_t, &quot;fire bolt&quot;
+  ) %&gt;% 
+    mutate(frame = frame)
+}
+map_dfr(0:24, fire_bolt_frame) %&gt;% 
+  move_to_center() %&gt;% 
+  ggplot(aes(x=x,y=y,colour=label)) + geom_point() + transition_manual(frames = frame ) + theme_linedraw()  +
+  scale_x_continuous(breaks=seq(-130,130,by = 5), minor_breaks = NULL) +
+  scale_y_continuous(breaks=seq(-130,130, by=5), minor_breaks = NULL) + coord_fixed()</code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-11-1.gif" /><!-- --></p>
+<p>DnD 3.5 edition &amp; Pathfinder has diagonals count for 1.5 (round down) distance, which is somewhere between the two extremes above.</p>
+<pre class="r"><code>
+pathfinder_grid &lt;- 
+  tibble(x=0,y=0, dist = 0)
+
+iterate_distances &lt;- function(grid){
+  right &lt;- grid %&gt;% 
+    mutate(x=x+1,dist=dist+1)
+  left &lt;- grid %&gt;% 
+    mutate(x=x-1, dist=dist+1)
+  up &lt;- grid %&gt;% 
+    mutate(y=y+1, dist=dist+1)
+  down &lt;- grid %&gt;% 
+    mutate(y=y-1, dist=dist+1)
+  
+  ur &lt;- grid %&gt;% 
+    mutate(x=x+1,y=y+1, dist=dist+1.5)
+  ul &lt;- grid %&gt;% 
+    mutate(x=x-1,y=y+1, dist=dist+1.5)
+  dr &lt;- grid %&gt;% 
+    mutate(x=x+1,y=y-1, dist=dist+1.5)
+  dl &lt;- grid %&gt;% 
+    mutate(x=x-1,y=y-1, dist=dist+1.5)
+  
+  bind_rows(
+    grid, right, up, left, down, ur, ul, dr, dl
+  ) %&gt;% 
+    group_by(x,y) %&gt;% 
+    summarise(dist=min(dist)) %&gt;% 
+    ungroup()
+}</code></pre>
+<pre class="r"><code>for(i in seq(24)){
+  pathfinder_grid &lt;- iterate_distances(pathfinder_grid)
+}</code></pre>
+<p>In this situation, our wizard’s target zone is:</p>
+<pre class="r"><code>
+pathfinder_grid %&gt;% 
+    mutate(dist=floor(dist)) %&gt;% 
+    mutate_all(function(x) x*5) %&gt;% 
+  filter(dist&lt;120) %&gt;% 
+transform_to_rectangle() %&gt;% 
+  ggplot(aes(xmin=xmin,ymin=ymin,xmax=xmax,ymax=ymax, fill=dist)) + geom_rect() + theme_linedraw()  +
+  scale_x_continuous(breaks=seq(-200,200,by = 5), minor_breaks = NULL) +
+  scale_y_continuous(breaks=seq(-200,200, by=5), minor_breaks = NULL) + coord_fixed() +
+  scale_fill_viridis_c(option=&quot;B&quot;)</code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>And our cleric’s is:</p>
+<p>In this situation, our wizard’s target zone is:</p>
+<pre class="r"><code>
+pathfinder_grid %&gt;% 
+    mutate(dist=floor(dist)) %&gt;% 
+    mutate_all(function(x) x*5) %&gt;% 
+  filter(dist&lt;60) %&gt;% 
+transform_to_rectangle() %&gt;% 
+  ggplot(aes(xmin=xmin,ymin=ymin,xmax=xmax,ymax=ymax, fill=dist)) + geom_rect() + theme_linedraw()  +
+  scale_x_continuous(breaks=seq(-200,200,by = 5), minor_breaks = NULL) +
+  scale_y_continuous(breaks=seq(-200,200, by=5), minor_breaks = NULL) + coord_fixed() +
+  scale_fill_viridis_c(option=&quot;B&quot;)</code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>As an animation:</p>
+<pre class="r"><code>
+map_dfr(1:20, function(frame){
+  pathfinder_grid %&gt;% 
+    mutate(dist=floor(dist)) %&gt;% 
+    filter(dist&lt;frame) %&gt;% 
+    mutate(frame=frame)
+}) %&gt;% 
+  mutate(x=x*5,y=y*5) %&gt;% 
+  transform_to_rectangle() %&gt;% 
+  ggplot(aes(xmin=xmin,ymin=ymin,xmax=xmax,ymax=ymax, fill=&quot;boom&quot;)) + geom_rect() + transition_manual(frame) + theme_linedraw()  +
+  scale_x_continuous(breaks=seq(-200,200,by = 5), minor_breaks = NULL) +
+  scale_y_continuous(breaks=seq(-200,200, by=5), minor_breaks = NULL) + coord_fixed() </code></pre>
+<p><img src="/post/2020-04-04-the-geometry-of-dungeons_files/figure-html/unnamed-chunk-16-1.gif" /><!-- --></p>
