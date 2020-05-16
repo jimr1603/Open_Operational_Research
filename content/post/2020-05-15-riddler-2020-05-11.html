@@ -1,0 +1,92 @@
+---
+title: Riddler 2020-05-15
+author: James Riley
+date: '2020-05-15'
+slug: riddler-2020-05-15
+categories:
+  - R
+tags:
+  - Riddler
+  - plotly
+  - DnD
+  - Brute Force
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/plotly-binding/plotly.js"></script>
+<script src="/rmarkdown-libs/typedarray/typedarray.min.js"></script>
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<link href="/rmarkdown-libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/crosstalk/js/crosstalk.min.js"></script>
+<link href="/rmarkdown-libs/plotly-htmlwidgets-css/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/plotly-main/plotly-latest.min.js"></script>
+
+
+<p>Two things are guaranteed to grab my attention in a <a href="https://fivethirtyeight.com/features/can-you-find-the-best-dungeons-dragons-strategy/">Riddler Column</a> - Dungeons and Dragons (DnD) and probability spaces small enough to enumerate all combinations.</p>
+<p>The default position is roll 1 20-sided die (d20), and the other scenarios involve 4 d20 rolls, with a probability space of 20^4= 160,000. More than I’m willing to do by hand, but R laughs at how easy this is.</p>
+<pre class="r"><code>
+die &lt;- 1:20
+all_combinations &lt;- list(die_1 = die,die_2=die,die_3=die,die_4=die) %&gt;% 
+  cross_df()</code></pre>
+<pre class="r"><code>result_table &lt;- all_combinations %&gt;% 
+  mutate(advantage_1 = pmax(die_1,die_2), advantage_2 = pmax(die_3,die_4),
+         dis_1 = pmin(die_1,die_2), dis_2=pmin(die_3,die_4)) %&gt;% 
+  mutate(dis_of_advantage = pmin(advantage_1, advantage_2),
+         advantage_of_dis = pmax(dis_1,dis_2)) </code></pre>
+<p>Then the average for each is:</p>
+<pre class="r"><code>result_table %&gt;% 
+  summarise(default = mean(die_1),
+            dis_of_advantage = mean(dis_of_advantage),
+            advantage_of_dis = mean(advantage_of_dis)) %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">default</th>
+<th align="right">dis_of_advantage</th>
+<th align="right">advantage_of_dis</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">10.5</td>
+<td align="right">11.16666</td>
+<td align="right">9.833338</td>
+</tr>
+</tbody>
+</table>
+<p>So disadvantage of advantage is better than default, which is better than advantage of disadvantage. On average.</p>
+<p>The probability of getting exactly each roll is:</p>
+<pre class="r"><code>result_table %&gt;% 
+  select(die_1, dis_of_advantage, advantage_of_dis) %&gt;% 
+  pivot_longer(1:3) %&gt;% 
+  count(name,value) %&gt;% 
+  group_by(name) %&gt;% 
+  mutate(p=n/sum(n)) %&gt;% 
+  ungroup() %&gt;% 
+  ggplot(aes(x=value,y=p,colour=name)) + geom_line() +
+  scale_y_continuous(labels=scales::percent) +
+  expand_limits(y=0) +
+  theme_minimal()</code></pre>
+<p><img src="/post/2020-05-15-riddler-2020-05-11_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Or the probability of getting <em>at least</em> N on the roll is:</p>
+<pre class="r"><code>result_table %&gt;% 
+  select(die_1, dis_of_advantage, advantage_of_dis) %&gt;% 
+  pivot_longer(1:3) %&gt;% 
+  count(name,value) %&gt;% 
+  group_by(name) %&gt;% 
+  mutate(p=n/sum(n)) %&gt;% 
+  arrange(-value) %&gt;% 
+  mutate(p=cumsum(p)) %&gt;% 
+  ungroup() %&gt;% 
+  plot_ly(x=~value,y=~p,split=~name) %&gt;% 
+  add_lines() %&gt;% 
+          layout(yaxis = list(tickformat = &quot;%&quot;))</code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"visdat":{"677d6300e59f":["function () ","plotlyVisDat"]},"cur_data":"677d6300e59f","attrs":{"677d6300e59f":{"x":{},"y":{},"split":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","mode":"lines","inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"yaxis":{"domain":[0,1],"automargin":true,"tickformat":"%","title":"p"},"xaxis":{"domain":[0,1],"automargin":true,"title":"value"},"hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"x":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],"y":[1,0.99049375,0.9639,0.92299375,0.8704,0.80859375,0.7399,0.66649375,0.5904,0.51349375,0.4375,0.36399375,0.2944,0.22999375,0.1719,0.12109375,0.0784,0.04449375,0.0199,0.00499375],"type":"scatter","mode":"lines","name":"advantage_of_dis","marker":{"color":"rgba(31,119,180,1)","line":{"color":"rgba(31,119,180,1)"}},"error_y":{"color":"rgba(31,119,180,1)"},"error_x":{"color":"rgba(31,119,180,1)"},"line":{"color":"rgba(31,119,180,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],"y":[1,0.95,0.9,0.85,0.8,0.75,0.7,0.65,0.6,0.55,0.5,0.45,0.4,0.35,0.3,0.25,0.2,0.15,0.1,0.05],"type":"scatter","mode":"lines","name":"die_1","marker":{"color":"rgba(255,127,14,1)","line":{"color":"rgba(255,127,14,1)"}},"error_y":{"color":"rgba(255,127,14,1)"},"error_x":{"color":"rgba(255,127,14,1)"},"line":{"color":"rgba(255,127,14,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],"y":[1,0.99500625,0.9801,0.95550625,0.9216,0.87890625,0.8281,0.77000625,0.7056,0.63600625,0.5625,0.48650625,0.4096,0.33350625,0.2601,0.19140625,0.1296,0.07700625,0.0361,0.00950625],"type":"scatter","mode":"lines","name":"dis_of_advantage","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
