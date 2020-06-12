@@ -1,0 +1,59 @@
+---
+title: '#GarageGymCompetition Results'
+author: James Riley
+date: '2020-06-10'
+slug: garagegymcompetition-results
+categories:
+  - R
+tags:
+  - DYEL
+  - GarageGymCompetiton2020
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+---
+
+
+
+<p>I’ve had a little play with the <a href="https://garagegymcompetition.wordpress.com/2020-results/">#GarageGymCompetiton 2020 data</a></p>
+<p>First, a density plot of the Male lifts (rescaled to kg) with myself highlighted:</p>
+<pre class="r"><code>data &lt;- pin_get(&quot;Garagegym-2020&quot;)
+me &lt;- data %&gt;% 
+  filter(`IG Handle`==&quot;Jimr1603&quot;) %&gt;% 
+  select(1:5) %&gt;% 
+  pivot_longer(-1) %&gt;% 
+  mutate(`Weight (kg)`=value/2.2)
+
+data %&gt;% 
+  filter(Gender==&quot;Male&quot;) %&gt;% 
+  select(1:5) %&gt;% 
+  pivot_longer(-1) %&gt;% 
+  mutate(`Weight (kg)` = value/2.2) %&gt;% 
+  ggplot(aes(x=`Weight (kg)`)) + geom_density() +
+  geom_vline(data=me, mapping=aes(xintercept=`Weight (kg)`))+ facet_wrap(~name) +
+  scale_y_continuous(labels=scales::percent) + ggthemes::theme_few() </code></pre>
+<p><img src="/post/2020-05-25-garagegymcompetition-results_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>I’m considering seeing if I can throw that sort of thing at Plotly in Javascript and let people see themselves on that plot.</p>
+<p>Also, I’ve discovered <a href="https://cran.r-project.org/web/packages/ggalt/vignettes/ggalt_examples.html">dumbbell charts in package ggalt</a> so here’s a comparison between people’s totals for this year against last year:</p>
+<p>I’m not squishing 80-ish names into the Y-axis there, so I decided to arrange by this year’s total and gave people a number instead of a IG handle.</p>
+<pre class="r"><code>data %&gt;% 
+  filter(`Last Year&#39;s Total`!=0, Total!=0) %&gt;% 
+  arrange(Total) %&gt;% 
+  mutate(`IG Handle`=seq_along(`IG Handle`)) %&gt;% 
+  ggplot(aes(y=`IG Handle`, x=`Last Year&#39;s Total`, xend=Total)) + geom_dumbbell() + 
+    ggthemes::theme_few() +
+    scale_colour_viridis_c(labels=scales::percent, option = &quot;C&quot;) </code></pre>
+<p><img src="/post/2020-05-25-garagegymcompetition-results_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>What about last year’s:</p>
+<pre class="r"><code>data %&gt;% 
+  filter(`Last Year&#39;s Total`!=0, Total!=0) %&gt;% 
+  arrange(`Last Year&#39;s Total`) %&gt;% 
+  mutate(`IG Handle`=seq_along(`IG Handle`)) %&gt;% 
+  ggplot(aes(y=`IG Handle`, x=`Last Year&#39;s Total`, xend=Total)) + geom_dumbbell() + 
+    ggthemes::theme_few() +
+    scale_colour_viridis_c(labels=scales::percent, option = &quot;C&quot;) </code></pre>
+<p><img src="/post/2020-05-25-garagegymcompetition-results_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>The weirdness is where some people’s totals went down. I’ve not found a nice way to show that on the dumbbell plot.</p>
