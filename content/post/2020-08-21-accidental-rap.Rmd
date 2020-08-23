@@ -1,0 +1,314 @@
+---
+title: Accidental RAP
+author: James Riley
+date: '2020-08-23'
+slug: accidental-rap
+categories:
+  - R
+tags:
+  - RAP
+  - non-open data
+  - fitness
+  - Fitocracy
+  - Plotly
+  - json
+description: ''
+featured: ''
+featuredalt: ''
+featuredpath: ''
+linktitle: ''
+type: post
+output:
+  blogdown::html_page:
+    dev: "svg"
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
+library(tidyverse)
+library(lubridate)
+library(plotly)
+library(glue)
+
+options(lubridate.week.start = 1)
+
+
+```
+
+I have this pipeline of data - I do a workout, record bits as I go along, log it on Fitocracy...
+
+Fito haven't added any features in years, in fact they're barely keeping the server running at this point. 
+
+So I grabbed [this script](https://github.com/luketurner/fitocracy-export) that asks the server for all my workout data, which arrives as a giant blob of JSON.
+
+The data on my machine doesn't need to be the most timely, so I have [cron](https://en.wikipedia.org/wiki/Cron) run that script 1ce a day. [^1]
+
+[^1]: For 1 user running this script 1ce a day, I don't mind if it's inefficient in that it takes 10 mins. It's far more important to me that it _works_.
+
+
+There's interviews with the founders of Fitocracy that showed that they distrusted libraries and wanted to code everything from scratch. This really shows in the JSON that the server spits out. I have this little script that converts that JSON into a CSV:
+
+
+```{r eval=FALSE}
+library(tidyverse)
+library(jsonlite)
+
+fito <- fromJSON("fitocracy_data.json")
+
+
+name <- function(activity){
+  activity$actions[[1]]$action$name[1]
+}
+
+names(fito) <- map_chr(fito, name)
+
+extract_1_workout <- function(workout){
+  map_dfr(workout, function(x){
+    x  %>%
+      select(string_metric,  actiondate, points)
+  })
+}
+
+condense_1_activity <- function(activity){
+  map_dfr(seq_along(activity$actions), ~extract_1_workout(activity$actions[.x])) %>%
+    mutate(name=name(activity))
+}
+
+unpacked_result_table <- map_dfr(fito, condense_1_activity)
+
+write_csv(unpacked_result_table, "JR fito.csv")
+  
+
+```
+
+Honestly, the heavy lifting is done by the `jsonlite` package. The rest is a bit of `purrr` going up and down the list of lists of lists and keeping only the useful stuff. 
+
+
+Now I have a (massive) csv that's accurate up to midnight last night. Then the below dashboard sort of grew out of that.
+
+It wasn't until someone gave a presentation on Reproducible Analytical Pipelines (RAP) that I realised I'd built one just trying to motivate myself to keep lifting heavy stuff.
+
+
+## Dates by PR
+
+```{r}
+
+data <- pins::pin_get("JR_fito")
+activities <-  c("Deadlift", 
+                   "Squat",
+                   "Shoulder Press",
+                   "Bench Press")
+
+activities_regex <- activities %>% 
+  str_flatten(collapse = "|") %>% 
+  str_c("(",.,")")
+```
+
+```{r}
+extract_numbers <- function(string, what){
+  str_extract(string, glue("[0-9]+\\.?[0-9]* {what}")) %>%
+    str_remove(what) %>%
+    as.numeric()
+}
+```
+
+```{r}
+actual_1rm <- function(data, activity){
+  data %>%
+    group_by(name) %>%
+    mutate(kg = extract_numbers(string_metric, "kg")) %>%
+    mutate(reps = extract_numbers(string_metric, "reps")) %>%
+    filter(reps==1) %>%
+    top_n(1, kg) %>%
+    select(name, kg, reps) %>%
+    filter(name %in% activity) %>%
+    ungroup() %>%
+    distinct()
+}
+
+actual_1rm(data, c("Barbell Deadlift", 
+                     "Barbell Squat",
+                     "Standing Barbell Shoulder Press (OHP)",
+                     "Barbell Bench Press")) %>%
+  knitr::kable()
+```
+
+```{r}
+fito <- data %>%
+  filter(str_detect(name, activities_regex)) %>%
+  mutate(kg = extract_numbers(string_metric, "kg")) %>%
+  mutate(reps = extract_numbers(string_metric, "reps")) %>%
+  filter(!is.na(kg), !is.na(reps)) %>% 
+  arrange(actiondate) %>%
+  group_by(name) %>%
+  mutate(kg = cummax(kg)) %>%
+  select(name, actiondate, kg) %>%
+  group_by(name, kg) %>%
+  top_n(-1, actiondate) %>%
+  ungroup() %>%
+  distinct()
+
+```
+
+
+
+```{r}
+fito %>%
+  filter(str_detect(name, "Barbell")) %>% 
+  filter(year(actiondate)>=2019 ) %>% 
+  plot_ly(x=~actiondate,y=~kg,split=~name) %>%
+  add_markers()
+
+```
+
+## Volume for the year
+
+```{r}
+
+
+this_year <- year(today())
+
+dummy <- list(name = activities, 
+                actiondate = seq(ymd("2020-01-01"), today(), by=1), 
+                volume = 0) %>%
+  cross_df() %>%
+  mutate(actiondate = as_date(actiondate))
+
+volume <- data %>%
+  filter(str_detect(name, activities_regex)) %>%
+  mutate(kg = extract_numbers(string_metric, "kg")) %>%
+  mutate(reps = extract_numbers(string_metric, "reps")) %>%
+  filter(!is.na(kg), !is.na(reps)) %>%  
+  filter(year(actiondate) == this_year) %>%
+  mutate(kg = if_else(str_detect(name, "Dumbbell"), kg*2, kg) ) %>%
+  mutate(volume = kg * reps) %>%
+  mutate(name = str_extract(name, activities_regex)) %>% 
+  arrange(actiondate) %>%
+  bind_rows(dummy) %>%
+  group_by(name, actiondate) %>%
+  summarise(volume=sum(volume)) %>%
+  mutate(cumulative_volume=cumsum(volume)) %>%
+  ungroup() 
+
+volume %>%
+
+  mutate(cumulative_volume = cumulative_volume/1000) %>%
+ 
+  ggplot(aes(x=actiondate, y=cumulative_volume, fill=name)) + geom_area() +
+    labs(title = str_glue("Cumulative Volume for Powerlifts in {this_year}"),
+       y="Volume (tonne reps)") +
+    ggthemes::theme_tufte() + ggthemes::scale_fill_few()
+``` 
+
+## Workout days for this year
+
+```{r}
+data %>%
+  select(actiondate) %>%
+  filter(year(actiondate)==this_year) %>%
+  group_by(actiondate) %>%
+  summarise(n=1) %>%
+  mutate(week = isoweek(actiondate), weekday=wday(actiondate, label = T)) %>%
+  ggplot(aes(x=weekday,y=week, fill=n)) + geom_tile() + ggthemes::theme_tufte() + coord_flip() + 
+  scale_y_discrete()  + theme(legend.position = "none") +
+  labs(title = "Days where I logged a workout this year")
+
+```
+
+```{r}
+volume %>% 
+  filter(volume>0) %>% 
+  filter(name==activities[1]) %>% 
+  mutate(weekday = wday(actiondate, label = T), week = isoweek(actiondate)) %>% 
+  ggplot(aes(x=weekday,y=week,fill=volume)) +  geom_tile() + 
+  ggthemes::theme_tufte() + coord_flip() + 
+  scale_y_discrete() + scale_fill_viridis_c(option="inferno") +
+  labs(title=activities[1])
+
+```
+
+```{r}
+volume %>% 
+  filter(volume>0) %>% 
+  filter(name==activities[2]) %>% 
+  mutate(weekday = wday(actiondate, label = T), week = isoweek(actiondate)) %>% 
+  ggplot(aes(x=weekday,y=week,fill=volume)) +  geom_tile() + 
+  ggthemes::theme_tufte() + coord_flip() + 
+  scale_y_discrete() + scale_fill_viridis_c(option="inferno") +
+  labs(title=activities[2])
+```
+
+
+```{r}
+volume %>% 
+  filter(volume>0) %>% 
+  filter(name==activities[3]) %>% 
+  mutate(weekday = wday(actiondate, label = T), week = isoweek(actiondate)) %>% 
+  ggplot(aes(x=weekday,y=week,fill=volume)) +  geom_tile() + 
+  ggthemes::theme_tufte() + coord_flip() + 
+  scale_y_discrete() + scale_fill_viridis_c(option="inferno") +
+  labs(title=activities[3])
+```
+
+
+```{r}
+volume %>% 
+  filter(volume>0) %>% 
+  filter(name==activities[4]) %>% 
+  mutate(weekday = wday(actiondate, label = T), week = isoweek(actiondate)) %>% 
+  ggplot(aes(x=weekday,y=week,fill=volume)) +  geom_tile() + 
+  ggthemes::theme_tufte() + coord_flip() + 
+  scale_y_discrete() + scale_fill_viridis_c(option="inferno") +
+  labs(title=activities[4])
+
+```
+
+```{r}
+
+data %>%
+  filter(str_detect(name, activities_regex)) %>%
+  mutate(kg = extract_numbers(string_metric, "kg")) %>%
+  mutate(reps = extract_numbers(string_metric, "reps")) %>%
+  filter(!is.na(kg), !is.na(reps)) %>%  
+  mutate(year=year(actiondate)) %>% 
+  filter(year == this_year) %>%
+  mutate(kg = if_else(str_detect(name, "Dumbbell"), kg*2, kg) ) %>%
+  mutate(volume = kg * reps) %>%
+  mutate(name = str_extract(name, activities_regex)) %>% 
+  arrange(actiondate) %>%
+  bind_rows(dummy) %>%
+  mutate( week = isoweek(actiondate)) %>% 
+  
+  group_by(week, name) %>% 
+  summarise(volume=sum(volume)/1000) %>% 
+  ungroup() %>% 
+  ggplot(aes(x=0,xend=volume,y=week)) + ggalt::geom_dumbbell() + facet_wrap("name", ncol=2) +  
+  labs(x="weekly volume (tonne reps)") +
+  ggthemes::theme_tufte() + ggthemes::scale_colour_few()
+```
+
+The programs I've been working with while running these scripts have focused on pressing things overhead, pressing on a bench, squatting and deadlifting, so that's why those ones get more attention.
+
+I came across Stronger By Science's [Art & Science of Lifting](https://www.strongerbyscience.com/art-and-science/) which confirmed that (as long as the weight isn't too light) the better workout is generally the one with more volume - the repetitions (reps) times the weight. So I started graphing volume.
+
+The heatmaps of volume for those lifts are kinda inspired by GitHub's activity graphs.
+
+I installed the `ggalt` package just so I could draw dumbbell graphs.
+
+## Further work
+
+The dashboard gets tweaked fairly often, sometimes adding a table/removing a graph/changing a colour scheme. 
+
+Blogging about how I accidentally built a RAP has been on the TODO list for a while...
+
+I want my nightly cron script to pin the latest data with the pins package, which I'll do by tweaking the json->csv part of the pipeline.
+
+
+
+
