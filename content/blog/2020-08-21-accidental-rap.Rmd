@@ -16,8 +16,7 @@ description: ''
 featured: ''
 featuredalt: ''
 featuredpath: ''
-linktitle: ''
-type: post
+linktitle:
 output:
   blogdown::html_page:
     dev: "svg"
