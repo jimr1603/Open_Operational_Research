@@ -10,6 +10,8 @@ googleAnalytics         = ""
 pluralizeListTitles     = false
 disableLanguages        = []
 
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+
 [markup.goldmark.renderer]
   unsafe                = true
 
@@ -23,7 +25,7 @@ disableLanguages        = []
   highlightjs           = true
   highlightjsTheme      = ""
   highlightjsLang       = []
-  viewMorePostsLink     = "/post/"
+  viewMorePostsLink     = "/blog/"
   readingTime           = true
   imageStretch          = ""
   removeBlur            = false
@@ -101,7 +103,7 @@ disableLanguages        = []
   [[menu.main]]
     name              = "Blog"
     identifier        = "blog"
-    url               = "/post/"
+    url               = "/blog/"
     pre               = "<i class='far fa-newspaper'></i>"
     weight            = 3
 
