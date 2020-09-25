@@ -121,13 +121,6 @@ rssLimit = 10
     identifier        = "R-bloggers"
     url               = "https://www.r-bloggers.com/"
     weight            = 5.5 
-  
-  [[menu.main]]
-    name              = "Contact"
-    identifier        = "contact"
-    url               = "/contact/"
-    pre               = "<i class='far fa-envelope'></i>"
-    weight            = 6
 
 [social]
   # Coding Communities
