@@ -12,6 +12,7 @@ disableLanguages        = []
 
 Copyright = '<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International License</a>'
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+rssLimit = 10
 
 [markup.goldmark.renderer]
   unsafe                = true
@@ -114,7 +115,13 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     url               = "/categories/"
     pre               = "<i class='fas fa-sitemap'></i>"
     weight            = 5
-
+  
+  [[menu.main]]
+    name              = "R-Bloggers"
+    identifier        = "R-bloggers"
+    url               = "https://www.r-bloggers.com/"
+    weight            = 5.5 
+  
   [[menu.main]]
     name              = "Contact"
     identifier        = "contact"
