@@ -9,7 +9,7 @@ tags:
   - geospatial
 output:
   blogdown::html_page:
-    dev: "svg"
+    dev: "png"
 ---
  
 ```{r setup, include=FALSE}
