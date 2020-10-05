@@ -1,0 +1,129 @@
+---
+title: What have the Vikings ever done for us?
+author: James Riley
+date: "`r Sys.Date()`"
+slug: what-have-the-vikings-ever-done-for-us
+categories:
+  - R
+tags:
+  - geospatial
+output:
+  blogdown::html_page:
+    dev: "png"
+---
+ 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+library(tidyverse)
+library(lubridate)
+
+library(sf)
+library(tmap)
+
+tmap_mode("plot")
+
+```
+
+A friend mentioned that "Wensleydale" breaks down into "Wens" (Woden/Wednesday) "ley" (clearing) "dale" (field), or "Odin's field in a woodland clearing". Later, I remembered a lesson in school about elements of place names, and how the [Danelaw](https://en.wikipedia.org/wiki/Danelaw) was more likely to have Viking names than the South. 
+
+We didn't have computers powerful enough to handle the geographic data ONS put out now when I was in school, so I've come back to look at the hypothesis that there are more Old Norse (ON) place names in what was the Danelaw. 
+
+I've tried, unsuccessfully, to get the geography and name for low-level regions from the OpenStreetMap. Querying GB/England all at once makes the server go "nah, that's too big a request", while downloading the XML files means getting into the guts of XML parsing. 
+
+The nearest approximation to what I wanted on ONS was "parishes & non-civil parished areas", but I then lose bigger areas like "Harrogate". 
+
+Tmap had interactive graphs in the preview, but not in the build. I expect there's some issue between {rmarkdown} and {tmap}. I've thrown in the border-file for England + Wales as a _few_ parishes popped up in Wales but none in Scotland. Likely they have a different name for areas at that level up there. This is one of the reasons I wanted ot work with OSM data. 
+
+```{r}
+border <- st_read("http://geoportal1-ons.opendata.arcgis.com/datasets/f2c2211ff185418484566b2b7a5e1300_0.geojson?outSR={%22latestWkid%22:27700,%22wkid%22:27700}") %>% 
+  select(name=ctry17nm) %>% 
+  filter(name != "Scotland") %>%  # None of my local geographies appear in Scotland.
+  st_simplify() %>% 
+  tm_shape() + tm_borders()
+
+parishes <- pins::pin_get("parishes") #Actual data too big for Github, too big to link like previous line.
+
+
+```
+
+
+I then went looking for bits of place names that were ON or otherwise, and stumbled into [Wikipedia](https://en.wikipedia.org/wiki/List_of_generic_forms_in_place_names_in_Ireland_and_the_United_Kingdom). That article has plenty of ambiguous forms - "holm" is listed as Old English (OE)/ON. Although OE is Anglo-Saxon, a continental Germanic language - OE & ON are language cousins. [This article](https://en.wikipedia.org/wiki/Toponymy_of_England) has some nice suffixes flagged as OE or ON:
+
+OE:
+
+- -ham
+- -ing
+- -tun
+- -burh
+- -ford
+- -leah
+
+ON: 
+
+- -by
+- -thorp
+- -thwait
+- -toft
+
+Which makes it look like "Wensleydale" is more OE than ON. 
+
+I'm going to throw a _little_ [regex](https://en.wikipedia.org/wiki/Regular_expression) at this problem, since these are pre-standardised spelling, so "-leah" can also be "-ley". 
+
+
+```{r}
+map <- parishes %>%
+  mutate(form = case_when(
+    str_detect(name, "(by$|thorp.?$|thwait.?$|toft$)") ~ "ON",
+    str_detect(name, "(ham$|ing$|tun$|burh$|ford$|leah$|ley$)") ~ "OE",
+    TRUE ~ "OTHER")) %>%
+  filter(form != "OTHER") %>% 
+  st_as_sf()
+
+border + tm_shape(map) + tm_polygons("form")
+```
+
+What if I'm less strict with suffixes? (Answer, the browser complains about how much data I'm throwing at it, back to static images.)
+
+```{r}
+
+map <- parishes %>%
+  mutate(form = case_when(
+    str_detect(name, "(by|thorp.?|thwait.?|toft)") ~ "Old Norse",
+    str_detect(name, "(ham|ing|tun|burh|ford|leah|ley)") ~ "Old English",
+    TRUE ~ "OTHER")) %>%
+  filter(form != "OTHER") %>%
+  st_as_sf()
+
+border + 
+  tm_shape(map) + tm_polygons() + tm_facets("form")
+
+```
+
+I think "-by" shows this pretty well. There's a few false positives, but there's 11,500 parishes in this dataset and it would be a pain to go through al of them by hand.
+
+```{r}
+map <- parishes %>%
+  filter(str_detect(name, "by")) %>%
+  st_as_sf()
+
+border + tm_shape(map) + tm_polygons()
+
+```
+
+This makes "Grimsby" "Grim's village", "Grimnir" being "the hooded or masked one (Odin)". The 9 Grim places in this file hardly show a trend:
+
+```{r}
+map <- parishes %>%
+  filter(str_detect(name, "grim")) %>%
+  st_as_sf()
+
+border + tm_shape(map) + tm_polygons()
+```
+
+I _think_ I'd find more pagan gods in the names of natural features (rivers, hills, etc.) than place names. "Ullswater" _might_ be named for "Ullr" but there's not a Ullswater parish. 
+
+So, Old English place names seem to  be found just about everywhere in England, but Old Norse place names tend to be found in the historic Danelaw. I might come back to looking at the rough borders of the Danelaw in the context of the North-South divide. 
