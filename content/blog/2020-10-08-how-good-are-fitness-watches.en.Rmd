@@ -1,0 +1,117 @@
+---
+title: How good are fitness watches?
+author: James Riley
+date: "`r Sys.Date()`"
+slug: how-good-are-fitness-watches
+categories:
+  - R
+tags:
+  - json
+  - fitness
+  - geospatial
+output:
+  blogdown::html_page:
+    dev: "svg"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+library(tidyverse)
+library(lubridate)
+library(plotly)
+```
+
+I was entirely prepared to be making a post about how fitness/smart watches are terrible at measuring heart rate. However, we don't do science to prove that we're correct, but to become correct.
+
+I took my Wahoo Tickr ( [ECG-based](https://en.wikipedia.org/wiki/Electrocardiography) ) and my Samsung Galaxy Watch Active ( [PPG-based](https://en.wikipedia.org/wiki/Photoplethysmogram) ) out for 30 minutes of cycling at lunchtime. 
+
+Samsung lets me download _all_ my health data, as a lot of badly-labelled JSON files. Wahoo uses Garmin's proprietary format which {sf} doesn't read, but the Free Software [GPS Babel](http://www.gpsbabel.org/) does. 
+
+I've stripped just the heart rate & timestamp data, because I don't want to announce to everyone where I live. 
+
+Initially, they look like they have pretty good agreement:
+
+```{r}
+wahoo <- read_csv(here::here("static/data/cycling/tickr.csv")) %>%
+  rename(heart_rate = description) %>%
+  mutate(sensor = "wahoo")
+
+samsung <- read_csv(here::here("static/data/cycling/samsung.csv")) %>%
+  rename(timestamp = start_time) %>%
+  mutate(sensor = "samsung")
+
+heart_data <- bind_rows(wahoo, samsung)
+
+heart_data %>%
+  ggplot(aes(x = timestamp, y = heart_rate, colour = sensor)) + geom_line() + theme_minimal() + ggthemes::scale_colour_few()
+```
+
+Before I start looking at an error function, there's a few bits that are worth zooming-in.
+
+```{r}
+heart_data %>%
+  filter(timestamp < ymd_hm("2020-10-08 12:05")) %>% 
+  ggplot(aes(x = timestamp, y = heart_rate, colour = sensor)) + geom_point() + theme_minimal() + ggthemes::scale_colour_few()
+```
+
+The Wahoo looks like it's measuring HR about 1ce/second, while the Samsung normally measures about 1ce/10 seconds, but gave up for 2 minutes near the start of the workout. 
+
+```{r}
+heart_data %>%
+  filter(timestamp > ymd_hm("2020-10-08 12:05")) %>% 
+  ggplot(aes(x = timestamp, y = heart_rate, colour = sensor)) + geom_point() + theme_minimal() + ggthemes::scale_colour_few()
+
+```
+
+But once HR had adjusted to workout levels, they agree pretty well.
+
+Now to build an error function. Given that the tickr has more data-points, I'll compare the tickr against the last figure the active watch produced:
+
+```{r}
+error_table <- wahoo %>%
+  left_join(samsung, by="timestamp") %>%
+  select(timestamp, heart_rate.x, heart_rate.y) %>%
+  rename(wahoo=heart_rate.x, samsung=heart_rate.y) %>%
+  mutate(tick = cumsum(!is.na(samsung))) %>% 
+  filter(tick>0) %>%
+  group_by(tick) %>%
+  mutate(samsung=first(samsung)) %>%
+  mutate(error = samsung-wahoo) %>%
+  ungroup() %>%
+  select(-tick)
+
+error_table %>% 
+  ggplot(aes(x = timestamp, y = error)) + geom_line() + theme_minimal()
+```
+
+
+Which is clearly terrible before 12:05, so let's look at the timescale where the Samsung was _actually recording_. 
+
+```{r}
+
+error_table %>% 
+  filter(timestamp > ymd_hm("2020-10-08 12:05")) %>% 
+  ggplot(aes(x = timestamp, y = error)) + geom_line() + theme_minimal()
+```
+
+It spends most of the time within 5 beats per minute of the better sensor, which is better than I expected.
+
+Some summary stats:
+
+```{r}
+error_table %>%
+  summarise( mean_error = mean(error),  RMS = sqrt(mean(error^2))) %>% 
+  knitr::kable(digits = 1)
+```
+
+I can strip out the time dimension and plot the Samsung reading against the Wahoo reading. I'm starting from 12:05 in this one, and adding the line ` y=x` as it shows "perfect agreement with Wahoo and Samsung". 
+
+```{r}
+error_table %>% 
+  filter(timestamp > ymd_hm("2020-10-08 12:05")) %>% 
+  ggplot(aes(x = wahoo, y = samsung, colour = error)) + geom_point() + geom_abline(slope = 1) + coord_fixed() + scale_color_gradient2() + theme_minimal() 
+```
