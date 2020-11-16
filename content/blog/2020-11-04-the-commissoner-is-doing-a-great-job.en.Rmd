@@ -1,0 +1,139 @@
+---
+title: The Commissoner is doing a great job!
+author: James Riley
+date: '`r Sys.Date()'
+slug: the-commissoner-is-doing-a-great-job
+categories:
+  - R
+tags:
+  - API
+  - package development
+  - blaseball
+  - Graph theory
+output:
+  blogdown::html_page:
+    dev: "svg"
+---
+
+ 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+library(tidyverse)
+library(tidygraph)
+library(ggraph)
+library(visNetwork)
+```
+
+[My favourite AI blog](https://aiweirdness.com/post/633411394686042112/splorts-teams) has introduced me to Blaseball, an absurdist fan-simulator where weather effects include "flocks of birds", and "black hole". 
+
+In a pretty crappy year all around, we've gathered around a pretty big random number generator and we tell stories. [Some of us make music](https://thegarages.bandcamp.com/). 
+
+There's a [Society for Internet Blaseball Research](https://sibr.dev/projects) as quite a few mechanics are still being worked out, and some of us like making art through data. 
+
+For a bunch of self-organised projects, the interconnectivity is _good_. There is a massive datablase, with a well-documented API, and a Python package for requesting data from the API. If the Python-ists have a package, I want one for R, so I fired up the [documentation for the httr package](https://cran.r-project.org/web/packages/httr/vignettes/api-packages.html) and [Hadley/Jenny's book on writing R packages](https://r-pkgs.org/). 
+
+It's a [work in progress](https://github.com/jimr1603/blaseballData/), but it's working well enough to play with the playerStats endpoint. 
+
+Through various means, players can move teams. Not so much through trades, but through stealing, and weather.
+
+So for a bit of data vis, who have been the biggest gainers/losers of players? 
+
+```{r}
+players <- pins::pin_get("playerStats")
+
+moved_team <- players %>%
+  filter(team != "PODS", team != "Hall Stars") %>%
+  group_by(player_id) %>%
+  filter(team_id != lag(team_id) | (team_id != lead(team_id))) %>%
+  select(player_id, player_name, team) %>%
+  mutate(from = team, to = lead(team)) %>%
+  filter(!is.na(to)) %>%
+  select(-team) %>%
+  ungroup()
+```
+
+biggest losers of players:
+
+```{r}
+moved_team %>%
+  count(from) %>%
+  arrange(desc(n)) %>%
+  rename(team = from) %>%
+  slice_max(n, n = 3) %>%
+  knitr::kable()
+```
+
+Biggest gainers of players:
+
+```{r}
+moved_team %>%
+  count(to) %>%
+  rename(team = to) %>%
+  arrange(desc(n)) %>%
+  slice_max(n, n = 3) %>%
+  knitr::kable()
+```
+
+I told SIBR I was going to make some ugly graphs of player movement, and here they are:
+
+```{r}
+set_graph_style(plot_margin = margin(1, 1, 1, 1))
+
+moved_team_graph <-
+  moved_team %>%
+  select(from, to) %>%
+  group_by(from, to) %>%
+  summarise(n = n()) %>%
+  ungroup() %>%
+  as_tbl_graph()
+
+moved_team_graph %>%
+  activate(edges) %>%
+  filter(n == 1) %>%
+  ggraph(layout = "circle") + geom_edge_link(aes(
+    start_cap = label_rect(node1.name),
+    end_cap = label_rect(node2.name)
+  ),
+  arrow = arrow(length = unit(4, "mm"))
+  ) +
+  geom_node_text(aes(label = name))
+```
+
+```{r}
+
+moved_team_graph %>%
+  activate(edges) %>%
+  filter(n > 1) %>%
+  ggraph(layout = "circle") + geom_edge_link(aes(
+    start_cap = label_rect(node1.name),
+    end_cap = label_rect(node2.name)
+  ),
+  arrow = arrow(length = unit(4, "mm"))
+  ) +
+  geom_node_text(aes(label = name)) + facet_wrap(~n, ncol = 1)
+```
+
+
+Finally, a visNetwork for maximum Data Crime. (Who am I kidding, this graph could get much worse.)
+
+```{r}
+
+moved_team_visgraph <- moved_team %>%
+  select(from, to, label = player_name) %>%
+  filter(from != to) %>%
+  as_tbl_graph() %>%
+  toVisNetworkData()
+
+visNetwork(moved_team_visgraph$nodes, moved_team_visgraph$edges) %>%
+  visEdges(arrows = "to") %>%
+  visNodes(shape = "box")
+```
+
+
+## Footnote
+
+Since starting this post the *Coffee Cup* has been announced, and probably messed up these data. So I'm choosing to ignore the Coffee Cup. Also, the boss battle between the Pods and the Hall Stars doesn't count for this analysis. 
