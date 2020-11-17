@@ -18,7 +18,7 @@ rssLimit = 10
   unsafe                = true
 
 [outputs]
-  home                  = ["html", "json", "rss"]
+  home                  = ["html",  "rss"]
 
 [params]
   enableCDN             = false
