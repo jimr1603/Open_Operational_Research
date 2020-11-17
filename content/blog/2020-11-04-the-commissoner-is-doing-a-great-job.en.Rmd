@@ -1,7 +1,7 @@
 ---
 title: The Commissoner is doing a great job!
 author: James Riley
-date: '`r Sys.Date()'
+date: '`r Sys.Date()`'
 slug: the-commissoner-is-doing-a-great-job
 categories:
   - R
