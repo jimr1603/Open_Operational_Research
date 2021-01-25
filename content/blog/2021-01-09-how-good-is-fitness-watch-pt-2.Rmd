@@ -1,0 +1,94 @@
+---
+title: How good are fitness watches (pt 2)
+author: James Riley
+date: '`r Sys.Date()`'
+slug: fit-watch-2
+categories:
+  - R
+tags:
+  - fitness
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+library(tidyverse)
+library(plotly)
+
+theme_set(ggthemes::theme_tufte())
+```
+
+Samsung watch did OK at cycling, but cycling is pretty steady - get up to working heart rate and stay roughly there. I wondered how it does at barbell training, so I took it to Thursday's deadlift session [^1]. Deadlifts are a few seconds of high effort followed by a few minutes catching your breath. 
+
+[^1]: before anyone points out, yes England is in Lockdown Mk 3. I have weights in my garage.
+
+
+The Wahoo chest strap wasn't overly pleased with this concept - it is marketed for runners/cyclists. I got these data out of it by saying I was running on a treadmill. This disabled the GPS, so when I ran the Wahoo data through [GPS babel](http://www.gpsbabel.org/) it discarded all the data because babel likes working with nice GPS traces. I ended up deep in the documentation and got a spreadsheet of the heart data. 
+
+```{r}
+
+wahoo   <- read_csv(here::here("static/data/deadlifts/wahoo.csv")) %>% 
+  select(timestamp=Timestamp, heart_rate=`heart rate`) %>% 
+  mutate(sensor="chest-strap")
+samsung <- read_csv(here::here("static/data/deadlifts/samsung.csv")) %>% 
+  rename(timestamp=start_time) %>% 
+  mutate(sensor="watch")
+
+data <- bind_rows(wahoo, samsung)
+
+data %>% 
+  ggplot(aes(x=timestamp, y=heart_rate, colour=sensor)) +
+    geom_line() + 
+    labs(
+      title = "Heart rate over a training session",
+      y = "heart rate (bpm)"
+    )
+```
+
+Looks like the watch was consistently below the chest-strap. Apart from about 20:10 when I went out of range of the phone to grab a drink and the sensor started logging 0s. 
+
+```{r}
+errors <- left_join(samsung, wahoo, by="timestamp") %>% 
+  filter(heart_rate.y > 0) %>% 
+    mutate(error = heart_rate.y-heart_rate.x) %>% 
+  select(timestamp, error)
+    
+
+errors %>% 
+  ggplot(aes(x=timestamp, y=error)) + 
+    geom_line() + 
+    labs(
+      title="Difference between chest strap and fitness watch",
+      y = "heart rate difference (bpm)"
+    )
+```
+
+Last time they were within about 10 bpm of each other, but this is almost never that close.
+
+## Recovery time
+
+Heart rate is a reasonable proxy for recovery between working sets. Immediately after a set of deadlifts our subject is too tired to do more deadlifts, and their heart rate shoots upwards, then starts to go back down. If it settled down to a lower level and stayed there then we might say they were resting too long. 
+
+There's all sorts of strategies for "are you resting enough/too much between sets?". For this test I rested as much as I thought I needed, and eyeing the graphs it looks like I was about right. 
+
+```{r}
+wahoo %>% 
+  mutate(heart_rate = 
+           if_else(heart_rate==0, NA_real_, heart_rate)) %>% 
+  #The zeros really should be NA. 
+  ggplot(aes(x=timestamp, y=heart_rate)) +
+    scale_y_continuous(breaks = seq(100, 180,by=10)) +
+    geom_line()
+```
+
+
+The main other option is some form of timer. I am outraged at how much some of these cost and I'm designing one for myself with an arduino. Watch this space. 
+
+As I've been falling down the rabbit-hole of evidence-based fitness[^2], I've discovered that people are generally OK at self-regulating recovery time. Given that the heart strap is awkward to deal with and the watch was garbage, I think I'll play with my timer and occasionally check with the chest strap that the timer is set appropriately. 
+
+There's also a possible complication - it was about 3 degrees C in the garage. This makes my skin redder than normal, which affects how easily the camera on the watch can detect a pulse as *more red*.  
+
+[^2]: Instead of blogging, obviously. I generated these data `r as.integer(lubridate::today() - lubridate::ymd("2021-01-07"))` days ago
