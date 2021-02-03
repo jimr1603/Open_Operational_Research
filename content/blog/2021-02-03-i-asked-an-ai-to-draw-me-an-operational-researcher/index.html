@@ -1,0 +1,80 @@
+---
+title: I asked an AI to draw me "an Operational Researcher"...
+author: james riley
+date: '2021-02-03'
+slug: an-operational-researcher
+categories:
+  - Python
+tags:
+- machine learning
+- google colab
+- neural networks
+---
+
+
+
+<p>AI Weirdness had another <a href="https://aiweirdness.com/post/641389107563626496/searching-for-bernie">great post</a> using <a href="https://github.com/lucidrains/big-sleep">Big Sleep</a> which uses a neural net to steer another neural net towards a given prompt. Again, I am amazed at how much easier it has become to play with these, from the second link you can go into their Google Colab workbook and drive a properly set-up virtual machine in seconds. For free.</p>
+<p>The first thing I asked for was “an Operational Researcher”. I got this:</p>
+<div class="figure">
+<img src="images/an_operational_researcher.png" alt="" />
+<p class="caption">Big Sleep with prompt “an Operational Researcher”</p>
+</div>
+<p>Which appears to be some sort of fly on a pencil, and an awesome album cover.</p>
+<p>I was given access to a gigantic neural net <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> on Google’s hardware, and I’ve been reading/watching bits of William Gibson, the father of Cyberpunk, recently. <a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> So I asked it to draw me a “neuromancer”:</p>
+<div class="figure">
+<img src="images/neuromancer.png" alt="" />
+<p class="caption">Big Sleep with prompt “neuromancer”</p>
+</div>
+<p>Which ought to be the cover for a Gibson novel, or a Doctorow/Stross novel. Or maybe a Gary Numan album, possibly The Network.</p>
+<p>One very useful feature of the colab notebook is that you can choose the random seed. This should improve reproducibility. It also showed me how lucky I was to get that image on my first run, many seeds produced garbage.</p>
+<p>One seed was doing well:</p>
+<div class="figure">
+<img src="images/neuromancer%2020200127.png" alt="" />
+<p class="caption">Big Sleep with prompt “neuromancer”, different random seed to above</p>
+</div>
+<p>but eventually fell into feature collapse:</p>
+<div class="figure">
+<img src="images/neuromancer%2020200127%20collapse.png" alt="" />
+<p class="caption">Previous image with more training demonstrating feature collapse</p>
+</div>
+<p>Which still look like <em>awesome</em> album covers.</p>
+<p>After asking for “neuromancer”, “technomancer” came to mind, reminding me of a sysadmin friend. Seed 0 was definitely a Numan album cover.</p>
+<div class="figure">
+<img src="images/technomancer%20seed%200.png" alt="" />
+<p class="caption">Prompt “technomancer”, seed 0</p>
+</div>
+<p>Seed 3 showed promise, but collapsed before too long:</p>
+<div class="figure">
+<img src="images/technomancer%20seed%203.png" alt="" />
+<p class="caption">Prompt “technomancer”, seed 3</p>
+</div>
+<p>Since it was giving me trippy images, I gave it the prompt “your brain on drugs”. It delivered feature collapse.</p>
+<p>Before feature collapse:</p>
+<div class="figure">
+<img src="images/your%20brain%20on%20drugs%20600.png" alt="" />
+<p class="caption">Prompt “your brain on drugs”, before feature collapse</p>
+</div>
+<p>After feature collapse:</p>
+<div class="figure">
+<img src="images/your%20brain%20on%20drugs%20700.png" alt="" />
+<p class="caption">Prompt “your brain on drugs”, before feature collapse</p>
+</div>
+<div id="sideways-discussion-on-copyright" class="section level2">
+<h2>Sideways discussion on copyright</h2>
+<p>one Now the main tricky thing is to work out what copyright details to write for the “images/” folder for this post. In England &amp; Wales the creator is automatically granted a copyright once their creative work is in a tangible form. Digital counts.</p>
+<p>Who created these art?</p>
+<p>Did the authors of BigGan create every image it has spat out, by writing its code? One level lower, did is BigGan doing anything bigger than really fancy filters to a few Gigabytes of uncredited photos? Does the author of an Instagram filter get copyright over your selfies?</p>
+<p>Should BigGan/Big Sleep get legal personhood and assigned copyright? No. Neural nets are not biology, and even if they were BG is smaller than a hamster, and the <a href="https://en.wikipedia.org/wiki/Monkey_selfie_copyright_dispute">monkey selfie</a>
+ruled against the monkey.</p>
+<p>Is what I did sufficient to constitute “creative work”? I trashed at least twice as many photos as I’ve chosen to share for this post. That feels incorrect, I fed a program some potentially interesting inputs, about 50% of what came out was interesting and I deleted the rest.</p>
+<p>Where I’ve given the prompts &amp; seeds this is entirely reproducible. “Technomancer seed 3 300 epochs” would likely be too small to qualify as a distinct copyrighted work, but you can go to that colab workbook and should get the same image.</p>
+<p>This is already a semi-serious issue - the explosion of “keep calm &amp; …” merchandise came from very shallow algorithms connected to print-on-demand services. We only noticed when <a href="https://www.channel4.com/news/amazon-removes-offensive-keep-calm-and-hit-her-t-shirts">Amazon pulled the plug on really offensive designs</a>. These were fly-by-night operations, spin up a design, sell it, delete it if it doesn’t sell. They were moving too fast to notice what their programs had spat out, and definitely moving too fast to sue each other for copyright infringement. But could they have?</p>
+<p>UK Copyright law was founded in the context of the printing press and was extended to a death-plus system to harmonise with a trading bloc we just left. A computer was a lady with a pencil and an abacus, and making a commercial copy involved machinery bigger than some flats I’ve lived in. d</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>but still smaller than a hamster.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Opening crawl for Johnny Mnemonic (movie) starts “Second decade of the 21st century. Corporations rule. The world is threatened by a new plague”. Cyberpunk isn’t supposed to be <em>that</em> prophetic.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
