@@ -30,8 +30,8 @@ Which ought to be the cover for a Gibson novel, or a Doctorow/Stross novel. Or m
 One very useful feature of the colab notebook is that you can choose the random seed. This should improve reproducibility. It also showed me how lucky I was to get that image on my first run, many seeds produced garbage. 
 
 One seed was doing well:
-![Big Sleep with prompt "neuromancer", different random seed to above](images/neuromancer 20200127.png)
 
+![Big Sleep with prompt "neuromancer", different random seed to above](images/neuromancer 20200127.png)
 
 but eventually fell into feature collapse:
 
@@ -64,7 +64,7 @@ After feature collapse:
 
 ## Sideways discussion on copyright
 
-Now the main tricky thing is to work out what copyright details to write for the "images/" folder for this post. In England & Wales the creator is automatically granted a copyright once their creative work is in a tangible form. Digital counts. 
+one Now the main tricky thing is to work out what copyright details to write for the "images/" folder for this post. In England & Wales the creator is automatically granted a copyright once their creative work is in a tangible form. Digital counts. 
 
 Who created these art?
 
