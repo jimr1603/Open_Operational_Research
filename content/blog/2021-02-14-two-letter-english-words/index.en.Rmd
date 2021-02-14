@@ -1,0 +1,61 @@
+---
+title: Two letter English words
+author: james riley
+date: '`r Sys.Date()`'
+slug: two-letter
+categories:
+  - R
+tags:
+  - visulisation
+---
+```{r}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+library(tidyverse)
+library(plotly)
+
+theme_set(ggthemes::theme_tufte())
+```
+A short one today as I just wanted to see these two graphs.
+
+[The Oatmeal has a free game](http://theoatmeal.com/blog/free_game) with his usual humour. It's built on making words from the given letters, and one level only lets you play two letter words. 
+
+I found an English dictionary-file at [github](https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt), so let's load it and keep the two letter words.
+
+```{r}
+two_letter <- read_lines("https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt") 
+two_letter <- tibble(word = two_letter) %>% 
+  filter(str_length(word) == 2)
+```
+
+There are $26^2=674$ possible 2-letter words, but only 427 of them are realised. "ta" is a word, "tf" is not. 
+
+A little tidymagic will visualise this:
+
+```{r}
+two_letter %>% 
+  mutate(letter_1 = str_extract(word, "^.")) %>% 
+  mutate(letter_2 = str_extract(word, ".$")) %>% 
+  ggplot(aes(x=letter_1, y=letter_2)) + geom_tile() + coord_fixed() +
+    labs(title = "Two-letter English Words")
+
+```
+
+
+
+Or some plotly magic:
+
+
+```{r}
+two_letter %>% 
+  mutate(letter_1 = str_extract(word, "^.")) %>% 
+  mutate(letter_2 = str_extract(word, ".$")) %>% 
+  plot_ly(x=~letter_1, y=~letter_2) %>% 
+    add_markers(text=~word, hoverinfo="text") 
+```
+
+
+
