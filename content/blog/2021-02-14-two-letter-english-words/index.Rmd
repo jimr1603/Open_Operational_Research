@@ -1,12 +1,10 @@
 ---
-title: Two letter English words
-author: james riley
-date: '`r Sys.Date()`'
+title: "Two letter English words"
+author: "james riley"
+date: "`r Sys.Date()`"
 slug: two-letter
-categories:
-  - R
-tags:
-  - visulisation
+categories: R
+tags: visulisation
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
