@@ -2,7 +2,7 @@
 title: "Two letter English words"
 author: "james riley"
 date: "`r Sys.Date()`"
-slug: two-letter
+slug: []
 categories: R
 tags: visulisation
 ---
