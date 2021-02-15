@@ -5,7 +5,8 @@ date: "`r Sys.Date()`"
 slug: []
 categories:
   - R
-tags: visulisation
+tags:
+  - visulisation
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
