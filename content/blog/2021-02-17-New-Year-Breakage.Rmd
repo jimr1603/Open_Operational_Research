@@ -160,7 +160,9 @@ data %>%
   ggthemes::theme_tufte() + ggthemes::scale_colour_few()
 
 ```
-No major change. Let's say "at least I was consistent" :D. 
+
+
+No major difference in workout volume in betwixtmass and general. Let's say "at least I was consistent" :D. 
 
 
 
