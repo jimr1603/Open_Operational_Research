@@ -1,0 +1,71 @@
+---
+title: How good are fitness watches (pt 2)
+author: James Riley
+date: '2021-01-31'
+slug: fit-watch-2
+categories:
+  - R
+tags:
+  - fitness
+---
+
+
+
+<p>Samsung watch did OK at cycling, but cycling is pretty steady - get up to working heart rate and stay roughly there. I wondered how it does at barbell training, so I took it to Thursday’s deadlift session <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>. Deadlifts are a few seconds of high effort followed by a few minutes catching your breath.</p>
+<p>The Wahoo chest strap wasn’t overly pleased with this concept - it is marketed for runners/cyclists. I got these data out of it by saying I was running on a treadmill. This disabled the GPS, so when I ran the Wahoo data through <a href="http://www.gpsbabel.org/">GPS babel</a> it discarded all the data because babel likes working with nice GPS traces. I ended up deep in the documentation and got a spreadsheet of the heart data.</p>
+<pre class="r"><code>wahoo   &lt;- read_csv(here::here(&quot;static/data/deadlifts/wahoo.csv&quot;)) %&gt;% 
+  select(timestamp=Timestamp, heart_rate=`heart rate`) %&gt;% 
+  mutate(sensor=&quot;chest-strap&quot;)
+samsung &lt;- read_csv(here::here(&quot;static/data/deadlifts/samsung.csv&quot;)) %&gt;% 
+  rename(timestamp=start_time) %&gt;% 
+  mutate(sensor=&quot;watch&quot;)
+
+data &lt;- bind_rows(wahoo, samsung)
+
+data %&gt;% 
+  ggplot(aes(x=timestamp, y=heart_rate, colour=sensor)) +
+    geom_line() + 
+    labs(
+      title = &quot;Heart rate over a training session&quot;,
+      y = &quot;heart rate (bpm)&quot;
+    )</code></pre>
+<p><img src="/post/2021-01-09-how-good-is-fitness-watch-pt-2_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>Looks like the watch was consistently below the chest-strap. Apart from about 20:10 when I went out of range of the phone to grab a drink and the sensor started logging 0s.</p>
+<pre class="r"><code>errors &lt;- left_join(samsung, wahoo, by=&quot;timestamp&quot;) %&gt;% 
+  filter(heart_rate.y &gt; 0) %&gt;% 
+    mutate(error = heart_rate.y-heart_rate.x) %&gt;% 
+  select(timestamp, error)
+    
+
+errors %&gt;% 
+  ggplot(aes(x=timestamp, y=error)) + 
+    geom_line() + 
+    labs(
+      title=&quot;Difference between chest strap and fitness watch&quot;,
+      y = &quot;heart rate difference (bpm)&quot;
+    )</code></pre>
+<p><img src="/post/2021-01-09-how-good-is-fitness-watch-pt-2_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Last time they were within about 10 bpm of each other, but this is almost never that close.</p>
+<div id="recovery-time" class="section level2">
+<h2>Recovery time</h2>
+<p>Heart rate is a reasonable proxy for recovery between working sets. Immediately after a set of deadlifts our subject is too tired to do more deadlifts, and their heart rate shoots upwards, then starts to go back down. If it settled down to a lower level and stayed there then we might say they were resting too long.</p>
+<p>There’s all sorts of strategies for “are you resting enough/too much between sets?”. For this test I rested as much as I thought I needed, and eyeing the graphs it looks like I was about right.</p>
+<pre class="r"><code>wahoo %&gt;% 
+  mutate(heart_rate = 
+           if_else(heart_rate==0, NA_real_, heart_rate)) %&gt;% 
+  #The zeros really should be NA. 
+  ggplot(aes(x=timestamp, y=heart_rate)) +
+    scale_y_continuous(breaks = seq(100, 180,by=10)) +
+    geom_line()</code></pre>
+<p><img src="/post/2021-01-09-how-good-is-fitness-watch-pt-2_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>The main other option is some form of timer. I am outraged at how much some of these cost and I’m designing one for myself with an arduino. Watch this space.</p>
+<p>As I’ve been falling down the rabbit-hole of evidence-based fitness<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>, I’ve discovered that people are generally OK at self-regulating recovery time. Given that the heart strap is awkward to deal with and the watch was garbage, I think I’ll play with my timer and occasionally check with the chest strap that the timer is set appropriately.</p>
+<p>There’s also a possible complication - it was about 3 degrees C in the garage. This makes my skin redder than normal, which affects how easily the camera on the watch can detect a pulse as <em>more red</em>.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>before anyone points out, yes England is in Lockdown Mk 3. I have weights in my garage.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Instead of blogging, obviously. I generated these data 24 days ago<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>

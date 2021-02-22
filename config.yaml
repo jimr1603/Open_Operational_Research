@@ -1,0 +1,47 @@
+baseurl: https://openor.blog/
+languageCode: en
+title: Open Operational Research
+theme: "hugo-lithium"
+googleAnalytics: ''
+disqusShortname: ''
+ignoreFiles:
+  - \.Rmd$
+  - \.Rmarkdown$
+  - _cache$
+  - \.knit\.md$
+  - \.utf8\.md$
+rssLimit: 10
+permalinks:
+  post: /:year/:month/:day/:slug/
+menu:
+  main:
+    - name: About
+      url: /about/
+    - name: Categories
+      url: /categories/
+    - name: Tags
+      url: /tags/
+    - name: GitHub
+      url: https://github.com/jimr1603/Open_Operational_Research
+    - name: RSS Feed 
+      url: /index.xml
+    
+params:
+  MathJaxCDN: //cdnjs.cloudflare.com/ajax/libs
+  MathJaxVersion: 2.7.5
+  highlightjsCDN: //cdnjs.cloudflare.com/ajax/libs
+  highlightjsLang:
+    - r
+    - yaml
+  highlightjsTheme: github
+  highlightjsVersion: 9.12.0
+  logo:
+    alt: Logo
+    height: 50
+    url: an_operational_researcher.png
+    width: 50
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
