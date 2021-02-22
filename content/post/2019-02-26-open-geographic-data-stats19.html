@@ -21,7 +21,7 @@ linktitle: ''
 
 
 <p>I have a folder of data waiting to be played with. The playing with is the interesting part. Most of the inertia is over the cleaning the data part.</p>
-<p>One of these datasets is Stats19, provided by DfT under the <a href="www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">OGL</a>. There’s now a package for easy loading of a cleaned dataset: <a href="https://ropensci.org/blog/2019/02/26/stats19/">stats19</a>. Note the comment about how prior to its release they estimate about 80% of time spent working with these data was on doing similar cleaning that everyone else was doing!</p>
+<p>One of these datasets is Stats19, provided by DfT under the <a href="www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">OGL</a>. There’s now a package for easy loading of a cleaned dataset: <a href="https://ropensci.org/post/2019/02/26/stats19/">stats19</a>. Note the comment about how prior to its release they estimate about 80% of time spent working with these data was on doing similar cleaning that everyone else was doing!</p>
 <p>For now, I’m going to work with 2017 data. A later post might look at trends.</p>
 <pre class="r"><code>crashes &lt;- get_stats19(year = 2017, type = &quot;Accidents&quot;, ask = FALSE)
 casualties &lt;- get_stats19(year = 2017, type = &quot;Casualties&quot;, ask = FALSE)

@@ -59,7 +59,7 @@ output:
   st_as_sf()
 
 border + tm_shape(map) + tm_polygons(&quot;form&quot;)</code></pre>
-<p><img src="/blog/2020-10-02-what-have-the-vikings-ever-done-for-us.en_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><img src="/post/2020-10-02-what-have-the-vikings-ever-done-for-us.en_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <p>What if I’m less strict with suffixes? (Answer, the browser complains about how much data I’m throwing at it, back to static images.)</p>
 <pre class="r"><code>map &lt;- parishes %&gt;%
   mutate(form = case_when(
@@ -71,20 +71,20 @@ border + tm_shape(map) + tm_polygons(&quot;form&quot;)</code></pre>
 
 border + 
   tm_shape(map) + tm_polygons() + tm_facets(&quot;form&quot;)</code></pre>
-<p><img src="/blog/2020-10-02-what-have-the-vikings-ever-done-for-us.en_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="/post/2020-10-02-what-have-the-vikings-ever-done-for-us.en_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <p>I think “-by” shows this pretty well. There’s a few false positives, but there’s 11,500 parishes in this dataset and it would be a pain to go through al of them by hand.</p>
 <pre class="r"><code>map &lt;- parishes %&gt;%
   filter(str_detect(name, &quot;by&quot;)) %&gt;%
   st_as_sf()
 
 border + tm_shape(map) + tm_polygons()</code></pre>
-<p><img src="/blog/2020-10-02-what-have-the-vikings-ever-done-for-us.en_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="/post/2020-10-02-what-have-the-vikings-ever-done-for-us.en_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>This makes “Grimsby” “Grim’s village”, “Grimnir” being “the hooded or masked one (Odin)”. The 9 Grim places in this file hardly show a trend:</p>
 <pre class="r"><code>map &lt;- parishes %&gt;%
   filter(str_detect(name, &quot;grim&quot;)) %&gt;%
   st_as_sf()
 
 border + tm_shape(map) + tm_polygons()</code></pre>
-<p><img src="/blog/2020-10-02-what-have-the-vikings-ever-done-for-us.en_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="/post/2020-10-02-what-have-the-vikings-ever-done-for-us.en_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>I <em>think</em> I’d find more pagan gods in the names of natural features (rivers, hills, etc.) than place names. “Ullswater” <em>might</em> be named for “Ullr” but there’s not a Ullswater parish.</p>
 <p>So, Old English place names seem to be found just about everywhere in England, but Old Norse place names tend to be found in the historic Danelaw. I might come back to looking at the rough borders of the Danelaw in the context of the North-South divide.</p>

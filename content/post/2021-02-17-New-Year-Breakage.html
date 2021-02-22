@@ -14,7 +14,7 @@ tags:
 
 
 
-<p>Previously, I blogged on my <a href="https://openor.blog/blog/accidental-rap/">Accidental RAP</a>.</p>
+<p>Previously, I blogged on my <a href="https://openor.blog/post/accidental-rap/">Accidental RAP</a>.</p>
 <p>Today I ran it for the first time in 2021, and two things broke. I didn’t show the code last time, mostly because it’s a long report anyway. I’m going to hide most of the code in this one to show off the errors.</p>
 <p>There was one hardcoded reference to 2020, so this graph was just wrong.</p>
 <pre class="r"><code>this_year &lt;- year(today()) #Good so far
@@ -51,7 +51,7 @@ volume %&gt;%
     labs(title = str_glue(&quot;Cumulative Volume for Powerlifts in {this_year}&quot;),
        y=&quot;Volume (tonne reps)&quot;) +
     ggthemes::theme_tufte() + ggthemes::scale_fill_few()</code></pre>
-<p><img src="/blog/2021-02-17-New-Year-Breakage_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><img src="/post/2021-02-17-New-Year-Breakage_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <p>At least the title was right…</p>
 <p>Then on the GitHub-style activity heatmaps:</p>
 <pre class="r"><code>data %&gt;%
@@ -64,7 +64,7 @@ volume %&gt;%
   ggplot(aes(x=weekday,y=week, fill=n)) + geom_tile() + ggthemes::theme_tufte() + coord_flip() + 
   scale_y_discrete()  + theme(legend.position = &quot;none&quot;) +
   labs(title = &quot;Days where I logged a workout this year&quot;)</code></pre>
-<p><img src="/blog/2021-02-17-New-Year-Breakage_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p><img src="/post/2021-02-17-New-Year-Breakage_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <p>Oh. 2021-01-01 <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> is week 53 of 2020. That’s… not what I wanted.</p>
 <p>The first fix is</p>
 <pre class="r"><code>  actiondate = seq(ymd(&quot;2020-01-01&quot;), today(), by=1), #Oh, there&#39;s the hardcoded 2020</code></pre>
@@ -102,7 +102,7 @@ volume %&gt;%
              colour = betwixtmass)) + ggalt::geom_dumbbell() + facet_wrap(&quot;name&quot;, ncol=2) +  
   labs(x=&quot;weekly volume (tonne reps)&quot;) +
   ggthemes::theme_tufte() + ggthemes::scale_colour_few()</code></pre>
-<p><img src="/blog/2021-02-17-New-Year-Breakage_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="/post/2021-02-17-New-Year-Breakage_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>No major difference in workout volume in betwixtmass and general. Let’s say “at least I was consistent” :D.</p>
 </div>
 <div class="footnotes">
