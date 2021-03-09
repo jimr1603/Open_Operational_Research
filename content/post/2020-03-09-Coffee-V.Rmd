@@ -1,0 +1,84 @@
+---
+title: Open Coffee Map V
+author: james riley
+date: '`r Sys.Date()`'
+slug: Coffee-V
+categories:
+  - R
+tags:
+  - OpenStreetMap
+  - geospatial
+  - coffee
+  - Graph theory
+output:
+  blogdown::html_page:
+    dev: "svg"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+library("tidyverse")
+library("lubridate")
+library("tmap")
+library("dodgr")
+library("sf")
+
+theme_set(ggthemes::theme_tufte())
+
+```
+
+I've previously looked at the problem of "what coffee shops are in walking distance in a lunchtime from the office?" and [the last attempt](https://openor.blog/2020/02/08/open-coffee-map-part-4/)  involved persuading some OpenStreetMap data to become a Graph. 
+
+I've been reading [Geocomputation with R](https://geocompr.robinlovelace.net/), and one of the definite benefits of publishing with {bookdown} is that it stays up to date. [Chapter 12](https://geocompr.robinlovelace.net/transport.html) introduces a few packages that have a few different approaches to OSM data + street networks. 
+
+For this one I noticed that {dodgr} has "isochrones" - points of equal _time_ from an origin. So I've taken 30 minutes walking from the office to generate a filter on coffee shops.
+
+```{r}
+bbox <- tibble(x = c(-1.6200,-1.4852), y = c(53.8223,53.7769) ) %>% 
+  as.matrix() 
+
+Leeds <- dodgr_streetnet_sc(bbox) # OSM Data grab
+
+Leeds <- Leeds %>% 
+  weight_streetnet(wt_profile = "foot") # Turn it into a Graph, assuming WALKING
+```
+
+```{r}
+border <- dodgr_isochrones(Leeds, 
+                           from = "1675168027", # The vertex outside QH
+                           tlim = 30*60)  #seconds
+  
+#Transform the isochrone into a st_polygon:
+border_polygon <- bind_rows(border, slice_head(border, n=1)) %>% 
+  select(x,y) %>% 
+    as.matrix() %>% 
+    list() %>% 
+    st_polygon()
+```
+
+
+```{r}
+tmap_mode("view")
+
+coffee <- osmdata::opq(bbox) %>% 
+  osmdata::add_osm_feature(key = "amenity", value = "cafe") %>% 
+  osmdata::osmdata_sf()
+
+
+filter(coffee$osm_points, st_within(coffee$osm_points, border_polygon, sparse = F)) %>% 
+  select(name) %>% 
+  tm_shape() + tm_dots()
+```
+
+Looking at the extreme points I think {dodgr} has a model of a younger and fitter pedestrian than me. There's quite a lot of hill between the office and "waterside cafe". 
+
+`osmpoints` has sometimes returned the four corners of a coffee shop instead of its center point. This seems to happen when its name is not recorded. The tea shop in Kirkgate Market is not also tagged as a cafe - I might need to go into the documentation to see if it needs an update.
+
+I've a different Shiny/Golem project on the go, so plans to turn this into a Shinyapp are on hold, but with {dodgr} it got a lot easier.
+
+If you've read this far, then I'm going to plug [StreetComplete](https://wiki.openstreetmap.org/wiki/StreetComplete). Just as people like you and me ensure that Wikipedia is as good as it can be, anyone (on Android) can install a small app that asks a few questions like "does this cafe have disabled toilets?" or "what is the speed limit on this road?". When these data are good then people can use them for planning - being able to go into town without worrying about where the facilities are, or where the local vegan eatery is. 
