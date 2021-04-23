@@ -1,0 +1,138 @@
+---
+title: Bayesian Blaseball
+author: James Riley
+date: '2021-04-20'
+slug: bayesian-blaseball
+categories: 
+ - R
+tags:
+  - Bayesian Statistics
+  - Linear Regression
+  - Probability Theory
+  - Blaseball
+  - SIBR
+type: post
+---
+
+
+
+<div id="background" class="section level1">
+<h1>Background</h1>
+<p>In Blaseball, the fans are given some coins from the Blaseball gods so that we can bet on games, buy Concessions, and buy votes to give our favourite players Performance Enhancing Demons. Yes, buy votes, because wealth is a form of speech.</p>
+<div id="blaseball-betting" class="section level2">
+<h2>Blaseball Betting</h2>
+<p>As a team is more favoured to win, the payout for a winning bet goes down. This has been plucked from the site JavaScript:</p>
+<pre><code>(function (e, A) {
+                return 0.5 === e
+                  ? Math.round(2 * A)
+                  : e &lt; 0.5
+                  ? Math.round(
+                      A * (2 + 0.0015 * Math.pow(100 * (0.5 - e), 2.2))
+                    )
+                  : Math.round(
+                      A *
+                        (3.206 / (1 + Math.pow(0.443 * (e - 0.5), 0.95)) -
+                          1.206)
+                    );
+              })(I(), v)
+</code></pre>
+<p>I’m going to turn this into R as follows:</p>
+<pre class="r"><code>payout = function(odds, stake, round=FALSE){
+  
+  #validate inputs
+  assertthat::assert_that(all(between(odds, 0, 1)))
+  assertthat::assert_that(all(stake &gt; 0))
+  assertthat::are_equal(length(odds), length(stake))
+  assertthat::is.flag(round)
+  # Pad flag
+  round = rep(round, length(odds))
+  
+  # Translation of the JS
+  pay = case_when(
+    odds  &lt; 0.5 ~  stake * (2 + 0.0015 * (100 * (0.5 - odds))^2.2),
+    odds == 0.5 ~ 2 * stake,
+    odds  &gt; 0.5 ~ stake *(3.206 / (1 + (0.443 * (odds - 0.5))^0.95) - 1.206)
+  )
+  
+  # Making rounding optional
+  if_else(round, round(pay), pay)
+}</code></pre>
+<p>I’ve disabled rounding by default to make the function continuous rather than stepwise, and so it scales directly with stake.</p>
+<p>We can visualise this payout function:</p>
+<pre class="r"><code>tibble(odds = seq(0, 1, length.out = 1000)) %&gt;% 
+  mutate(payout = payout(odds, 1)) %&gt;% 
+  ggplot(aes(x=odds,y=payout)) + 
+    geom_line() + 
+    expand_limits(y=0) +
+    scale_x_continuous(labels=scales::percent)</code></pre>
+<p><img src="/post/2021-04-20-bayes-blaseball_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>If the odds were reliable, the Expected Payout would appear:</p>
+<pre class="r"><code>tibble(odds = seq(0, 1, length.out = 1000)) %&gt;% 
+  mutate(expected_payout = odds*payout(odds, 1)) %&gt;% 
+  ggplot(aes(x=odds,y=expected_payout)) + 
+    geom_line() + 
+    expand_limits(y=0) +
+    scale_x_continuous(labels=scales::percent) + 
+    geom_hline(yintercept = 1)</code></pre>
+<p><img src="/post/2021-04-20-bayes-blaseball_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>If the odds were good, we’d max bet on the favourite always - the payout for any odds &gt; 50% is &gt; 1.</p>
+</div>
+</div>
+<div id="enter-datamancy" class="section level1">
+<h1>Enter Datamancy</h1>
+<p>It doesn’t take long max betting on the favourite to see that the favourite wins more often than stated. SIBR have been archiving pretty much the entire data stream for a few Seasons now.</p>
+<p>SIBR is well-aware that the stated odds in Blasebal1 are wrong. If the game says someone is 55% likely to win they win more than 55% of the time.</p>
+<p>SIBR rejigged their APIs, so I need to completely redesign my blaseballData library. They’ve made the data available as csv as well as json so I might remove the httr/json library calls and just use readr.</p>
+<p>This is also reminding me to use pins for caching data, especially since blogdown/RStudio now loves running this whole document every time I save.</p>
+<pre class="r"><code>
+pins::pin(&quot;https://csv.sibr.dev/chronicler/v1/games&quot;, name=&quot;blaseball_games&quot;)
+
+games = pins::pin_get(&quot;blaseball_games&quot;) %&gt;% 
+  read_csv()</code></pre>
+<p>&amp; clean the data:</p>
+<pre class="r"><code>games = games %&gt;% 
+  filter(`data/homeOdds`&gt;0, `data/awayOdds`&gt;0) %&gt;% # Some old data does not have odds.
+  rename(homeScore = `data/homeScore`, awayScore = `data/awayScore`) %&gt;% 
+  rename(homeOdds = `data/homeOdds`, awayOdds = `data/awayOdds`) %&gt;% 
+  select(homeOdds, awayOdds, homeScore, awayScore) %&gt;% 
+  filter(homeScore != awayScore) %&gt;% # Games in progress have score=0 in this table
+  mutate(homeWin = homeScore &gt; awayScore) </code></pre>
+<p>The site gives the odds to 0 decimal places so I’m going to be rounding the decimal odds from the feed to make N bigger.</p>
+<p>&amp; visualise the data:</p>
+<pre class="r"><code>games %&gt;% 
+  mutate(homeOdds = round(homeOdds, 2)) %&gt;% 
+  group_by(homeOdds) %&gt;% 
+  summarise(win_pc = mean(homeWin), n=n()) %&gt;% 
+  
+  ggplot(aes(x=homeOdds, y=win_pc, colour=n)) + geom_point() +
+    scale_x_continuous(labels=scales::percent) + 
+    scale_y_continuous(labels=scales::percent) + 
+    expand_limits(x=c(0,1), y=c(0,1)) +
+    scale_colour_viridis_c()</code></pre>
+<p><img src="/post/2021-04-20-bayes-blaseball_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>We’re looking at the ratio of actual wins:stated odds, and it’s easier to do this vertically rather than diagonally:</p>
+<pre class="r"><code>games %&gt;% 
+  mutate(homeOdds = round(homeOdds, 2)) %&gt;% 
+  group_by(homeOdds) %&gt;% 
+  summarise(win_pc = mean(homeWin), n=n()) %&gt;% 
+
+  mutate(ratio = win_pc/homeOdds) %&gt;% 
+  ggplot(aes(x=homeOdds, y=ratio, colour=n)) + 
+    geom_point() +
+    scale_x_continuous(labels=scales::percent) + 
+    scale_y_continuous(labels=scales::percent) + 
+    expand_limits(x=c(0,1), y=c(0,1)) +
+    scale_colour_viridis_c() +
+    geom_hline(yintercept = 1)</code></pre>
+<p><img src="/post/2021-04-20-bayes-blaseball_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>While I’m here, the distribution of home odds looks funky:</p>
+<pre class="r"><code>games %&gt;% 
+  ggplot(aes(x=homeOdds)) +
+    geom_histogram(binwidth = 0.01) +
+    scale_x_continuous(labels=scales::percent) + 
+    expand_limits(x=c(0,1))</code></pre>
+<p><img src="/post/2021-04-20-bayes-blaseball_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>If the site was nudging the forecast winning team’s odds up, then we would expect to see a bimodal distribution of odds like that. Otherwise, we’d expect a mode of ~50%, depending on how big the home team advantage is.</p>
+<p>I’ve picked up <a href="https://nostarch.com/learnbayes">Bayesian Statistics the Fun Way</a> in my travels. It mostly focuses on a simple case of Bayesian Reasoning - setting a beta distribution for your prior belief, and updating it with observed “successes/failures”.</p>
+<p>Going into this I’ve heard that the stated odds are pretty</p>
+</div>
