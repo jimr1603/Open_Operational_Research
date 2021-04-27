@@ -1,0 +1,67 @@
+---
+title: Space-filling Curves
+author: James Riley
+date: '2021-04-27'
+slug: space-filling-curves
+categories:
+  - R
+tags:
+  - Mathematics
+  - Fractals
+---
+
+
+
+<div id="discovering-new-packages" class="section level1">
+<h1>Discovering new packages</h1>
+<p>My news reader is subscribed to the <a href="https://www.r-bloggers.com/2021/04/march-2021-top-40-new-cran-packages/">R-bloggers news-feed</a>, which includes <a href="https://rviews.rstudio.com/2021/04/22/march-2021-top-40-new-cran-packages/">RStudio’s ‘Top 40’ new CRAN packages of the month</a>. Most of them go over my head - “Genomics” is its own category, and I know next to nothing about Genomics at that level.</p>
+<p>I do know a couple of things about Hilbert Curves, so <a href="https://cran.r-project.org/web/packages/gghilbertstrings/index.html">gghilbertstrings</a> caught my eye.</p>
+<p>I’ve started a few longer posts and parked them since the last post. Sometimes it’s good to just go “this 1 graph is pretty”.</p>
+</div>
+<div id="what-is-this-fractal" class="section level1">
+<h1>What is this fractal?</h1>
+<p><a href="https://xkcd.com/195/">XKCD already used it for a visualisation</a>, and <a href="https://www.explainxkcd.com/wiki/index.php/195:_Map_of_the_Internet">explain XCKD</a> has a decent explanation of IP addresses, but relies on <a href="https://en.wikipedia.org/wiki/Hilbert_curve">Wikipedia</a> for explaining the space-filling curve.</p>
+</div>
+<div id="pictures" class="section level1">
+<h1>Pictures</h1>
+<p>gganimate is not playing nicely with my Hilbert curves - you can see an animation on the Wiki page above.</p>
+<p>I’m going to choose (too many) digits of <span class="math inline">\(\pi\)</span>: I’ve used it for visualising before.</p>
+<div id="why-you-dont-graph-pi-in-a-line" class="section level2">
+<h2>Why you don’t graph <span class="math inline">\(\pi\)</span> in a line:</h2>
+<pre class="r"><code>#Turn Pi into a giant number array. 
+
+pi = read_file(here::here(&quot;static/data/pi&quot;)) %&gt;% 
+  str_remove_all(&quot; &quot;) %&gt;% # Copied from internet, it had some spaces.
+  str_remove_all(&quot;\\.&quot;) %&gt;% 
+  str_split(&quot;&quot;)
+
+pi = pi[[1]] %&gt;% 
+  as.numeric()
+
+
+tibble(x = seq_along(pi), pi = pi) %&gt;% 
+  ggplot(aes(x=x, y=pi)) + geom_point()</code></pre>
+<p><img src="/post/2021-04-25-space-filling-curves_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>All digits get smushed into each other. If I expand:</p>
+<pre class="r"><code>tibble(x = seq_along(pi), pi = pi) %&gt;% 
+  filter(x &lt;= 1000) %&gt;% 
+  ggplot(aes(x=x, y=pi)) + geom_point()</code></pre>
+<p><img src="/post/2021-04-25-space-filling-curves_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Still blooming useless. But it looks cool. I think there’s a sweet spot where it will look like morse code.</p>
+</div>
+<div id="hilbert-plots" class="section level2">
+<h2>Hilbert Plots</h2>
+<pre class="r"><code>tibble(val = seq_along(pi), pi = pi) %&gt;% 
+  filter(val &lt;= 1000) %&gt;% 
+  mutate(pi = as_factor(pi)) %&gt;% 
+  gghilbertplot(val, color = pi, add_curve = TRUE) + scale_color_viridis_d()</code></pre>
+<p><img src="/post/2021-04-25-space-filling-curves_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>By using more of the plot, we can see more.</p>
+<p>At 100k points, there’s serious overplotting and we’re into Jackson Pollock territory.</p>
+<pre class="r"><code>tibble(val = seq_along(pi), pi = pi) %&gt;% 
+
+  mutate(pi = as_factor(pi)) %&gt;% 
+  gghilbertplot(val, color = pi, add_curve = TRUE) + scale_color_viridis_d()</code></pre>
+<p><img src="/post/2021-04-25-space-filling-curves_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+</div>
