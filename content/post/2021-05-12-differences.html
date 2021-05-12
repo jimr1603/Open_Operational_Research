@@ -1,0 +1,106 @@
+---
+title: Differences within genders are greater than those between genders
+author: James Riley
+date: '2021-05-12'
+slug: differences
+categories:
+  - R
+tags:
+  - NHANES
+  - Visualisation
+output:
+  blogdown::html_page:
+    dev: "svg"
+---
+
+
+
+<p>As Titled. Borrowing the (NHANES)[<a href="https://www.cdc.gov/nchs/nhanes/index.htm" class="uri">https://www.cdc.gov/nchs/nhanes/index.htm</a>] for this one as the licensing is about 1000% easier to deal with than Health Survey for England. Years 2009-10 and 2011-12 are in the {NHANES} package.</p>
+<p>Partially this is about reducing a distribution to a point. You can say “the average man is taller than the average woman”.</p>
+<pre class="r"><code>data = NHANES::NHANESraw %&gt;%  
+  filter(!is.na(Height)) %&gt;% 
+  filter(Age&gt;=18) #Adults for simplicity
+
+data %&gt;% 
+  group_by(Gender) %&gt;% 
+  summarise(`Height (m)` = weighted.mean(Height, WTINT2YR)/100) %&gt;% 
+  knitr::kable(digits = 2)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Gender</th>
+<th align="right">Height (m)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">female</td>
+<td align="right">1.62</td>
+</tr>
+<tr class="even">
+<td align="left">male</td>
+<td align="right">1.76</td>
+</tr>
+</tbody>
+</table>
+<p>But the distribution of heights looks more like this:</p>
+<pre class="r"><code>data %&gt;% 
+  mutate(Height = Height/100) %&gt;%  #cm to m
+  ggplot(aes(x = Height, colour = Gender, weight = WTINT2YR)) + #geom_density accepts survey weight as an aes!
+    geom_density() +
+    ggthemes::scale_colour_few()</code></pre>
+<p><img src="/post/2021-05-12-differences_files/figure-html/unnamed-chunk-2-1.svg" width="672" /></p>
+<p>i.e. being below 1.62m &amp; male is possible, being over 1.76m and female is possible.</p>
+<pre class="r"><code>data %&gt;% 
+  filter(Gender == &quot;female&quot;) %&gt;% 
+  mutate(tall = Height &gt; 176) %&gt;% 
+  summarise(tall_women  = weighted.mean(tall, WTINT2YR)) %&gt;% 
+  mutate(tall_women = scales::percent(tall_women, accuracy = 0.1)) %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">tall_women</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2.7%</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>data %&gt;% 
+  filter(Gender == &quot;male&quot;) %&gt;% 
+  mutate(short = Height &lt; 162) %&gt;% 
+  summarise(short_men  = weighted.mean(short, WTINT2YR)) %&gt;% 
+  mutate(short_men = scales::percent(short_men, accuracy = 0.1)) %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">short_men</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">3.5%</td>
+</tr>
+</tbody>
+</table>
+<p>As a contrived example, we could have a 50 men and 50 women on a double-decker bus and 1 or 2 men would be below the female average height, and 1 or 2 women would be above male average height.</p>
+<p>A very contrived example, American data and public transit hasn’t really caught on there.</p>
+<p>While I poked the {ggplot2} (<code>geom_density</code> documentation)[<a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="uri">https://ggplot2.tidyverse.org/reference/geom_density.html</a>], I saw that <code>position=fill</code> gives conditional densities. e.g. if I plucked a random person and knew their height, how likely is it that they’re male/female?</p>
+<pre class="r"><code>data %&gt;% 
+  ggplot(aes(x=Height, fill=Gender, weight=WTINT2YR)) +
+  geom_density(position=&quot;fill&quot;) +
+  ggthemes::scale_fill_few() +
+  scale_y_continuous(labels=scales::percent)</code></pre>
+<p><img src="/post/2021-05-12-differences_files/figure-html/unnamed-chunk-5-1.svg" width="672" /></p>
+<p>Either I’ve ducked that one up, or there’s a bump there that corresponds to something significant in feet and inches.</p>
+<p>To really hammer the point, if I don’t split by gender then the distribution is not bi-modal.</p>
+<pre class="r"><code>data %&gt;% 
+  ggplot(aes(x=Height)) + geom_density()</code></pre>
+<p><img src="/post/2021-05-12-differences_files/figure-html/unnamed-chunk-6-1.svg" width="672" /></p>
+<p>There’s not a really obvious “male” peak and an obvious “female” peak.</p>
+<p>This stuff matters when you can’t reasonably assume that someone is approximately average. In basketball, height helps. Female athletes who are just as many <span class="math inline">\(\sigma\)</span> from the average as the male athletes don’t deserve the sh!t they get for being tall.</p>
+<p>And if a study said “the average response was …” it’s totally expected that <em>your</em> response might be plus or minus a <span class="math inline">\(\sigma\)</span> or two.</p>
