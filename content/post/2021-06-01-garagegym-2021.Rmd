@@ -197,3 +197,12 @@ data %>%
 I could have done inset graphs, but blogdown would have made them tiny. They're readable at this scale. 
 
 There's some interesting clustering going on, probably because some folk use kg, some use lbs, and 45lbs doesn't have an exact analog in kg plates.
+
+# Postscript
+
+I was discussing the data with the organiser, and pulled this together that shows New Wilks increasing as training experience increases:
+
+
+![New Wilks tends to increase with training experience, scatterplot of training experience (categorical) against New Wilks score, with a linear regression line for Male and Female small multiples. In both cases the regression line is positive.](/post/2021-06-01-garagegym-2021_files/Rplot.png)
+
+I'm not including the code here, since the additional column of "training experience" was privately shared. 
