@@ -1,0 +1,90 @@
+---
+title: Gym Clock
+author: james riley
+date: '2021-06-21'
+slug: gym-clock
+categories:
+  - Arduino C
+tags:
+  - DYEL
+  - electronics
+  - minimal viable product
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>When I compared the heart rate sensors on my watch and on my chest strap, I mentioned a work-in-progress gym clock. I’ve overcome one major bug, but it’s definitely not <em>finished</em>.</p>
+<p>In the background, I’ve tweaked a few things. This project made me want to talk about non-R projects, and I’m trying to make this blog suitable for submission to R-bloggers, which means that the RSS feed for the R category needs to work. I’ve broken and fixed the site at least twice for this reason.</p>
+<div id="the-pb-clock" class="section level1">
+<h1>The PB clock</h1>
+<div id="motivation" class="section level2">
+<h2>Motivation</h2>
+<p>I saw crossfit-style gym clocks selling for ~£100, which lead to me giving the Yorkshire Exclamation “Ow Much?!”. I’ve used &lt;£10 of parts, but easily &gt;£100 of time. But playing with microelectronics is a hobby, and we don’t do hobbies to save money, but for the enjoyment - ask any knitter/spinner.</p>
+<p>The main <em>need</em> of this project was “display a 3-minute timer”. So some sort of screen, a single button, a power supply, and a brain. I grabbed an arduino as the brain since I had a few in my electronics box.</p>
+<p>I don’t mind that it only does 3 minutes. That minimises my urge to endlessly tinker.</p>
+<p>I’d use my phone, but I don’t like covering my phone in lifting/climbing chalk, and I’m afraid of dropping my phone when tired. 1 Physical button is good.</p>
+</div>
+<div id="current-iteration" class="section level2">
+<h2>Current Iteration</h2>
+<div class="figure">
+<img src="images/clock2.png" alt="" />
+<p class="caption">Current iteration of gym clock</p>
+</div>
+<p>For the blog I’ve thrown the Arduino-C source code to <a href="https://github.com/jimr1603/PB_clock">its own Github Repo</a>, rather than have a giant blob of not-very-useful text. This is a decent example of blogging improving a project - I’ve neglected version control, and I can use GitHub issues/project board to look at new features.</p>
+<p>I’m now calling it the PB clock because:</p>
+<ul>
+<li>the plastic jar used to hold peanut powder (peanut butter, without the fat).</li>
+<li>PB = Personal Best; usually your Personal Best lift. (Heaviest, most repetitions, …)</li>
+</ul>
+</div>
+<div id="on-a-minimal-viable-product" class="section level2">
+<h2>On a minimal-viable-product</h2>
+<div class="figure">
+<img src="images/20210508_185056.jpg" style="width:50.0%;height:50.0%" alt="" />
+<p class="caption">Iteration 1 of the gym clock, on a breadboard.</p>
+</div>
+<p>I got the project to that stage, then started field-testing it - I took it to the home gym.</p>
+<p>Every step of this has been “make some changes, check it works on the bench, then take it to the gym/garage and see how it does”.
+There’s plenty more I want to do to this project, but this model of “get it back in the garage doing its job ASAP” is nice. With this model it’s getting used now, rather than sitting at the bottom of the projects drawer waiting for a rainy day. It also means some shortcuts aren’t great, but it works so whatever.</p>
+<p>For example:</p>
+<pre><code>String clockTime = &quot;&quot;;
+
+  clockTime = clockTime + minutes + &quot;:&quot;;
+  if(seconds &lt;= 9){
+    clockTime += &quot;0&quot;;
+    clockTime += seconds;
+  }else{
+    clockTime +=  seconds;
+  }
+</code></pre>
+<p>I should be working with a char* array there, but pointers hurt my head. This works, and even if I’ve unnecessarily included the String library with this code, there’s still plenty of space on the chip.</p>
+</div>
+<div id="field-debugging" class="section level2">
+<h2>Field Debugging</h2>
+<p>The MVP approach showed me a problem with one of the components, which for ages I thought was a problem in code.</p>
+<p>I would come to the clock expecting it to be flashing “00:00”, but the time had gone up! This happened on the time-scale of a workout (45-ish minutes). I didn’t have the patience to watch it at the bench looking for the reset.</p>
+<p>I thought that I’d got the debounce wrong on the button - so I kept increasing how long I needed to press the reset button to reset the timer.</p>
+<p>Eventually I added a debug-flag LED, pictured in the breadboard version above. In R I might have:</p>
+<pre class="r"><code>function_that_does_not_work = function(foo, bar, bang){
+  message(&quot;Foo, bar, bang:&quot;)
+  message(list(foo, bar, bang))
+  ...
+}</code></pre>
+<p>in a function that isn’t behaving. Similarly throwing <code>console.log</code> around in JavaScript to check why something isn’t doing what you expect it to do.</p>
+<p>In this case, the unexpected behaviour was the timer resetting. I thought it was the button triggering too easily, so once the button had been pressed &amp; the timer reset, that green LED would stay on. It would stay on until the Arduino reset, for example through a power interruption.</p>
+<p>The green LED went out when the clock unexpectedly reset - so the problem was not my button code that I’ve now set to be too insensitive, but the power supply I was using. I think the USB power blocks I had to hand didn’t expect something as small as this would be connected.</p>
+<p>The current iteration has 4x AA batteries, in the black box in the picture.</p>
+</div>
+<div id="onwards" class="section level2">
+<h2>Onwards</h2>
+<ol style="list-style-type: decimal">
+<li>Take this list and turn it into a TODO list on GitHub.</li>
+<li>Make the reset button less sensitive.</li>
+<li>Refresh the clock when the timer resets.</li>
+<li>Make holes in the case for the components, glue/tape the components.</li>
+<li>Possibly before (4), consider <a href="https://en.wikipedia.org/wiki/Blinkenlights">blinkenlights</a>.</li>
+<li>Consider making a second, maybe when current jar has been emptied, so one can be in the gym while the other is on the bench.</li>
+</ol>
+</div>
+</div>
