@@ -1,0 +1,121 @@
+---
+title: "Unit conversion"
+author: "James Riley"
+date: "2021-07-08"
+slug: unit-conversion
+categories: R
+tags:
+- cycling
+- units
+- Visualisation
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>If I had to condense advice for life/wellbeing/career into a soundbite, I’d go with “be curious”.</p>
+<p>I’ve been comparing cycle routes on <a href="https://www.cyclestreets.net/help/journey/faq/#calories">CycleStreets</a>, Google Maps, and Strava. CycleStreets has a energy cost estimate of the journey, with a little ? link next to it.</p>
+<p><a href="https://www.cyclestreets.net/help/journey/faq/#calories">They outline their estimate of calorie cost of a journey, including their formula.</a></p>
+<p>This is a <em>brilliant</em> example of the mess of units we use. The formula was written for meters/second, I think of road speed in miles per hour, a lot of the world thinks of kilometres per hour. I think of human energy in kcal, the formula wants to use watts.</p>
+<p>All my route finders give a total ascent/descent stat, but if I want my distances in miles they give it in feet, when I think of ascent in meters.</p>
+<div id="subscribe-to-r-bloggers-already" class="section level2">
+<h2>Subscribe to R-bloggers already</h2>
+<p>I have <a href="https://www.r-bloggers.com/">R-bloggers</a> in my News Reader. A while ago the authors of the package announced <a href="https://cran.r-project.org/web/packages/units/index.html">units</a> on R-bloggers.</p>
+<p>I had my formula in science units, my head in a mess of units, but I remembered that I spotted units had been released.</p>
+</div>
+<div id="back-to-energy-spent-cycling" class="section level2">
+<h2>Back to energy spent cycling</h2>
+<p>A first stab at making that formula as a function:</p>
+<pre class="r"><code>power = function(v, 
+                 g=9.81, 
+                 m=90, 
+                 k_1=0.0053, 
+                 k_2=0.26,
+                 s=0){
+  g * m * v * (k_1 + s) + k_2 * v^3
+} 
+
+power(5.4)</code></pre>
+<pre><code>## [1] 66.20924</code></pre>
+<p>I simplified it a bit by saying v_a = v_g. And we’ve replicated their example.</p>
+<p>If I do the sums, then apply units I can look at a speed-power curve:</p>
+<pre class="r"><code>tibble(speed = seq(0, 11, length.out= 100)) %&gt;% 
+  mutate(power = power(speed)) %&gt;% 
+  mutate(speed = set_units(speed, &quot;m/s&quot;)) %&gt;% 
+  mutate(power = set_units(power, &quot;watts&quot;)) %&gt;% 
+  mutate(speed = set_units(speed, &quot;miles/hour&quot;)) %&gt;% #SI to thinking in road speed
+  mutate(power = set_units(power, &quot;kcal/hour&quot;)) %&gt;% #SI to human-level energy units
+  ggplot(aes(x=speed, y=power)) + geom_line()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>This is after I tried starting with speed in miles/h and converting to m/s. It didn’t like that because the units are incompatible.</p>
+<p>This is great! Sensible errors are better than producing nonsensical output, so let’s rewrite the function including a statement that most of these parameters have dimension.</p>
+<pre class="r"><code>power = function(v, 
+                 g=9.81, 
+                 m=90, 
+                 k_1=0.0053, 
+                 k_2=0.26,
+                 s=0){
+  units(v) &lt;- &quot;m/s&quot;
+  units(g) &lt;- &quot;m/s^2&quot;
+  units(m) &lt;- &quot;kg&quot;
+  units(k_1) &lt;- 1
+  units(k_2) &lt;- &quot;kg/m&quot;
+  units(s) &lt;- 1
+  set_units(g * m * v * (k_1 + s) + k_2 * v^3, &quot;watts&quot;)
+} </code></pre>
+<p>Then what I wanted for the above example is:</p>
+<pre class="r"><code>tibble(speed = seq(0, 25, length.out = 100)) %&gt;% #I think this is clearer as 2 lines 
+  mutate(speed = set_units(speed, &quot;miles/hour&quot;)) %&gt;% 
+  mutate(power = power(speed)) %&gt;% 
+  mutate(power = set_units(power, &quot;kcal/hour&quot;)) %&gt;% 
+  ggplot(aes(x=speed, y=power)) + geom_line()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="other-graphs" class="section level2">
+<h2>Other graphs</h2>
+<p>I read <a href="https://withouthotair.com/">Sustainable Energy Without the Hot Air</a>, which suggested in general that moving slower is more energy efficient for distance. <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p>I scribbled on my notepad:</p>
+<p>I have:</p>
+<ul>
+<li>speed <span class="math inline">\(\frac{m}{s}\)</span></li>
+<li>power <span class="math inline">\(\frac{j}{s}\)</span></li>
+</ul>
+<p>I want:</p>
+<ul>
+<li>energy per distance <span class="math inline">\(\frac{j}{m} = \frac{j}{s} \div \frac{m}{s} = \frac{\text{power}}{\text{speed}}\)</span></li>
+</ul>
+<p>So the dimensional analysis helped me work out what sums I wanted to do.</p>
+<pre class="r"><code>tibble(speed = seq(0, 25, length.out = 1000)) %&gt;% #I think this is clearer as 2 lines 
+  mutate(speed = set_units(speed, &quot;miles/hour&quot;)) %&gt;% 
+  mutate(power = power(speed)) %&gt;% 
+  mutate(energy_per_dist = power/speed) %&gt;% 
+  mutate(energy_per_dist = set_units(energy_per_dist, &quot;kcal/mile&quot;)) %&gt;% 
+  ggplot(aes(x=speed, y=energy_per_dist)) + geom_line() +
+  ggforce::scale_y_unit(breaks = c(0,5,10,15)) + expand_limits(y=c(0,15))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Or using “fat is 9kcal/gram”:</p>
+<pre class="r"><code>tibble(speed = seq(0, 20, length.out = 1000)) %&gt;% 
+  mutate(speed = set_units(speed, &quot;miles/hour&quot;)) %&gt;% 
+  mutate(power = power(speed)) %&gt;% 
+  mutate(energy_per_dist = power/speed) %&gt;% 
+  mutate(energy_per_dist = set_units(energy_per_dist, &quot;kcal/mile&quot;)) %&gt;% 
+  mutate(fat_burned = energy_per_dist / as_units(9, &quot;kcal/g&quot;)) %&gt;% 
+  mutate(fat_burned = set_units(fat_burned, &quot;g/Mm&quot;)) %&gt;% 
+  ggplot(aes(x=speed, y=fat_burned)) + geom_line() +
+  expand_limits(y=0)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>“Mm” being “mega-meters”, or 1000 km. Somewhere in the region of 40 office commutes = 1Mm, for me. I suppose this reinforces the truism that one does cardio to improve their cardiovascular health, not for the energy deficit!</p>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<ul>
+<li>The {units} package can simplify a bunch of analysis, directly by handling conversion, and indirectly by pointing out that you’re trying to add meters and seconds.</li>
+<li>Cycling can be part of my weight loss, but not the whole story.</li>
+</ul>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>That formula sure looks like it’d apply to a motor vehicle, with some different k_1 and k_2.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
