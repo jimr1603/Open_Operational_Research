@@ -1,0 +1,173 @@
+---
+title: Improbable (?) Data
+author: james riley
+date: '`r Sys.Date()`'
+slug: improbable-data
+categories:
+  - R
+tags:
+  - Open Powerlifting
+  - simulation
+output:
+  blogdown::html_page:
+    dev: "svg"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+library(tidyverse)
+library(janitor)
+library(plotly)
+library(pins)
+
+theme_set(ggthemes::theme_tufte())
+
+```
+
+Greg Nuckols in [Monthly Applications of Strength Sport Vol 5 Issue 6](https://www.massmember.com/products/mass-subscription/categories/2148015444/posts/2149426067) demonstrates that some standard deviations in a dataset are mathematically impossible, but we don't have to jump to the worst conclusion - it could be a transcription error. 
+
+He writes 
+
+>  so I really don’t want to download the OpenPowerlifting dataset to see how improbable these subjects’ squat:bench, squat:deadlift and bench:deadlift ratios are, but I’ll give you my completely non-quantitative assessment: they’re … highly atypical.
+
+I'm on holidays, I've got a copy of OPL to hand, and this is more interesting right now than my cycling data.
+
+I'm still working with a pre-covid copy of OPL. I don't want to import it again right now, and we're not close enough to normal for it to matter much. Maybe later I'll demo how good {pins} has got with pinning remote data. 
+
+```{r}
+opl =  pins::pin_get("open-powerlifting-latest") #Not actually latest. I need to update this pipeline with the pins updates.
+
+opl = opl %>% 
+  janitor::clean_names() %>% 
+  filter(sex == "M") %>%  #Subjects were Male
+  filter(equipment == "Raw") %>% # Push down the numbers a little by forcing unequiped lifts
+  filter(tested == "Yes") # Probably a sensible filter
+```
+
+The study cohort had a training age of about 4 or 5 years. Training age isn't recorded in OpenPowerlifting, and treating two records as the same person at different meets is complicated. So I'm treating all remaining records as totally new people compatible to our study cohort.
+
+First, comparing the study means against distributions in OPL:
+
+```{r}
+
+opl %>% 
+  select(squat = best3squat_kg) %>% 
+  filter(squat > 0) %>% 
+  ggplot(aes(x=squat)) + 
+    geom_density() + 
+    geom_vline(xintercept = 126.5) +
+    geom_vline(xintercept = 126.7) +
+    geom_vline(xintercept = 129.5)
+```
+
+
+```{r}
+opl %>% 
+  select(bench = best3bench_kg) %>% 
+  filter(bench > 0) %>% 
+  ggplot(aes(x=bench)) + 
+    geom_density() + 
+    geom_vline(xintercept = 105.4) +
+    geom_vline(xintercept = 095.4) +
+    geom_vline(xintercept = 110.7)
+
+```
+
+
+
+```{r}
+opl %>% 
+  select(deadlift = best3deadlift_kg) %>% 
+  filter(deadlift > 0) %>% 
+  ggplot(aes(x=deadlift)) + 
+    geom_density() + 
+    geom_vline(xintercept = 124.5) +
+    geom_vline(xintercept = 121.7) +
+    geom_vline(xintercept = 127.5)
+
+```
+
+Before looking at the ratios, these guys were in a totally different percentile for bench than they were in squat or deadlift. They're sub-modal, but not way out in extreme low percentiles. 
+
+Let's look at the mean values inside the distributions of ratios:
+
+```{r}
+ratios = opl %>% 
+  select(deadlift = best3deadlift_kg,
+         bench = best3bench_kg,
+         squat = best3squat_kg) %>% 
+  filter(deadlift > 0,
+         bench > 0,
+         squat > 0) %>% 
+  mutate(deadlift_t_squat = deadlift/squat,
+        squat_t_bench = squat/bench,
+        deadlift_t_bench = deadlift/bench)
+
+ratios %>%
+  filter(deadlift_t_bench < 5) %>% # These data have a looooong tail
+  ggplot(aes(x=deadlift_t_bench)) + 
+    geom_density() +
+  geom_vline(xintercept = 124.5/105.4) +
+  geom_vline(xintercept = 121.7/095.4) +
+  geom_vline(xintercept = 127.5/110.7) 
+```
+
+As noted in the zoom-in on bench, they appear to be bench specialists...
+
+```{r}
+
+ratios %>%
+    filter(squat_t_bench < 3) %>% # These data have a looooong tail
+
+  ggplot(aes(x=squat_t_bench)) + 
+    geom_density() +
+  geom_vline(xintercept = 126.5/105.4) +
+  geom_vline(xintercept = 126.7/095.4) +
+  geom_vline(xintercept = 129.5/110.7) 
+```
+
+```{r}
+
+ratios %>%
+    filter(deadlift_t_squat < 3) %>% # These data have a looooong tail
+  ggplot(aes(x=deadlift_t_squat)) + 
+    geom_density() +
+  geom_vline(xintercept = 124.5/126.5) +
+  geom_vline(xintercept = 121.7/126.7) +
+  geom_vline(xintercept = 127.5/129.5) 
+```
+
+We can go a little higher dimension with this - is it unusual to have a deadlift:bench ratio of about 1.2 AND a deadlift to squat ratio of about 0.98?
+
+```{r}
+ratios %>% 
+  filter(deadlift_t_squat<5, deadlift_t_bench<5) %>% 
+  ggplot(aes(x=deadlift_t_squat, y=deadlift_t_bench)) +  
+  geom_bin2d(aes(fill = stat(log(count)))) +
+ scale_fill_viridis_c() + coord_fixed() +
+  geom_hline(yintercept = 1.2) +
+  geom_vline(xintercept = 0.98)
+```
+
+I log-transformed the counts because otherwise that hot spot in the middle is the only bit that isn't dark blue. 
+
+
+Since this is 3d data, taking a different 2d slice:
+
+```{r}
+ratios %>% 
+  filter(deadlift_t_bench<5,squat_t_bench<5) %>% 
+  ggplot(aes(x=deadlift_t_bench, y=squat_t_bench)) +  
+  geom_bin2d(aes(fill = stat(log(count)))) +
+ scale_fill_viridis_c()  + coord_fixed() + 
+  geom_hline(yintercept = 1.2) + 
+  geom_vline(xintercept = 1.18)
+```
+
+To conclude, the sample's 1RM bench, squat and deadlift are weird but not incredibly weird, at least comparing the study group to the nearest group that we have a large dataset for. 
+
+As ever, more open data would be cool. Filming the lifts would be amazing - we could see if the researchers were too generous or strict on calling a lift successful, and see what build the participants were. But science is still working in a paper journal mindset, so the incentives aren't there (yet?) for this sort of thing. 
