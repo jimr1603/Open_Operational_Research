@@ -1,0 +1,108 @@
+---
+title: Cycling Pipeline
+author: James Riley
+date: "2021-10-01"
+categories:
+  - R
+tags:
+  - cycling
+  - fitness
+  - geospatial
+slug: cycling-pipeline
+output:
+  blogdown::html_page:
+    dev: svg
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="leeds-bradford-is-a-bit-hilly" class="section level1">
+<h1>Leeds-Bradford is a bit hilly</h1>
+<p>This came up in conversation - to go any direction on my bike I have to go up or down a hill, and if I go down a hill I have to go up to get back up the hill.</p>
+</div>
+<div id="data-pipelines" class="section level1">
+<h1>Data pipelines</h1>
+<p>I have a <em>bit</em> of a data pipeline going on that ended with me having a nice folder of json files that several R packages are happy to deal with.</p>
+<p><img src="images/bikedata.drawio.svg" /></p>
+<p>There’s a cadence sensor on my shoe <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, the chest strap has made appearances in other posts, and GPS lies on my phone. I activate Wahoo every trip as the main data collector, but Zombies Run! is there because I’m more motivated to do cardio if there’s a game element.</p>
+<p>I don’t directly use Strava, but it accepts data from everything and will give data to everything.</p>
+<p>Wahoo spits out GPX files, which are awful to work with. So Wahoo has been asked nicely to give the files to Dropbox, Dropbox gives them to my home server, and my home server waits for me to open <a href="https://www.goldencheetah.org/">GoldenCheetah</a>.</p>
+<p>GC is absolute overkill for what I’m using it for. At most, I’m getting the paid features from Strava out of it. The main user is clearly someone who is training bike seriously. BUT, it converts everything in the background to a sensible json format.</p>
+<p>GC is also uploading to an open data project, so at least there’s someone way below athlete level making the data more representative.</p>
+<p>Strava passes the data to <a href="https://www.theconqueror.events/">Conqueror Challenge</a> where a little icon is moving around the Iceland Ring Road quite slowly. But my little virtual me sends me postcards, and I get a medal at the end. Did I mention that I really like gamified incentives?</p>
+</div>
+<div id="data-analysis" class="section level1">
+<h1>Data Analysis</h1>
+<p>To hide where I keep my directory of json, I’ve done one bit of summary analysis before throwing a csv/spreadsheet into this dir.</p>
+<p>In this case trackeR is happy reading the GoldenCheetah json files, but I’ve also done some bits with purrr/jsonlite as relevant. It all depends on how I’m looking at the data.</p>
+<pre class="r"><code>activities = read_directory($CENSORED, 
+                            parallel = TRUE)
+summary(activities) %&gt;% 
+    as_tibble() %&gt;% 
+    mutate(date = lubridate::as_date(sessionStart, &quot;day&quot;)) %&gt;% 
+    select(date, total_elevation_gain, durationMoving) %&gt;% 
+  filter(date &gt;= as.Date(&quot;2021-05-01&quot;)) %&gt;% 
+  write_csv(&quot;cycling-summary.csv&quot;)</code></pre>
+<pre class="r"><code>elevation = read_csv(&quot;cycling-summary.csv&quot;) %&gt;% 
+  filter(durationMoving &gt; 1) # Buggy records
+
+elevation %&gt;% 
+  filter(!is.na(total_elevation_gain)) %&gt;% 
+  mutate(cumulative_elevation = cumsum(total_elevation_gain)) %&gt;% 
+  ggplot(aes(x=date, y=cumulative_elevation))  + geom_step() +
+  scale_y_continuous(labels = ~scales::comma(., suffix = &quot;m&quot;))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.svg" width="672" /></p>
+<p><a href="https://www.wolframalpha.com/input/?i=12000+m+height">Wolfram Alpha is my go-to for comparing unusual measurements</a></p>
+<pre class="r"><code>elevation = read_csv(&quot;cycling-summary.csv&quot;)
+
+elevation %&gt;% 
+  filter(!is.na(total_elevation_gain)) %&gt;% 
+  mutate(cumulative_elevation = cumsum(total_elevation_gain)) %&gt;% 
+  ggplot(aes(x=date, y=cumulative_elevation))  + geom_step() +
+  scale_y_continuous(labels = ~scales::comma(., suffix = &quot;m&quot;)) +
+  geom_hline(yintercept = 8550) +
+  geom_label(aes(as.Date(&quot;2021-09-14&quot;), 8550, label = &quot;Everest&quot;)) + 
+  geom_hline(yintercept = 1345) +
+  geom_label(aes(as.Date(&quot;2021-09-14&quot;), 1345, label = &quot;Ben Nevis&quot;)) </code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.svg" width="672" /></p>
+<p>Some people do an Everest in 1 day/awake cycle, it took me 2.5 months.</p>
+<p>More relevant for the title is elevation gain in a single session:</p>
+<pre class="r"><code>elevation %&gt;% 
+  ggplot(aes(x=total_elevation_gain)) + geom_density()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.svg" width="672" /></p>
+<p>Or over time:</p>
+<pre class="r"><code>elevation %&gt;% 
+  ggplot(aes(x=date, y=total_elevation_gain)) + geom_point() </code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.svg" width="672" /></p>
+<pre class="r"><code>elevation %&gt;% 
+  mutate(avg_climb = total_elevation_gain/durationMoving) %&gt;% 
+  ggplot(aes(y=avg_climb, x=date)) + geom_point() </code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.svg" width="672" /></p>
+<p>Huh, I thought I was pushing myself a bit more, but it looks like I’ve picked a total climb and avg climbing speed I’m happy with and settled into it.</p>
+<div id="with-apologies-to-joy-division" class="section level2">
+<h2>With apologies to Joy Division…</h2>
+<p>Also I’m borrowing a few ggplot settings from <a href="https://www.r-bloggers.com/2019/07/recreating-unknown-pleasures-graphic/">DataWookie</a></p>
+<pre class="r"><code>library(ggridges)
+elevation %&gt;% 
+  mutate(month = lubridate::floor_date(date, &quot;month&quot;)) %&gt;% 
+  ggplot(aes(x=total_elevation_gain, y=month, group=month)) + 
+  geom_density_ridges(                 
+    scale= 1,
+                 size = 1,
+                 fill = &quot;black&quot;,
+                 colour = &quot;white&quot;) +
+    theme_void() +
+  theme(
+    panel.background = element_rect(fill = &quot;black&quot;),
+    plot.background = element_rect(fill = &quot;black&quot;, color = &quot;black&quot;),
+  )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.svg" width="672" /></p>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>funny story, it glitched hard when I had it mounted 90 degrees in the wrong direction. I don’t know why the app was happy reporting that I achieved 4500 RPM.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
