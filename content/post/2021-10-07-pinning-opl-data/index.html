@@ -1,0 +1,80 @@
+---
+title: Pinning OPL Data
+author: James Riley
+date: "2021-10-07"
+slug: pinning-opl-data
+categories:
+  - R
+tags:
+  - DYEL
+  - fitness
+  - Open Powerlifting
+  - package development
+output:
+  blogdown::html_page:
+    dev: svg
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>RStudio anounced <a href="https://cran.r-project.org/web/packages/pins/vignettes/pins.html">pins 1.0.0</a>. I like the changes, but it’s taking a bit of getting used to.</p>
+<p><em>Find data and put it somewhere sensible</em> is a good first step in a project. In the old API it was difficult to distinguish between “here is a dataset I have that will never change, put it somewhere sensible” and “I would like the latest data from this server, but I’d like to cache it so I don’t hit the server every time I render this report”.</p>
+<p>For example, I’ve handwaved “2020 is a weird year for Powerlifting so I’m excluding it” in a few posts so I don’t have to update my OpenPowerlifting pin.</p>
+<p>If this was as simple as “I pointed <code>board_url</code> at the file” then I wouldn’t be posting. The file is a zip. {readr} can read a csv inside a zip but I can only find it working when the zip consists of only a csv.</p>
+<p>So I hacked together a simple script that pointed <code>board_url</code> at the zip, extracted the csv and pinned it.</p>
+<p>I don’t want the same snippet at the start of any OPL analysis, so I took a few additional steps to make it a package - <a href="https://github.com/jimr1603/openpoweRlifting">openpoweRlifting</a>. <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<p>It’s a minimal product at this point, you can throw a PR up for that sweet <a href="https://hacktoberfest.digitalocean.com/">Hacktoberfest</a> swag if you want.</p>
+<div id="rstudio-cloud" class="section level2">
+<h2>RStudio Cloud</h2>
+<p>RStudio server on my home box is out of date, and I’ve given that box a little bit too much work. I’m testing RStudio Cloud. So far my only problem is that I want certain settings by default in a new workspace. It’s probably here somewhere.</p>
+<p>As this blog works via GitHub I only needed to clone the project to work over here.</p>
+<p>Similarly, I have a fresh environment to test my new pinboard!</p>
+</div>
+<div id="pinning-the-opl" class="section level2">
+<h2>Pinning the OPL</h2>
+<pre class="r"><code>library(&quot;pins&quot;)
+remotes::install_github(&quot;jimr1603/openpoweRlifting&quot;)
+library(&quot;openpoweRlifting&quot;)
+
+board = board_folder(&quot;~/pins/&quot;)
+
+#pin_opl(board)
+
+opl = pin_read(board, &quot;opl-ipf&quot;)  %&gt;%
+  filter(equipment == &quot;Raw&quot;) %&gt;% #free up a little RAM
+  select(sex, age_class, bodyweight_kg, weight_class_kg, best3squat_kg,
+         best3bench_kg, best3deadlift_kg) %&gt;% #free up more RAM
+  filter((sex==&quot;M&quot; &amp; weight_class_kg %in% c(&#39;59&#39;, &#39;66&#39;, &#39;74&#39;, &#39;83&#39;, &#39;93&#39;, &#39;105&#39;, &#39;120&#39;, &#39;120+&#39;)) |
+          (sex==&quot;F&quot; &amp; weight_class_kg %in% c(&#39;47&#39;, &#39;52&#39;, &#39;57&#39;, &#39;63&#39;, &#39;69&#39;, &#39;76&#39;, &#39;84&#39;, &#39;84+&#39;))) # filter for current wt classes. </code></pre>
+<p>There’s two expensive computations there - downloading the zip and extracting the zip. {pins} ensures that the zip doesn’t get downloaded again unnecessarily. I may or may not get around to fixing the other one. (Looks at so many unfinished projects on GH.)</p>
+</div>
+<div id="analysis" class="section level2">
+<h2>Analysis</h2>
+<p>A recent episode of <a href="https://www.youtube.com/channel/UCEGGAs257niPVJ5BvXymVLQ">Iron Culture Podcast</a> floated the suggestion that some weight categories suit different lifts more. So I’m going to do a simple analysis on max lifts by weight class &amp; sex.</p>
+<pre class="r"><code>opl %&gt;%
+  mutate(id = row_number()) %&gt;% #cheaper on RAM than name strings
+  pivot_longer(c(best3squat_kg, best3bench_kg, best3deadlift_kg)) %&gt;%
+  filter(!is.na(value)) %&gt;%
+  group_by(name, weight_class_kg, sex) %&gt;%
+  summarise(max_lift = max(value), bodyweight = mean(bodyweight_kg, na.rm=T)) %&gt;% #Hack to make the graph look right
+  ungroup() %&gt;%
+
+  rename(lift=name) %&gt;%
+  ggplot(aes(x=bodyweight, y=max_lift, colour=lift)) + geom_point() + facet_wrap(&quot;sex&quot;) + ggthemes::scale_colour_few()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.svg" width="672" />
+While the general trend is increasing for all 3 lifts X 2 sexes <a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>, there are a few cases where the lighter weight class is doing better than the next class up, on absolute numbers.</p>
+</div>
+<div id="ideas-pile" class="section level2">
+<h2>Ideas Pile</h2>
+<p>Somewhere in-and-among all this I found a couple of bugs in the package. (There’s 1 function, and I’ve fixed 2 bugs already…) and updated this post.</p>
+<p>The graph of absolute top lifts by weight category is interesting, but it’d be nice to come back to this and look at <a href="https://www.strongerbyscience.com/whos-the-most-impressive-powerlifter/">Allometric Scalling</a>.
+The free tier of RS Cloud is limited to 1GB of RAM. This was not a good dataset to work with. I’m going to create an issue where someone can pin the dataset as a SQLite Database to make analysis easier on the free machine.</p>
+</div>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Look, there’s two hard problems in CompSci - naming things and cache invalidation. And I’ve delegated the 2nd problem to {pins}.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>A very small number of lifters are recorded as Mx. The <a href="https://www.powerlifting.sport/fileadmin/ipf/data/rules/technical-rules/english/IPF_Technical_Rules_Book_2021.pdf">2021 Rulebook</a> only has weight classes for M/F and otherwise only references Men and Women. Today the easiest thing to do is filter for sex %in% c(M, F), but digging further into how this data happened is on the ideas pile.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
