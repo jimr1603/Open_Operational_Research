@@ -1,0 +1,107 @@
+---
+title: Pinning OPL Data
+author: James Riley
+date: "`r Sys.Date()`"
+slug: pinning-opl-data
+categories:
+  - R
+tags:
+  - DYEL
+  - fitness
+  - Open Powerlifting
+  - package development
+output:
+  blogdown::html_page:
+    dev: svg
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+library(tidyverse)
+
+
+theme_set(ggthemes::theme_tufte())
+
+```
+
+
+RStudio anounced [pins 1.0.0](https://cran.r-project.org/web/packages/pins/vignettes/pins.html). I like the changes, but it's taking a bit of getting used to.
+
+*Find data and put it somewhere sensible* is a good first step in a project. In the old API it was difficult to distinguish between "here is a dataset I have that will never change, put it somewhere sensible" and "I would like the latest data from this server, but I'd like to cache it so I don't hit the server every time I render this report". 
+
+For example, I've handwaved "2020 is a weird year for Powerlifting so I'm excluding it" in a few posts so I don't have to update my OpenPowerlifting pin. 
+
+If this was as simple as "I pointed `board_url` at the file" then I wouldn't be posting. The file is a zip. {readr} can read a csv inside a zip but I can only find it working when the zip consists of only a csv. 
+
+So I hacked together a simple script that pointed `board_url` at the zip, extracted the csv and pinned it. 
+
+I don't want the same snippet at the start of any OPL analysis, so I took a few additional steps to make it a package - [openpoweRlifting](https://github.com/jimr1603/openpoweRlifting). [^1]
+
+[^1]: Look, there's two hard problems in CompSci - naming things and cache invalidation. And I've delegated the 2nd problem to {pins}.
+
+It's a minimal product at this point, you can throw a PR up for that sweet [Hacktoberfest](https://hacktoberfest.digitalocean.com/) swag if you want.
+
+## RStudio Cloud
+
+RStudio server on my home box is out of date, and I've given that box a little bit too much work. I'm testing RStudio Cloud. So far my only problem is that I want certain settings by default in a new workspace. It's probably here somewhere. 
+
+As this blog works via GitHub I only needed to clone the project to work over here. 
+
+Similarly, I have a fresh environment to test my new pinboard!
+
+## Pinning the OPL
+
+```{r}
+library("pins")
+remotes::install_github("jimr1603/openpoweRlifting")
+library("openpoweRlifting")
+
+board = board_folder("~/pins/")
+
+#pin_opl(board)
+
+opl = pin_read(board, "opl-ipf")  %>%
+  filter(equipment == "Raw") %>% #free up a little RAM
+  select(sex, age_class, bodyweight_kg, weight_class_kg, best3squat_kg,
+         best3bench_kg, best3deadlift_kg) %>% #free up more RAM
+  filter((sex=="M" & weight_class_kg %in% c('59', '66', '74', '83', '93', '105', '120', '120+')) |
+          (sex=="F" & weight_class_kg %in% c('47', '52', '57', '63', '69', '76', '84', '84+'))) # filter for current wt classes. 
+```
+
+
+There's two expensive computations there - downloading the zip and extracting the zip. {pins} ensures that the zip doesn't get downloaded again unnecessarily. I may or may not get around to fixing the other one. (Looks at so many unfinished projects on GH.)
+
+
+## Analysis
+
+A recent episode of [Iron Culture Podcast](https://www.youtube.com/channel/UCEGGAs257niPVJ5BvXymVLQ) floated the suggestion that some weight categories suit different lifts more. So I'm going to do a simple analysis on max lifts by weight class & sex. 
+
+
+```{r}
+opl %>%
+  mutate(id = row_number()) %>% #cheaper on RAM than name strings
+  pivot_longer(c(best3squat_kg, best3bench_kg, best3deadlift_kg)) %>%
+  filter(!is.na(value)) %>%
+  group_by(name, weight_class_kg, sex) %>%
+  summarise(max_lift = max(value), bodyweight = mean(bodyweight_kg, na.rm=T)) %>% #Hack to make the graph look right
+  ungroup() %>%
+
+  rename(lift=name) %>%
+  ggplot(aes(x=bodyweight, y=max_lift, colour=lift)) + geom_point() + facet_wrap("sex") + ggthemes::scale_colour_few()
+
+```
+While the general trend is increasing for all 3 lifts X 2 sexes [^2], there are a few cases where the lighter weight class is doing better than the next class up, on absolute numbers. 
+
+
+[^2]: A very small number of lifters are recorded as Mx. The [2021 Rulebook](https://www.powerlifting.sport/fileadmin/ipf/data/rules/technical-rules/english/IPF_Technical_Rules_Book_2021.pdf) only has weight classes for M/F and otherwise only references Men and Women. Today the easiest thing to do is filter for sex %in% c(M, F), but digging further into how this data happened is on the ideas pile.
+
+## Ideas Pile
+
+Somewhere in-and-among all this I found a couple of bugs in the package. (There's 1 function, and I've fixed 2 bugs already...) and updated this post. 
+
+The graph of absolute top lifts by weight category is interesting, but it'd be nice to come back to this and look at [Allometric Scalling](https://www.strongerbyscience.com/whos-the-most-impressive-powerlifter/). 
+The free tier of RS Cloud is limited to 1GB of RAM. This was not a good dataset to work with. I'm going to create an issue where someone can pin the dataset as a SQLite Database to make analysis easier on the free machine. 
