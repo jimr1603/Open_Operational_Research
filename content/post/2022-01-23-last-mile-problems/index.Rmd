@@ -1,0 +1,138 @@
+---
+title: Last Mile Problems
+author: James Riley
+date: "`r Sys.Date()`"
+slug: last-mile-problems
+categories:
+  - R
+tags:
+  - API
+  - geospatial
+  - routing
+  - cycling
+  - fitness
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+library(tidyverse)
+library(tmap)
+library(units)
+library(ggforce)
+library(valhallr)
+library(sf)
+tmap_mode("view")
+
+theme_set(ggthemes::theme_few())
+```
+
+
+I have two-ish sensible routes on bike to/from work, depending on mood/weather/roadworks.
+Except for the last mile. 
+
+Next time I'm in the office I'll grab the GPS log, process it outside of here, and show
+how the last mile [^1] takes far too long. 
+
+Update: this happened:
+
+```{r}
+ride = read_csv("data.csv") %>% 
+  mutate(secs = set_units(secs, "seconds")) %>% 
+  mutate(dist = set_units(dist, "meters")) %>% 
+  mutate(dist = set_units(dist, "km")) %>% 
+  mutate(time = set_units(secs, "minutes")) 
+
+ride %>% 
+  ggplot(aes(x=time, y=dist)) + geom_point() +
+    geom_smooth(method = "lm") +
+    expand_limits(x=60)
+```
+
+`dist` is distance as the crow flies from the target location. Different paths to work are different lengths, but I want to compare door-to-door time.
+
+The gradient of that line corresponds to a sort of average useful speed - time spent going away from target is penalised, only movement towards the target counts. I kind-of want to throw some components together - compare crow-flying distance to work against my average bus of about 70 mins each way. But I suspect with a very large variance...
+
+
+[^1]: As the crow flies. One of the problems is having to zig-zag through a road geometry that Lovecraft would be proud of.
+
+This means I can actually blog about this, since I've already given away enough info
+for anyone to work out which office I'm at, but haven't said where home is. 
+
+Between [Cycle Superhighway 1](https://www.openstreetmap.org/relation/6386965#map=13/53.8006/-1.6466)[^2] and
+[National Route 66](https://www.openstreetmap.org/relation/17883#map=16/53.7941/-1.5543) I can get to `Point A` and I want to be at `Work`:
+
+```{r}
+coordinates = tribble(~name, ~lat, ~lon,
+                      "point A", 53.79314,-1.55170,
+                      "Work", 53.79778,-1.53044
+        ) %>% 
+  select(name, lon, lat) #cheap fix for coords being lon-lat, not lat-lon as copied from OSM
+
+coordinates %>% 
+  st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
+  tm_shape() +
+    tm_dots()
+```
+
+The title for today's post derives from the crow-flying distance between those points:
+
+```{r}
+coordinates %>% 
+  st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
+  st_distance() %>% 
+  knitr::kable()
+```
+
+It's a matrix of pairwise distances, but 1489m is close enough to 1 mile to make comparisons to "last mile" in shipping.
+
+I tinkered with the [valhallr library last year](https://github.com/chris31415926535/valhallr/pull/1) and still have a local Docker image of West Yorkshire set up for routing. Docker is great - I can tell the image to go to sleep when I'm not playing with it. 
+
+After the initial setup, which was basically feeding a bbox of limit coordinates into a config file, waiting about 1 afternoon for it to work out the network, this is by far the easiest roll-your-own routing engine I've played with. 
+
+Note - 1 way systems mean that point A -> work is a different problem to work -> point A. 
+
+```{r}
+route_1 = route(coordinates[1,], coordinates[2,], costing="bicycle") 
+
+route_2 = route(coordinates[2,], coordinates[1,], costing="bicycle") 
+
+map_trip(route_1)
+```
+
+```{r}
+
+map_trip(route_2)
+
+```
+
+Ah. Point A is in a slightly awkward spot for the return trip, and valhalla doesn't believe in dismounting and crossing the road as a pedestrian.
+
+```{r}
+point_b = tribble(
+  ~name, ~lat, ~lon,
+  "point B",53.79698,-1.53084
+) %>% 
+  select(name, lon, lat)
+
+
+route_3 = route(point_b, coordinates[1,], costing="bicycle") 
+
+map_trip(route_3)
+```
+
+That looks much more sensible. However, I suspect that the OSM data that I fed into my valhalla server is way out of date, and the odd road might be shut for roadworks now. 
+
+Compare with [cyclestreets](https://www.cyclestreets.net/journey/79638854/) there's pretty good agreement. In the [return trip](https://www.cyclestreets.net/journey/79638864/) it does believe in dismounting to cross awkward roads. I also really like the cycle-focused OSM tiles CS use - cycle paths, pubs and cafes are highlighted. 
+
+Both are better than what I tried the first time, which mostly involved getting stuck in the inner Leeds loop, roads/cycleways closed for roadworks, and random disappearing cycle paths. 
+
+I've played with the Google Maps routing service, but the programmers at Google seem to believe that any road that is bike-legal is fair game. 
+
+ORS [has some interesting features](https://maps.openrouteservice.org/#/directions/Wharf%20Approach,Leeds,England,United%20Kingdom/York%20Street,Leeds,England,United%20Kingdom/data/55,130,32,198,15,97,4,224,38,9,96,59,2,24,5,192,166,6,113,0,184,64,90,1,24,3,160,21,148,128,152,0,96,19,130,128,88,6,96,166,129,217,77,96,54,26,1,165,49,226,172,106,52,34,38,141,0,28,20,132,85,32,27,136,153,70,85,234,180,101,34,72,142,141,73,240,20,53,133,66,84,170,16,161,46,161,78,32,120,128,128,1,213,60,8,137,176,229,0,11,202,0,91,92,132,38,219,219,64,64,1,155,192,0,219,162,227,128,2,121,131,133,32,3,155,227,67,162,36,2,187,135,35,64,216,129,7,160,135,162,166,33,129,69,226,166,67,123,123,162,34,195,162,192,128,2,250,53,0,0). For the full route I could mark out a polygon of "avoid this area" around the death road if it tried to take me that way. I might try building their thing another time, or playing with their free API tokens. I doubt I'd go past the free tier. 
+
+[^2]: I'm going to grab some photos demonstrating bad urban design in something whose name suggests something built to an international standard, or at least comparible in quality to a motorway. [^3]
+
+[^3]: I thought I had these photos, but my not-gopro crapped out on me. 
