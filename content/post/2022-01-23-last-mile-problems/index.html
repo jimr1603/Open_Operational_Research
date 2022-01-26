@@ -1,0 +1,119 @@
+---
+title: Last Mile Problems
+author: James Riley
+date: "2022-01-26"
+slug: last-mile-problems
+categories:
+  - R
+tags:
+  - API
+  - geospatial
+  - routing
+  - cycling
+  - fitness
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+<script src="{{< blogdown/postref >}}index_files/htmlwidgets/htmlwidgets.js"></script>
+<script src="{{< blogdown/postref >}}index_files/jquery/jquery.min.js"></script>
+<link href="{{< blogdown/postref >}}index_files/leaflet/leaflet.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/leaflet/leaflet.js"></script>
+<link href="{{< blogdown/postref >}}index_files/leafletfix/leafletfix.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/proj4/proj4.min.js"></script>
+<script src="{{< blogdown/postref >}}index_files/Proj4Leaflet/proj4leaflet.js"></script>
+<link href="{{< blogdown/postref >}}index_files/rstudio_leaflet/rstudio_leaflet.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index_files/leaflet-binding/leaflet.js"></script>
+<script src="{{< blogdown/postref >}}index_files/leaflet-providers/leaflet-providers_1.9.0.js"></script>
+<script src="{{< blogdown/postref >}}index_files/leaflet-providers-plugin/leaflet-providers-plugin.js"></script>
+
+
+<p>I have two-ish sensible routes on bike to/from work, depending on mood/weather/roadworks.
+Except for the last mile.</p>
+<p>Next time I’m in the office I’ll grab the GPS log, process it outside of here, and show
+how the last mile <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> takes far too long.</p>
+<p>Update: this happened:</p>
+<pre class="r"><code>ride = read_csv(&quot;data.csv&quot;) %&gt;% 
+  mutate(secs = set_units(secs, &quot;seconds&quot;)) %&gt;% 
+  mutate(dist = set_units(dist, &quot;meters&quot;)) %&gt;% 
+  mutate(dist = set_units(dist, &quot;km&quot;)) %&gt;% 
+  mutate(time = set_units(secs, &quot;minutes&quot;)) 
+
+ride %&gt;% 
+  ggplot(aes(x=time, y=dist)) + geom_point() +
+    geom_smooth(method = &quot;lm&quot;) +
+    expand_limits(x=60)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p><code>dist</code> is distance as the crow flies from the target location. Different paths to work are different lengths, but I want to compare door-to-door time.</p>
+<p>The gradient of that line corresponds to a sort of average useful speed - time spent going away from target is penalised, only movement towards the target counts. I kind-of want to throw some components together - compare crow-flying distance to work against my average bus of about 70 mins each way. But I suspect with a very large variance…</p>
+<p>This means I can actually blog about this, since I’ve already given away enough info
+for anyone to work out which office I’m at, but haven’t said where home is.</p>
+<p>Between <a href="https://www.openstreetmap.org/relation/6386965#map=13/53.8006/-1.6466">Cycle Superhighway 1</a><a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> and
+<a href="https://www.openstreetmap.org/relation/17883#map=16/53.7941/-1.5543">National Route 66</a> I can get to <code>Point A</code> and I want to be at <code>Work</code>:</p>
+<pre class="r"><code>coordinates = tribble(~name, ~lat, ~lon,
+                      &quot;point A&quot;, 53.79314,-1.55170,
+                      &quot;Work&quot;, 53.79778,-1.53044
+        ) %&gt;% 
+  select(name, lon, lat) #cheap fix for coords being lon-lat, not lat-lon as copied from OSM
+
+coordinates %&gt;% 
+  st_as_sf(coords = c(&quot;lon&quot;, &quot;lat&quot;), crs = 4326) %&gt;% 
+  tm_shape() +
+    tm_dots()</code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"createMapPane","args":["tmap401",401]},{"method":"addProviderTiles","args":["Esri.WorldGrayCanvas",null,"Esri.WorldGrayCanvas",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["OpenStreetMap",null,"OpenStreetMap",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addProviderTiles","args":["Esri.WorldTopoMap",null,"Esri.WorldTopoMap",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"pane":"tilePane"}]},{"method":"addCircleMarkers","args":[[53.79314,53.79778],[-1.5517,-1.53044],[2.82842712474619,2.82842712474619],["point.A","Work"],".",{"interactive":true,"className":"","pane":"tmap401","stroke":true,"color":"#666666","weight":1,"opacity":0.5,"fill":true,"fillColor":["#000000","#000000"],"fillOpacity":[1,1]},null,null,["<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>point A<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>name<\/nobr><\/td><td align=\"right\"><nobr>point A<\/nobr><\/td><\/tr><\/table><\/div>","<style> div.leaflet-popup-content {width:auto !important;overflow-y:auto; overflow-x:hidden;}<\/style><div style=\"max-height:25em;padding-right:0px;\"><table>\n\t\t\t   <thead><tr><th colspan=\"2\"><b>Work<\/b><\/th><\/thead><\/tr><tr><td style=\"color: #888888;\"><nobr>name<\/nobr><\/td><td align=\"right\"><nobr>Work<\/nobr><\/td><\/tr><\/table><\/div>"],null,["point A","Work"],{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addLayersControl","args":[["Esri.WorldGrayCanvas","OpenStreetMap","Esri.WorldTopoMap"],".",{"collapsed":true,"autoZIndex":true,"position":"topleft"}]}],"limits":{"lat":[53.79314,53.79778],"lng":[-1.5517,-1.53044]},"fitBounds":[53.79314,-1.5517,53.79778,-1.53044,[]]},"evals":[],"jsHooks":[]}</script>
+<p>The title for today’s post derives from the crow-flying distance between those points:</p>
+<pre class="r"><code>coordinates %&gt;% 
+  st_as_sf(coords = c(&quot;lon&quot;, &quot;lat&quot;), crs = 4326) %&gt;% 
+  st_distance() %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<tbody>
+<tr class="odd">
+<td align="right">0.000 [m]</td>
+<td align="right">1488.619 [m]</td>
+</tr>
+<tr class="even">
+<td align="right">1488.619 [m]</td>
+<td align="right">0.000 [m]</td>
+</tr>
+</tbody>
+</table>
+<p>It’s a matrix of pairwise distances, but 1489m is close enough to 1 mile to make comparisons to “last mile” in shipping.</p>
+<p>I tinkered with the <a href="https://github.com/chris31415926535/valhallr/pull/1">valhallr library last year</a> and still have a local Docker image of West Yorkshire set up for routing. Docker is great - I can tell the image to go to sleep when I’m not playing with it.</p>
+<p>After the initial setup, which was basically feeding a bbox of limit coordinates into a config file, waiting about 1 afternoon for it to work out the network, this is by far the easiest roll-your-own routing engine I’ve played with.</p>
+<p>Note - 1 way systems mean that point A -&gt; work is a different problem to work -&gt; point A.</p>
+<pre class="r"><code>route_1 = route(coordinates[1,], coordinates[2,], costing=&quot;bicycle&quot;) 
+
+route_2 = route(coordinates[2,], coordinates[1,], costing=&quot;bicycle&quot;) 
+
+map_trip(route_1)</code></pre>
+<div id="htmlwidget-2" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addPolylines","args":[[[[{"lng":[-1.551051,-1.551036,-1.551021,-1.551009,-1.551015,-1.55019,-1.549955,-1.549538,-1.54941,-1.549248,-1.549081,-1.548598,-1.548514,-1.548437,-1.548207,-1.547975,-1.547372,-1.547276,-1.547245,-1.547232,-1.547137,-1.547026,-1.546953,-1.546951,-1.54692,-1.546769,-1.546613,-1.546476,-1.546323,-1.546093,-1.545137,-1.544563,-1.543972,-1.543611,-1.543335,-1.542899,-1.54265,-1.542513,-1.542349,-1.542209,-1.542102,-1.542035,-1.541992,-1.541846,-1.541719,-1.541619,-1.541599,-1.54154,-1.541493,-1.541418,-1.541251,-1.540674,-1.540456,-1.540323,-1.539889,-1.539317,-1.538591,-1.538527,-1.538147,-1.538088,-1.538078,-1.538007,-1.537994,-1.537828,-1.537719,-1.537717,-1.537707,-1.537675,-1.537362,-1.536882,-1.536746,-1.536278,-1.53584,-1.535527,-1.534911,-1.534706,-1.534337,-1.534343,-1.534327,-1.53431,-1.534297,-1.534249,-1.534199,-1.53415,-1.534115,-1.534089,-1.534072,-1.534033,-1.534032,-1.534025,-1.534029,-1.534056,-1.534114,-1.534151,-1.5342,-1.534243,-1.534292,-1.534336,-1.534338,-1.534326,-1.53429,-1.534243,-1.534104,-1.533979,-1.533198,-1.533167,-1.533054,-1.532912,-1.532803,-1.532761,-1.532712,-1.532706,-1.532705,-1.53271,-1.532802,-1.532962,-1.533234,-1.533444,-1.533532,-1.533564,-1.533606,-1.533701,-1.533764,-1.533782,-1.533808,-1.533861,-1.533936,-1.533861,-1.533748,-1.533662,-1.532898,-1.532788,-1.53276,-1.532629,-1.532255,-1.531543,-1.531341,-1.531109,-1.530745,-1.53057,-1.530531,-1.530411,-1.530241,-1.530024,-1.529859,-1.529788],"lat":[53.792976,53.792926,53.792869,53.792797,53.792737,53.792728,53.792726,53.792715,53.792705,53.792683,53.79266,53.792574,53.792535,53.792484,53.792261,53.792295,53.792324,53.792332,53.792285,53.792249,53.792238,53.79223,53.792227,53.79228,53.792279,53.792327,53.792358,53.792353,53.792335,53.792335,53.792374,53.79243,53.792507,53.792557,53.7927,53.792742,53.792857,53.792924,53.793004,53.793058,53.793101,53.793104,53.793099,53.79305,53.793191,53.79323,53.793261,53.793338,53.793357,53.793365,53.793394,53.793504,53.793529,53.793564,53.793694,53.793798,53.793891,53.793901,53.793858,53.793852,53.793868,53.79399,53.794013,53.794281,53.794452,53.79447,53.79461,53.794711,53.794635,53.794576,53.794564,53.794555,53.794583,53.794575,53.794506,53.794508,53.794549,53.794577,53.794582,53.794589,53.794597,53.794662,53.794716,53.794768,53.794758,53.794785,53.794804,53.794839,53.794843,53.794878,53.794916,53.794954,53.79504,53.795101,53.79516,53.795202,53.795232,53.795259,53.795269,53.795278,53.795297,53.795319,53.795351,53.795375,53.795557,53.795582,53.795607,53.795646,53.795703,53.795727,53.795739,53.795755,53.795782,53.795821,53.795826,53.79587,53.795961,53.796045,53.796097,53.796135,53.79616,53.796323,53.796428,53.796441,53.796454,53.796489,53.796551,53.796556,53.796563,53.796573,53.796695,53.796712,53.796717,53.796739,53.796806,53.796931,53.796966,53.797009,53.797113,53.797173,53.797187,53.797232,53.797286,53.797413,53.797543,53.797634]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#03F","weight":5,"opacity":0.5,"fill":false,"fillColor":"#03F","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[53.792227,53.797634],"lng":[-1.551051,-1.529788]}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>map_trip(route_2)</code></pre>
+<div id="htmlwidget-3" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addPolylines","args":[[[[{"lng":[-1.529788,-1.529702,-1.529608,-1.529439,-1.529336,-1.529301,-1.529269,-1.529219,-1.529126,-1.529067,-1.528823,-1.528743,-1.528678,-1.528618,-1.528524,-1.528495,-1.528406,-1.528402,-1.528461,-1.52859,-1.528606,-1.528614,-1.528677,-1.5287,-1.528901,-1.529063,-1.52932,-1.529513,-1.529669,-1.529802,-1.529933,-1.530168,-1.530332,-1.530419,-1.530449,-1.530418,-1.530408,-1.530397,-1.530387,-1.530466,-1.530596,-1.530899,-1.531037,-1.53109,-1.531082,-1.531151,-1.531217,-1.531259,-1.531294,-1.531302,-1.531299,-1.531334,-1.531402,-1.531447,-1.531493,-1.531539,-1.531565,-1.531581,-1.531589,-1.531609,-1.531607,-1.531578,-1.531693,-1.531788,-1.531794,-1.531907,-1.53202,-1.532144,-1.532534,-1.532557,-1.532603,-1.532667,-1.532712,-1.532761,-1.532803,-1.532912,-1.533054,-1.533167,-1.533198,-1.533979,-1.534104,-1.534243,-1.53429,-1.534326,-1.534338,-1.534336,-1.534292,-1.534243,-1.5342,-1.534151,-1.534114,-1.534056,-1.534029,-1.534025,-1.534032,-1.534033,-1.534036,-1.53404,-1.53405,-1.534072,-1.534089,-1.534115,-1.53415,-1.534199,-1.534249,-1.534297,-1.53431,-1.534327,-1.534343,-1.534337,-1.534706,-1.534911,-1.535527,-1.53584,-1.536278,-1.536746,-1.536882,-1.537362,-1.537675,-1.537707,-1.537717,-1.537719,-1.537828,-1.537994,-1.538007,-1.538078,-1.538088,-1.538147,-1.538527,-1.538591,-1.538541,-1.538502,-1.538504,-1.538496,-1.538451,-1.538585,-1.538693,-1.538782,-1.538916,-1.539132,-1.539298,-1.539491,-1.539934,-1.540321,-1.54055,-1.540747,-1.540919,-1.541032,-1.541146,-1.541284,-1.541263,-1.541408,-1.541498,-1.541519,-1.541599,-1.541645,-1.541746,-1.542035,-1.542102,-1.542209,-1.542349,-1.542513,-1.54265,-1.542899,-1.543335,-1.543611,-1.543972,-1.544563,-1.545137,-1.546093,-1.546323,-1.546476,-1.546613,-1.546769,-1.54692,-1.546951,-1.546953,-1.547026,-1.547137,-1.547232,-1.547245,-1.547276,-1.547372,-1.547975,-1.548207,-1.548437,-1.548514,-1.548598,-1.549081,-1.549248,-1.54941,-1.549538,-1.549955,-1.55019,-1.551015,-1.551009,-1.551021,-1.551036,-1.551051],"lat":[53.797634,53.797745,53.797866,53.797934,53.798046,53.798092,53.798136,53.798097,53.798132,53.798154,53.798132,53.798113,53.798097,53.79809,53.798056,53.798046,53.798021,53.798014,53.797968,53.797857,53.797841,53.797821,53.797811,53.797792,53.797651,53.797536,53.797385,53.797276,53.797191,53.797121,53.797056,53.796943,53.79688,53.796845,53.796824,53.796788,53.796763,53.796705,53.796657,53.796656,53.796649,53.796464,53.796374,53.796311,53.796243,53.796215,53.796189,53.796151,53.796119,53.796071,53.796016,53.796016,53.795998,53.795958,53.795881,53.795791,53.795706,53.795652,53.795626,53.795514,53.795424,53.795318,53.795313,53.795311,53.795373,53.79538,53.795371,53.795415,53.795615,53.795669,53.795693,53.795726,53.795739,53.795727,53.795703,53.795646,53.795607,53.795582,53.795557,53.795375,53.795351,53.795319,53.795297,53.795278,53.795269,53.795259,53.795232,53.795202,53.79516,53.795101,53.79504,53.794954,53.794916,53.794878,53.794843,53.794839,53.794826,53.794816,53.794802,53.794792,53.794785,53.794758,53.794768,53.794716,53.794662,53.794597,53.794589,53.794582,53.794577,53.794549,53.794508,53.794506,53.794575,53.794583,53.794555,53.794564,53.794576,53.794635,53.794711,53.79461,53.79447,53.794452,53.794281,53.794013,53.79399,53.793868,53.793852,53.793858,53.793901,53.793891,53.793712,53.793573,53.79347,53.793379,53.793172,53.793155,53.793127,53.793097,53.793032,53.792947,53.792905,53.792886,53.79288,53.792876,53.792873,53.792858,53.793011,53.793111,53.793167,53.793188,53.793274,53.793284,53.793287,53.793248,53.793261,53.793272,53.793301,53.793104,53.793101,53.793058,53.793004,53.792924,53.792857,53.792742,53.7927,53.792557,53.792507,53.79243,53.792374,53.792335,53.792335,53.792353,53.792358,53.792327,53.792279,53.79228,53.792227,53.79223,53.792238,53.792249,53.792285,53.792332,53.792324,53.792295,53.792261,53.792484,53.792535,53.792574,53.79266,53.792683,53.792705,53.792715,53.792726,53.792728,53.792737,53.792797,53.792869,53.792926,53.792976]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#03F","weight":5,"opacity":0.5,"fill":false,"fillColor":"#03F","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[53.792227,53.798154],"lng":[-1.551051,-1.528402]}},"evals":[],"jsHooks":[]}</script>
+<p>Ah. Point A is in a slightly awkward spot for the return trip, and valhalla doesn’t believe in dismounting and crossing the road as a pedestrian.</p>
+<pre class="r"><code>point_b = tribble(
+  ~name, ~lat, ~lon,
+  &quot;point B&quot;,53.79698,-1.53084
+) %&gt;% 
+  select(name, lon, lat)
+
+
+route_3 = route(point_b, coordinates[1,], costing=&quot;bicycle&quot;) 
+
+map_trip(route_3)</code></pre>
+<div id="htmlwidget-4" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addPolylines","args":[[[[{"lng":[-1.53078,-1.530977,-1.531463,-1.532126,-1.53245,-1.532523,-1.532613,-1.53275,-1.532762,-1.532868,-1.53347,-1.533652,-1.53378,-1.533805,-1.533861,-1.533971,-1.534122,-1.534068,-1.533986,-1.533908,-1.533883,-1.533882,-1.533912,-1.533954,-1.533996,-1.534149,-1.534232,-1.534344,-1.53454,-1.534744,-1.535569,-1.535817,-1.536367,-1.536636,-1.536753,-1.536819,-1.536933,-1.537029,-1.537302,-1.537586,-1.537763,-1.537996,-1.538118,-1.538368,-1.538505,-1.538652,-1.538705,-1.538775,-1.539142,-1.539424,-1.539823,-1.540001,-1.540176,-1.540676,-1.54089,-1.541198,-1.541791,-1.54209,-1.542199,-1.542264,-1.54221,-1.541973,-1.541623,-1.541555,-1.541446,-1.541418,-1.541415,-1.541418,-1.541408,-1.541498,-1.541519,-1.541599,-1.541645,-1.541746,-1.542035,-1.542102,-1.542209,-1.542349,-1.542513,-1.54265,-1.542899,-1.543335,-1.543611,-1.543972,-1.544563,-1.545137,-1.546093,-1.546323,-1.546476,-1.546613,-1.546769,-1.54692,-1.546951,-1.546953,-1.547026,-1.547137,-1.547232,-1.547245,-1.547276,-1.547372,-1.547975,-1.548207,-1.548437,-1.548514,-1.548598,-1.549081,-1.549248,-1.54941,-1.549538,-1.549955,-1.55019,-1.551015,-1.551009,-1.551021,-1.551036,-1.551051],"lat":[53.796989,53.796955,53.79688,53.796759,53.796709,53.79669,53.796676,53.796653,53.796653,53.796647,53.796565,53.796534,53.796514,53.796506,53.796489,53.796465,53.79644,53.796299,53.796133,53.795957,53.795878,53.795755,53.795682,53.795623,53.795597,53.795501,53.795458,53.79542,53.795382,53.795369,53.795433,53.795437,53.795446,53.795458,53.795439,53.795418,53.795386,53.795354,53.79527,53.795176,53.795123,53.795052,53.795006,53.794942,53.794929,53.794937,53.794945,53.794956,53.795019,53.795058,53.795119,53.795116,53.795095,53.795022,53.794985,53.794916,53.7947,53.794566,53.794506,53.794475,53.794408,53.79411,53.793693,53.793674,53.793552,53.793492,53.793433,53.793365,53.793284,53.793287,53.793248,53.793261,53.793272,53.793301,53.793104,53.793101,53.793058,53.793004,53.792924,53.792857,53.792742,53.7927,53.792557,53.792507,53.79243,53.792374,53.792335,53.792335,53.792353,53.792358,53.792327,53.792279,53.79228,53.792227,53.79223,53.792238,53.792249,53.792285,53.792332,53.792324,53.792295,53.792261,53.792484,53.792535,53.792574,53.79266,53.792683,53.792705,53.792715,53.792726,53.792728,53.792737,53.792797,53.792869,53.792926,53.792976]}]]],null,null,{"interactive":true,"className":"","stroke":true,"color":"#03F","weight":5,"opacity":0.5,"fill":false,"fillColor":"#03F","fillOpacity":0.2,"smoothFactor":1,"noClip":false},null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[53.792227,53.796989],"lng":[-1.551051,-1.53078]}},"evals":[],"jsHooks":[]}</script>
+<p>That looks much more sensible. However, I suspect that the OSM data that I fed into my valhalla server is way out of date, and the odd road might be shut for roadworks now.</p>
+<p>Compare with <a href="https://www.cyclestreets.net/journey/79638854/">cyclestreets</a> there’s pretty good agreement. In the <a href="https://www.cyclestreets.net/journey/79638864/">return trip</a> it does believe in dismounting to cross awkward roads. I also really like the cycle-focused OSM tiles CS use - cycle paths, pubs and cafes are highlighted.</p>
+<p>Both are better than what I tried the first time, which mostly involved getting stuck in the inner Leeds loop, roads/cycleways closed for roadworks, and random disappearing cycle paths.</p>
+<p>I’ve played with the Google Maps routing service, but the programmers at Google seem to believe that any road that is bike-legal is fair game.</p>
+<p>ORS <a href="https://maps.openrouteservice.org/#/directions/Wharf%20Approach,Leeds,England,United%20Kingdom/York%20Street,Leeds,England,United%20Kingdom/data/55,130,32,198,15,97,4,224,38,9,96,59,2,24,5,192,166,6,113,0,184,64,90,1,24,3,160,21,148,128,152,0,96,19,130,128,88,6,96,166,129,217,77,96,54,26,1,165,49,226,172,106,52,34,38,141,0,28,20,132,85,32,27,136,153,70,85,234,180,101,34,72,142,141,73,240,20,53,133,66,84,170,16,161,46,161,78,32,120,128,128,1,213,60,8,137,176,229,0,11,202,0,91,92,132,38,219,219,64,64,1,155,192,0,219,162,227,128,2,121,131,133,32,3,155,227,67,162,36,2,187,135,35,64,216,129,7,160,135,162,166,33,129,69,226,166,67,123,123,162,34,195,162,192,128,2,250,53,0,0">has some interesting features</a>. For the full route I could mark out a polygon of “avoid this area” around the death road if it tried to take me that way. I might try building their thing another time, or playing with their free API tokens. I doubt I’d go past the free tier.</p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>As the crow flies. One of the problems is having to zig-zag through a road geometry that Lovecraft would be proud of.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>I’m going to grab some photos demonstrating bad urban design in something whose name suggests something built to an international standard, or at least comparible in quality to a motorway. [^3]<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
