@@ -1,0 +1,81 @@
+---
+title: Successfully competed in a powerlifting comp
+author: James Riley
+date: "2022-03-24" 
+slug: successfully-competed-in-a-powerlifting-comp
+categories:
+  - R
+tags:
+  - Open Powerlifting
+  - fitness
+output:
+  blogdown::html_page:
+    dev: svg
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<p>I’d be showing off some updates to {openpoweRlifting}, but:</p>
+<ul>
+<li>the epic csv downloads break the free tier of RStudio Cloud I’ve been playing with for overloading the RAM.</li>
+<li>The home RStudio Server isn’t much better on RAM.</li>
+<li>Batch processing it into a SQLite Database almost works.</li>
+</ul>
+<p>It turns out that in the actual server it’s 3 tables; meets, lifters and entries. The server internally produces 3 csvs for these and these might get exposed down the line. For today I built the server through docker, pulled out the csvs, and {pin}ned them.</p>
+<p>There’s faster ways to get just the csvs, but I spent the time doing other stuff rather than working out how to make rust happen.</p>
+<pre class="r"><code>board = board_local()
+entries = pin_read(board, &quot;opl-entries&quot;)
+lifters = pin_read(board, &quot;opl-lifters&quot;)
+meets   = pin_read(board, &quot;opl-meets&quot;)</code></pre>
+<p>I’m <a href="https://openpowerlifting.org/u/jamesriley7">James Riley #7</a>. My numbers aren’t brilliant, but a couple of years ago I was practically unable to walk from sciatica, so there’s a lot of progress from that low point.</p>
+<p><a href="https://www.strongerbyscience.com/whos-the-most-impressive-powerlifter/">Stronger by Science have written about scaling by body weight</a>, that at least theoretically goes past human limits.</p>
+<pre class="r"><code>first_entry = entries %&gt;% 
+  filter(!is.na(BodyweightKg)) %&gt;% 
+  filter(Event == &quot;SBD&quot;) %&gt;% 
+  left_join(
+    select(meets, MeetID, Date),# There&#39;s less ugly ways to do this, but meh,
+    by=&quot;MeetID&quot;) %&gt;% 
+  group_by(LifterID) %&gt;% 
+  slice_min(n=1, order_by=Date, with_ties = FALSE) %&gt;% 
+  ungroup()</code></pre>
+<pre class="r"><code>first_entry %&gt;% 
+  select(LifterID, BodyweightKg,
+         Best3BenchKg, Best3DeadliftKg, Best3SquatKg) %&gt;% 
+  pivot_longer(Best3BenchKg:Best3SquatKg) %&gt;% 
+  filter(value&gt;0) %&gt;% 
+  mutate(ass_factor = BodyweightKg^2/3 / (98.7^2/3)) %&gt;% 
+  mutate(ass_score = value * ass_factor) %&gt;% 
+  group_by(name) %&gt;% 
+  mutate(mean = mean(ass_score), sd = sd(ass_score)) %&gt;% # Cheap way to remove the long, long tail
+  filter(ass_score &lt;= mean + 2*sd) %&gt;% 
+  ungroup() %&gt;% 
+  ggplot(aes(x=ass_score)) + geom_density() +
+    facet_wrap(&quot;name&quot;, scales = &quot;free&quot;) </code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.svg" width="672" /></p>
+<p>You may be asking if I’ve been waiting to use the Allometric Strength Score abbreviated as ‘ass’ because I’m that immature. On my days off, yes, I am. I’m also making it a ASS factor relative to my weight on comp day. That makes it easier to relate these numbers to my unmodified numbers.</p>
+<p>And frankly, I’m somewhere around the 25% body fat level and would be generally in better health if it was 15% or lower. That puts me at least 1 weight category too high, but it was good to get the experience of comp before being in competitive shape.</p>
+<p>We’ve been looking at the 7 degrees of separation graph in Powerlifting Meets on the OpenPowerlifting chat server.</p>
+<p>With the entries/meets/lifters disambiguation I realised that it’s pretty easy to make a lifter is adjacent to a meet they’ve taken part in. Ordinary graph distance just needs halving then - the path from me to anyone else goes me -&gt; YNE spring open -&gt; someone else in the same comp. The distance we’re interested in is 1, the distance the graph says is 2.</p>
+<p>Anyway, for the connected component I’m in, practically everyone is about 4 meets away. This makes sense - at a regional meet someone will qualify for nationals. At a national meet someone will qualify for continental, … worlds.</p>
+<pre class="r"><code>rm(first_entry)
+
+lifters = select(lifters, LifterID, Name)
+meets = meets %&gt;% 
+  mutate(MeetName = str_c(MeetName, Date)) %&gt;% 
+  select(MeetID, MeetName)</code></pre>
+<pre class="r"><code>graph = entries %&gt;% 
+  select(MeetID, LifterID) %&gt;% 
+  left_join(lifters, by=&quot;LifterID&quot;) %&gt;% 
+  right_join(meets, by=&quot;MeetID&quot;) %&gt;% 
+  rename(from=Name, to=MeetID) %&gt;% 
+  as_tbl_graph(directed = FALSE)</code></pre>
+<pre class="r"><code>graph %&gt;% 
+  activate(nodes) %&gt;% 
+  mutate(flag = (name == &quot;James Riley #7&quot;)) %&gt;% 
+  arrange(desc(flag)) %&gt;% 
+  mutate(dist = node_distance_from(1)) %&gt;% # I wish I had a better way to do &quot;distance from named node&quot;
+  filter(is.finite(dist)) %&gt;% 
+  as_tibble() %&gt;% 
+  ggplot(aes(x=dist)) + geom_bar()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.svg" width="672" /></p>
