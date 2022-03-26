@@ -1,7 +1,7 @@
 ---
 title: Successfully competed in a powerlifting comp
 author: James Riley
-date: "2022-03-24" 
+date: "2022-03-26"
 slug: successfully-competed-in-a-powerlifting-comp
 categories:
   - R
@@ -44,14 +44,14 @@ meets   = pin_read(board, &quot;opl-meets&quot;)</code></pre>
          Best3BenchKg, Best3DeadliftKg, Best3SquatKg) %&gt;% 
   pivot_longer(Best3BenchKg:Best3SquatKg) %&gt;% 
   filter(value&gt;0) %&gt;% 
-  mutate(ass_factor = BodyweightKg^2/3 / (98.7^2/3)) %&gt;% 
+  mutate(ass_factor = (98.7^2/3)/ (BodyweightKg^2/3) ) %&gt;% #typo fix
   mutate(ass_score = value * ass_factor) %&gt;% 
   group_by(name) %&gt;% 
   mutate(mean = mean(ass_score), sd = sd(ass_score)) %&gt;% # Cheap way to remove the long, long tail
-  filter(ass_score &lt;= mean + 2*sd) %&gt;% 
+  filter(abs(ass_score-mean) &lt;=  3*sd) %&gt;% 
   ungroup() %&gt;% 
   ggplot(aes(x=ass_score)) + geom_density() +
-    facet_wrap(&quot;name&quot;, scales = &quot;free&quot;) </code></pre>
+    facet_wrap(&quot;name&quot;, scales = &quot;free&quot;)  </code></pre>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.svg" width="672" /></p>
 <p>You may be asking if I’ve been waiting to use the Allometric Strength Score abbreviated as ‘ass’ because I’m that immature. On my days off, yes, I am. I’m also making it a ASS factor relative to my weight on comp day. That makes it easier to relate these numbers to my unmodified numbers.</p>
 <p>And frankly, I’m somewhere around the 25% body fat level and would be generally in better health if it was 15% or lower. That puts me at least 1 weight category too high, but it was good to get the experience of comp before being in competitive shape.</p>

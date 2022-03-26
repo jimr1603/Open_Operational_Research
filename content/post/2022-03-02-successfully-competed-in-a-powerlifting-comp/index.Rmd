@@ -1,7 +1,7 @@
 ---
 title: Successfully competed in a powerlifting comp
 author: James Riley
-date: "2022-03-24" 
+date: "`r Sys.Date()`"
 slug: successfully-competed-in-a-powerlifting-comp
 categories:
   - R
@@ -69,14 +69,14 @@ first_entry %>%
          Best3BenchKg, Best3DeadliftKg, Best3SquatKg) %>% 
   pivot_longer(Best3BenchKg:Best3SquatKg) %>% 
   filter(value>0) %>% 
-  mutate(ass_factor = BodyweightKg^2/3 / (98.7^2/3)) %>% 
+  mutate(ass_factor = (98.7^2/3)/ (BodyweightKg^2/3) ) %>% #typo fix
   mutate(ass_score = value * ass_factor) %>% 
   group_by(name) %>% 
   mutate(mean = mean(ass_score), sd = sd(ass_score)) %>% # Cheap way to remove the long, long tail
-  filter(ass_score <= mean + 2*sd) %>% 
+  filter(abs(ass_score-mean) <=  3*sd) %>% 
   ungroup() %>% 
   ggplot(aes(x=ass_score)) + geom_density() +
-    facet_wrap("name", scales = "free") 
+    facet_wrap("name", scales = "free")  
 
 ```
 
