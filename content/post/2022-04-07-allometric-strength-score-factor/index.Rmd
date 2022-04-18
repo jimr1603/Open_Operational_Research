@@ -1,0 +1,81 @@
+---
+title: Allometric Strength Score (Factor)
+author: James Riley
+date: '2022-04-07'
+slug: allometric-strength-score-factor
+categories:
+  - R
+tags:
+  - Open Powerlifting
+  - fitness
+output:
+  blogdown::html_page:
+    dev: svg
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+library(tidyverse)
+library(pins)
+theme_set(ggthemes::theme_few())
+
+```
+
+Last time I looked at a method for normalising feats of strength by body mass. If you're attached to the RSS feed for this blog, or go through the GitHub history, I made a mistake and patched it. At first I *multiplied* by body mass ^2/3, rather than divided by. This produced far too many outliers, as people at great weight lifted great weights.
+
+There were still significant outliers when I changed the `*` to a `/`, which I believe at this point came down to laziness in filtering. There's equipped and unequipped lifting, federations that drug test and those that don't, and I've frankly not gotten into how weight is recorded in a disabled meet vs the formulas that account for missing limbs towards being in a weight class.
+
+```{r}
+board = board_local()
+entries = pin_read(board, "opl-entries") %>% 
+  janitor::clean_names() %>% 
+  filter(event == "SBD",
+         equipment == "Raw",
+         bodyweight_kg > 0,
+         tested == "Yes", #TODO: import this as logical, not text.  
+         sex %in% c("M", "F") # ASS score might scale between M/F sensibly, so sorry to people logged as neither.
+         ) %>% 
+  select(sex, 
+         bodyweight_kg,
+         best3squat_kg,
+         best3bench_kg,
+         best3deadlift_kg)
+
+```
+
+Checking median bodyweight gives about 80kg, so I'll scale the ASS score to a lifter at 80kg. i.e. ASS score for a 80kg lifter is unmodified, for someone <80kg it's uplifted, for someone >80kg it's downlifted.
+
+```{r}
+entries %>% 
+  pivot_longer(best3squat_kg:best3deadlift_kg) %>% 
+  filter(value > 0) %>% 
+  mutate(ASS_factor = (bodyweight_kg^(2/3))/(80^(2/3))) %>% 
+  mutate(ASS_score = value / ASS_factor) %>% 
+  ggplot(aes(x=value, colour=sex)) + 
+    facet_wrap("name", nrow=1, scale="free_x") +
+    geom_density() +
+    ggthemes::scale_colour_few()
+
+```
+
+Ah, a category error - the weights _look_ like a continuous variable, but in practise we'll usually use a minimum of a 1.25kg weight plate. (on each side, so total weight will be a multiple of 2.5kg. Lbs in USA.) So weight lifted more resembles a categorical variable than a continuous one.
+
+```{r}
+entries %>% 
+  pivot_longer(best3squat_kg:best3deadlift_kg) %>% 
+  filter(value > 0) %>% 
+  mutate(ASS_factor = (bodyweight_kg^(2/3))/(80^(2/3))) %>% 
+  mutate(ASS_score = value / ASS_factor) %>% 
+  ggplot(aes(x=value, fill=sex)) + 
+    facet_grid( vars(sex), vars(name), scale="free") +
+    geom_histogram(binwidth = 10) +
+    ggthemes::scale_fill_few() 
+```
+
+Clearly M/F have different distributions. Maybe since 'competitive' body fat percentages are about 5 percentage points higher in women, and fat doesn't contribute to a maximum lift. 
+
+Anyway, this was mostly a postscript to the last post due to oversight, and motivation for continuing my diet. 
