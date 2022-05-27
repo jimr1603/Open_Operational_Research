@@ -1,0 +1,136 @@
+---
+title: Garage Gym Comp Results 2022
+author: James Riley
+date: '2022-04-07'
+slug: ggc-results-2022 
+categories:
+  - R
+tags:
+  - GarageGymCompetition
+  - fitness
+output:
+  blogdown::html_page:
+    dev: svg
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+library(tidyverse)
+library(pins)
+library(plotly)
+theme_set(ggthemes::theme_few())
+
+```
+
+We have preliminary results for 2022 GGC. [As is tradition, I'm poking the data to see what falls out](https://openor.blog/2021/06/18/garagegym/). 
+
+This might also end up as a demo of RAP - if the final results are basically the same shape I can copy-paste the code. 
+
+```{r}
+
+data = readxl::read_excel("2022_Spring_GGC_DraftResults_V1.xlsx",
+                   sheet = 1) %>% 
+  janitor::clean_names()
+
+lifts = data %>% 
+  select(first_name, sex = athletes_sex,
+         age_range, account, 
+         body_weight = athletes_body_weight_in_kg,
+         total = athletes_total_in_kg, squat = athlete_s_squat_in_kg,
+         bench = athlete_s_bench_in_kg, deadlift = athlete_s_deadlift_in_kg) %>% 
+  pivot_longer(total:deadlift) 
+```
+
+
+```{r}
+lifts %>% 
+  filter(sex == "Male") %>% 
+  ggplot(aes(x=value)) +
+    geom_density() + 
+    facet_wrap("name", scales = "free") +
+    labs(title = "Male GGC entries")
+```
+
+
+```{r}
+lifts %>% 
+  filter(sex == "Female") %>%
+  ggplot(aes(x=value)) +
+    geom_density() + 
+    facet_wrap("name", scales = "free") +
+    labs(title = "Female GGC entries")
+```
+
+Again the field improves :D I'm so proud of us all. 
+
+Again, Non-Binary folk - sorry, I can't really do stats on 2 points. [^1]
+
+[^1]: For stats purposes I put "male" despite identifying as genderNULL. However, that's my choice and I wouldn't impose it on anyone. 
+
+Pulling the histogram from last year, can I make it work?
+
+```{r}
+plotly_pipe = function(data){
+  data %>% 
+    filter(kg > 0) %>% 
+    mutate(id = paste0(instagram_name, "|", first_name)) %>% 
+    mutate(kg = cut_interval(kg, n= n()/10)) %>% # I learned a new function. Mildly hacky way of dealing with 1/4 as many female entries as male.
+    select(id, kg) %>% 
+    arrange(kg) %>% 
+    group_by(kg) %>% 
+    mutate(y = row_number()) %>% 
+    ungroup() %>% 
+    plot_ly( x = ~kg, y = ~y, hovertext = ~id  ) %>% 
+      add_markers()
+}
+
+data %>% 
+  filter(athletes_sex == "Male") %>% 
+  select(first_name, instagram_name = account, kg = athletes_total_in_kg) %>% 
+  plotly_pipe()
+```
+
+```{r}
+data %>% 
+  filter(athletes_sex == "Female") %>% 
+  select(first_name, instagram_name = account, kg = athletes_total_in_kg) %>% 
+  plotly_pipe()
+```
+
+Yes! Awesomesauce.
+
+Unlike last year, I've some plans to throw these data into Javascript and make these graphs in JS and let people select themselves. 
+
+For the people who competed last year, how've they been doing?
+
+
+```{r}
+data %>% 
+  filter(x2021_total_in_kg > 0) %>% 
+  ggplot(aes(x=athletes_total_in_kg, x2021_total_in_kg,
+             colour=athletes_sex)) +
+    geom_point() +
+  labs(x = "2021 total (kg)", y = "2022 total (kg)") +
+  coord_fixed()
+
+```
+
+That's... hard to read. Staying still is staying on the line $y=x$. However I have relative changes and a dumbbell plot:
+
+```{r}
+data %>% 
+  arrange(x2021_total_in_kg) %>% 
+  filter(x2021_total_in_kg > 0) %>% 
+  mutate(y=row_number()) %>% 
+  mutate(improved = x2021_to_2022_percent_improvement > 0) %>% 
+  ggplot(aes(y=y, 
+             x=athletes_total_in_kg, xend=x2021_total_in_kg,
+             colour=improved)) +
+  ggalt::geom_dumbbell() 
+```
+
+My dumbbell plot doesn't distinguish between the end point being to the left or the right of the start point, so I added a flag for "is their 2022 total above or below the 2021 total". 
