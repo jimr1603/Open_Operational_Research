@@ -1,7 +1,7 @@
 ---
 title: Garage Gym Comp Results 2022 (final)
 author: James Riley
-date: '2022-06-0'
+date: '2022-06-08'
 slug: ggc-results-2022 
 categories:
   - R
