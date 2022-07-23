@@ -1,0 +1,31 @@
+---
+title: Inflation
+author: James Riley
+date: '2022-07-23'
+slug: inflation
+categories:
+  - JavaScript
+  - R
+tags:
+  - inflation
+  - ONS
+---
+
+
+
+<p>Inflation is a very hot topic right now. <a href="https://www.pcs.org.uk/news-events/news/insulting-public-sector-pay-offers-show-need-coordinate-action">Especially in the Civil Service where we face another real-terms pay cut.</a></p>
+<p>I’d say 11 or 12+ years, but I’ve worked there for 5, so sufficient to say “longer than I’ve been there”.</p>
+<p>I’ve been learning Javascript at Observable, and put together <a href="https://observablehq.com/@jimr1603/uk-cpih-inflation-calculator">this calculator</a> for demonstrating how much pay is down in real terms, for an individual.</p>
+<p>It also should embed below.</p>
+<iframe width="100%" height="500" frameborder="0"
+  src="https://observablehq.com/embed/@jimr1603/uk-cpih-inflation-calculator?cell=*"></iframe>
+<p>The original dataset was massive, and it would be horribly antisocial to force the whole thing to load so I pre-processed it with this R script:</p>
+<pre class="r"><code>library(&quot;tidyverse&quot;)
+read_csv(&quot;mm23.csv&quot;,
+         col_select = c(year = Title, CPIH=&quot;CPIH INDEX 00: ALL ITEMS 2015=100&quot;)) %&gt;% 
+  as_tibble() %&gt;% 
+  mutate(CPIH = as.numeric(CPIH)) %&gt;% 
+  filter(!is.na(CPIH)) %&gt;% 
+  arrange(-row_number()) %&gt;% 
+  write_csv(&quot;cpih.csv&quot;)</code></pre>
+<p>I thought this was going to end up being a pure JS post, but the R snuck in there!</p>
