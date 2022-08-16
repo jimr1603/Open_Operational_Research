@@ -1,0 +1,75 @@
+---
+title: Chaos Snek
+author: James Riley
+date: '2022-08-15'
+slug: chaos-snek
+categories:
+  - Python
+tags:
+  - chaos
+  - fractal
+  - Fractals
+---
+
+
+
+<p>I’m revisiting Python while I’m playing with not-R. It’s been a while.</p>
+<p>Since then;</p>
+<ul>
+<li>the transition from 2.x to 3.x is mostly a settled matter.</li>
+<li>pandas/numpy have matured, taking inspiration from the vectorised operations in R.</li>
+<li>I’ve stopped using <code>&lt;-</code> assignment in R, in favour of <code>=</code>.</li>
+<li>pandas has started looking at doing a similar pipe as I’ve seen in JS.</li>
+<li>RStudio have rebranded, partially to court Pythonistas.</li>
+<li>R Markdown support for Python has improved.</li>
+</ul>
+<p>I was plugging through Math for Python, where I came across our familiar chaos game.
+Since last time I’d been thinking about taking both/all paths, rather than randomly selecting a path.
+In the 3-node case, that means that the number of points triples every iteration, so I’ll start with just one point.</p>
+<p>I was also looking at the book by the pandas author, and was happy to see my nice vectorised arrays in numpy :)</p>
+<p>Moreso than usual, this code is clunky as hell. I’m feeling around and finding my feet here, so it’s going to be hella ugly.</p>
+<p>The following snippet comes from a notebook I was working in VSCode/Jupyter. I’m not getting RStudio to play nicely with Python today, at least not while I’m still in RMarkdown rather than Quatro.<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<pre class="python"><code>import matplotlib.pyplot as plt
+import numpy as np
+import math
+
+def transform_1(x, y):
+    x = 0.5 * x
+    y = 0.5 * y
+    return x,y
+def transform_2(x, y):
+    x = 0.5*x + 0.5
+    y = 0.5*y + 0.5
+    return x,y
+
+def transform_3(x,y):
+    x = 0.5*x+1
+    y=0.5*y
+    return x,y
+
+x = np.array([0])
+y = np.array([0])
+
+
+while(len(x) &lt; 1e4):
+    t1x, t1y = transform_1(x,y)
+    t2x, t2y = transform_2(x,y)
+    t3x, t3y = transform_3(x,y)
+
+    x = np.append(t1x,t2x)
+    x = np.append(x, t3x)
+
+    y = np.append(t1y, t2y)
+    y = np.append(y, t3y)
+
+plt.scatter(x/2,y, s=0.01)</code></pre>
+<div class="figure">
+<img src="images/triange.png" alt="" />
+<p class="caption">Matplotlib output</p>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>The while loop took forever to run in RStudio, barely any time in Jupyter. Likely R is asking Reticulate to do each iteration of the loop, taking the objects back, and sending them back across? Or something isn’t set up on this machine right yet.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
