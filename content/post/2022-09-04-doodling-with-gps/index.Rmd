@@ -1,0 +1,44 @@
+---
+title: Doodling with GPS
+author: James Riley
+date: '2022-09-05'
+slug: doodling-with-gps
+categories:
+  - R
+tags:
+  - GPS
+  - geospatial
+  - fitness
+  - cycling
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+
+library("tidyverse")
+library("sf")
+library("trackeR")
+theme_set(ggthemes::theme_few())
+
+```
+
+Some days you want to do serious analysis, some days you want to make rude drawings on GPS traces with your bike:
+
+```{r}
+data = jsonlite::fromJSON("~/Nextcloud/Health and Fitness/GoldenCheetah/James Riley/activities/2022_08_22_19_37_53.json")
+data = pluck(data, "RIDE", "SAMPLES")
+```
+
+```{r}
+data %>% 
+  filter(LAT != 0, LON != 0) %>% 
+  select(SECS, LAT, LON) %>% 
+  janitor::clean_names() %>% 
+  st_as_sf(coords = c("lat", "lon"), crs = "EPSG:4326") %>% 
+  st_normalize() %>% 
+  ggplot(aes(geometry = geometry)) + stat_sf_coordinates()
+```

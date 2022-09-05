@@ -1,0 +1,27 @@
+---
+title: Doodling with GPS
+author: James Riley
+date: '2022-09-05'
+slug: doodling-with-gps
+categories:
+  - R
+tags:
+  - GPS
+  - geospatial
+  - fitness
+  - cycling
+---
+
+
+
+<p>Some days you want to do serious analysis, some days you want to make rude drawings on GPS traces with your bike:</p>
+<pre class="r"><code>data = jsonlite::fromJSON(&quot;~/Nextcloud/Health and Fitness/GoldenCheetah/James Riley/activities/2022_08_22_19_37_53.json&quot;)
+data = pluck(data, &quot;RIDE&quot;, &quot;SAMPLES&quot;)</code></pre>
+<pre class="r"><code>data %&gt;% 
+  filter(LAT != 0, LON != 0) %&gt;% 
+  select(SECS, LAT, LON) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  st_as_sf(coords = c(&quot;lat&quot;, &quot;lon&quot;), crs = &quot;EPSG:4326&quot;) %&gt;% 
+  st_normalize() %&gt;% 
+  ggplot(aes(geometry = geometry)) + stat_sf_coordinates()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
