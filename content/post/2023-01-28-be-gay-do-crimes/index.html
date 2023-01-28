@@ -1,0 +1,122 @@
+---
+title: Be Gay, Do Crimes?
+author: James Riley
+date: '2023-01-28'
+slug: be-gay-do-crimes
+categories:
+  - R
+tags:
+  - census
+  - geospatial
+---
+
+
+
+<p>The Census 2021 is beginning to release data, and my corners of society have been excited at the maps <a href="https://www.ons.gov.uk/census/maps/choropleth/identity/sexual-orientation/sexual-orientation-4a/lesbian-gay-bisexual-or-other-lgb">showing where people identifying as Lesbian, Gay or Bisexual+</a> and <a href="https://www.ons.gov.uk/census/maps/choropleth/identity/gender-identity/gender-identity-4a/gender-identity-different-from-sex-registered-at-birth">gender identity not the same as assigned at birth</a>.</p>
+<p>I tip my hat to the ONS. The census isn’t the most exciting thing, but they are such expert data communicators that my mates were talking about map plots without me bringing it up.</p>
+<p>Of course, data is downloadable:
+<a href="https://www.ons.gov.uk/datasets/TS077/editions/2021/versions/1/filter-outputs/d0962f81-326f-41a5-a569-bedb13fd1b67#get-data">Census 2021 sexuality</a></p>
+<p>This is collected to “medium super output area” (MSOA), which makes sense given how many lower SOAs would return 1 or 0 not-heterosexual people.</p>
+<p>The obvious trend is that LGBT+ folks tend to be concentrated in the cities. Possibly in university cities. This is especially clear in Wales. So some things that share the urban/rural split will follow a LGBT+ gradient, and one can draw spurious correlations.</p>
+<p>The indexes of multiple deprivation are normally reported at the LSOA level, but <a href="https://research.mysociety.org/sites/imd2019/about/">University of Sheffield/MySociety collated the stats to MSOA level</a>. Good for me - I’d probably have done something not as good without a citation!</p>
+<div id="more-deprived-areas-are-more-likely-to-be-more-lgb" class="section level2">
+<h2>More deprived areas are more likely to be more LGB+</h2>
+<p>(Left is more deprived, right is less deprived.)</p>
+<pre class="r"><code>
+census = readxl::read_excel(&quot;data/TS077-2021-1-filtered-2023-01-28T19 48 00Z.xlsx&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  filter(sexual_orientation_6_categories_code &gt; 0) %&gt;% #remove the 0 invalid rows
+  filter(sexual_orientation_6_categories_code &lt; 5) %&gt;% #remove &quot;not answered&quot; instead of assuming anything
+  group_by(middle_layer_super_output_areas_code) %&gt;% 
+  mutate(p = observation/sum(observation)) %&gt;% 
+  filter(sexual_orientation_6_categories_code&gt;1) %&gt;% 
+  summarise(lgb_plus = sum(p))
+
+imd = read_csv(&quot;data/imd2019_msoa_level_data.csv&quot;) %&gt;% 
+  janitor::clean_names(  )
+
+
+left_join(imd, census, 
+          by = c( &quot;msoac&quot; = &quot;middle_layer_super_output_areas_code&quot;)) %&gt;% 
+  ggplot(aes(msoarank, lgb_plus)) + geom_point(alpha = 0.1) +
+  geom_smooth(method = &quot;lm&quot;) +
+  ggthemes::theme_few() +
+  scale_y_continuous(labels = scales::percent) </code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>Eyeballing the most LGB+ areas, I wonder if Brighton and Hove is skewing the results - it is both very LGB+ and coastal, and coastal tends to mean more deprived.</p>
+<p>Maybe if I facet by region:</p>
+<pre class="r"><code>
+
+left_join(imd, census, 
+          by = c( &quot;msoac&quot; = &quot;middle_layer_super_output_areas_code&quot;)) %&gt;% 
+  ggplot(aes(msoarank, lgb_plus)) + geom_point(alpha = 0.1) +
+  geom_smooth(method = &quot;lm&quot;) +
+  ggthemes::theme_few() +
+  scale_y_continuous(labels = scales::percent)  +
+  facet_wrap(&quot;reg&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Practically no correlation in Yorkshire and the Humber, which somewhat matches what I see in the map - there are better and worse areas that are more and less LGB+. Often along urban/rural lines, but with significant suburban outclaves.</p>
+</div>
+<div id="trans" class="section level1">
+<h1>Trans*</h1>
+<p>For keeping definining terms below a whole sentence, I’ll use:</p>
+<ul>
+<li>cisgender (cis): answered on the census that their gender identity is the same as the sex registered at birth.</li>
+<li>transgender (trans): answered on the census that their gender identity is <em>not</em> the same as the sex registered at birth.</li>
+</ul>
+<p>This is overbroad for some folks. This includes folks who entirely identify as male or female, and this identity is stable, as well as folks who sometimes identify as one, sometimes the other, sometimes neither, folks who identify as neither all the time… it’s a broad camp.</p>
+<p>However, it matches a 2-category split the ONS used, and while <a href="https://www.ons.gov.uk/filters/319b9162-c598-40ea-a740-c69c90079c58/dimensions">the data</a> has more categories, I’m going to follow their lead.</p>
+<pre class="r"><code>
+trans = read_csv(&quot;data/TS078-2021-1-filtered-2023-01-28T21 26 48Z.csv&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  filter(gender_identity_7_categories_code&gt;0) %&gt;% 
+  filter(gender_identity_7_categories_code&lt;6) %&gt;% #remove the not answered awkward cases 
+  group_by(middle_layer_super_output_areas_code) %&gt;% 
+  mutate(p = observation/sum(observation)) %&gt;% 
+  filter(gender_identity_7_categories_code&gt;1) %&gt;% #remove cis
+  summarise(trans = sum(p))</code></pre>
+<p>First graph looks vaguely similar.</p>
+<pre class="r"><code>
+left_join(imd, trans, 
+          by = c( &quot;msoac&quot; = &quot;middle_layer_super_output_areas_code&quot;)) %&gt;% 
+  ggplot(aes(msoarank, trans)) + geom_point(alpha = 0.1) +
+  geom_smooth(method = &quot;lm&quot;) +
+  ggthemes::theme_few() +
+  scale_y_continuous(labels = scales::percent) </code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>As does the 2nd:</p>
+<pre class="r"><code>
+left_join(imd, trans, 
+          by = c( &quot;msoac&quot; = &quot;middle_layer_super_output_areas_code&quot;)) %&gt;% 
+  ggplot(aes(msoarank, trans)) + geom_point(alpha = 0.1) +
+  geom_smooth(method = &quot;lm&quot;) +
+  ggthemes::theme_few() +
+  scale_y_continuous(labels = scales::percent) +
+  facet_wrap(&quot;reg&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Likely because both are more correlated with each other:</p>
+<pre class="r"><code>left_join(census, trans) %&gt;% 
+  ggplot(aes(x=lgb_plus, y=trans)) + geom_point(alpha = 0.1) +
+  geom_smooth(method = &quot;lm&quot;) +
+  scale_x_continuous(labels = scales::percent) + 
+  scale_y_continuous(labels = scales::percent)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Some days you do statistical tests, some days you slam down a overplotted scatter graph with a line of best fit.</p>
+</div>
+<div id="caveats" class="section level1">
+<h1>Caveats</h1>
+<p>This is based on self-deceleration on the census, and not everyone has ideal privacy when filling in the census. There could easily be closeted folks that my stats show as heterosexual.</p>
+<p>The cleanest solution I had for “did not answer” was to exclude them from the analysis. Cleaner, more robust, and more appropriate for a formal setting would be to include these, mapped to some 3rd category. Or to verify that they are genuinely small numbers.</p>
+<p>This is a single snapshot on a single day, performed once a decade. I am certain that some people would answer differently today.</p>
+<p>Throwing away the -8 coding for “not applicable” removed 0 people. Thanks ONS for including it for completeness.</p>
+<p>The stats don’t allow analysis of LGB+ &amp; Trans. Disambiguating sexuality and sexual identity is useful from ONS’s point of view, clearly, but the unity of the LGBT+ community is being a bit of a wedge issue these days. Ok, like any Union there’s been subdivisions, but come on folks, some of the first bricks at the Stonewall riots were thrown by <a href="https://en.wikipedia.org/wiki/Sylvia_Rivera">trans pioneers</a>.</p>
+<p>On the other hand, separating sexuality and gender identity helps break down the myth that a transwoman must be attracted to men, or vice versa. In fact the language ONS uses <a href="https://www.ons.gov.uk/peoplepopulationandcommunity/culturalidentity/genderidentity/bulletins/genderidentityenglandandwales/census2021">especially in the publication</a> is very inclusive of nonbinary identities.</p>
+</div>
+<div id="bloopers" class="section level1">
+<h1>Bloopers</h1>
+<p>A typo in an earlier iteration resulted in 100% of every MSOA coming back as LGB+. Temporarily making 100% of the Eng &amp; Wales population LGB+ might be my new favourite error. <a href="https://youtu.be/aWmkuH1k7uA?t=30">I am told I need to cite K Curbain for this one</a>.</p>
+<div id="clickbait" class="section level2">
+<h2>Clickbait?</h2>
+<p>IMD is an aggregate of multiple factors, one of which is crime. I’m going to extend this to look at some of the interesting factors of IMD against LGBT+ concentration, but that’ll involve studying the method U Sheffield did to scale LSOA to MSOA, and that’s a decent spot to break for a part 2.</p>
+</div>
+</div>
