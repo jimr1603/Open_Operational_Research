@@ -1,0 +1,156 @@
+---
+title: Valheim Piggies
+author: James Riley
+date: '2023-05-21'
+slug: valheim-piggies
+categories:
+  - R
+  - python
+tags:
+  - agent-based modelling
+---
+
+
+
+<p>Valheim is a survival base-builder and exploration and … it’s viking minecraft for adults.</p>
+<p>My group has a pig farm. The constraints on the pigs looks well-suited to agent-based modelling. Well, the game runs an agent-based model, I’m trying to take some of the properties out of the game to optimise some stuff.</p>
+<p>I’m iterating a model in Python with the mesa agent-based modelling library. So far it lets me estimate the relationship between pen size, and maximum population from overcrowding.</p>
+<p>This isn’t a fixed maximum. No matter how large the population you can always potentially have all but 2 piggies sitting in one corner of the pen, with two piggies in the opposite corner feeling uncrowded.</p>
+<div id="model-limitations" class="section level2">
+<h2>model limitations</h2>
+<p>Properties for the model taken from <a href="https://valheim.fandom.com/wiki/Taming">Valheim Wiki</a>.</p>
+<p>The model has piggies sitting exactly on a cartesian grid of 1m x 1m squares, the game seems more granular. This mostly affects the distance calcs.</p>
+<p>The model at this stage assumes the piggies are always well-fed. Adding food is for the next iteration.</p>
+<p>The model has a tick of 10 minutes. If the piggies are within range for 10 minutes then they should just ignore probability of mating and love points, they’ll almost certainly hit 3 love points within 10 mins.</p>
+<p>I mostly modified <a href="https://github.com/projectmesa/mesa-examples/">mesa examples</a> until I had something that worked, and worked the way I wanted it to. In particular I really like the included server to visualise what’s going on. It’s like having NETLOGO visualisation when you need it, and dropping it to save computer time when you don’t.</p>
+<p>For example, the visualisation showed me that randomly scattering piggies across the pen slowed down initial breeding because they might not be able to see any potential mate. In this iteration all piggies start in the same space.</p>
+</div>
+<div id="did-i-tick-the-model-enough-for-a-stable-final-population" class="section level2">
+<h2>Did I tick the model enough for a stable final population</h2>
+<pre class="r"><code>data = read_csv(&quot;data.csv&quot;) </code></pre>
+<p>If I average out the outputs over a given pen width, towards the end of the model run, most of the populations are stable. Ish. The bigger pen sizes aren’t quite stable yet.</p>
+<pre class="r"><code>data %&gt;% 
+  filter(Step &gt; 950) %&gt;% 
+  group_by(width, Step) %&gt;% 
+  summarise(n=mean(n)) %&gt;% 
+  ungroup() %&gt;% 
+  mutate(width = as_factor(width)) %&gt;% 
+  ggplot(aes(x=Step, y=n, colour=width)) +
+    geom_line() +
+    scale_colour_viridis_d()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+<div id="what-is-the-relationship-between-pen-size-and-stable-population" class="section level2">
+<h2>What is the relationship between pen size and stable population?</h2>
+<p>Kinda linear on the area of the (square pen).</p>
+<pre class="r"><code>data %&gt;% 
+  slice_max(order_by = Step, n=1) %&gt;% 
+  group_by(width) %&gt;% 
+  summarise(n=mean(n)) %&gt;% 
+  ungroup() %&gt;% 
+  mutate(area = width*width) %&gt;% 
+  ggplot(aes(x=area, y=n)) + 
+    geom_point()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>linear_model = data %&gt;% 
+  slice_max(order_by = Step, n=1) %&gt;% 
+  group_by(width) %&gt;% 
+  summarise(n=mean(n)) %&gt;% 
+  ungroup() %&gt;% 
+  mutate(area = width*width) %&gt;% 
+  lm(n~area, data=.)
+
+broom::glance(linear_model) %&gt;% 
+  knitr::kable()</code></pre>
+<table style="width:100%;">
+<colgroup>
+<col width="9%" />
+<col width="13%" />
+<col width="8%" />
+<col width="9%" />
+<col width="7%" />
+<col width="2%" />
+<col width="7%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="11%" />
+<col width="4%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">r.squared</th>
+<th align="right">adj.r.squared</th>
+<th align="right">sigma</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+<th align="right">df</th>
+<th align="right">logLik</th>
+<th align="right">AIC</th>
+<th align="right">BIC</th>
+<th align="right">deviance</th>
+<th align="right">df.residual</th>
+<th align="right">nobs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.9893311</td>
+<td align="right">0.989144</td>
+<td align="right">21.98826</td>
+<td align="right">5285.646</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">-265.04</td>
+<td align="right">536.0801</td>
+<td align="right">542.3127</td>
+<td align="right">27558.56</td>
+<td align="right">57</td>
+<td align="right">59</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>broom::tidy(linear_model) %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">std.error</th>
+<th align="right">statistic</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">37.5699758</td>
+<td align="right">4.3171261</td>
+<td align="right">8.702543</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">area</td>
+<td align="right">0.1974302</td>
+<td align="right">0.0027156</td>
+<td align="right">72.702451</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>Or as a picture:</p>
+<pre class="r"><code>data %&gt;% 
+  slice_max(order_by = Step, n=1) %&gt;% 
+  group_by(width) %&gt;% 
+  summarise(n=mean(n)) %&gt;% 
+  ungroup() %&gt;% 
+  mutate(area = width*width) %&gt;% 
+  ggplot(aes(x=area, y=n)) + 
+    geom_point() +
+    geom_smooth(method = lm)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>This overestimates at the top end of the pig pen size, but we have reason to believe the model hadn’t reached its stable point there. The top end also spends almost the entire render distance as the pig pen, and would produce far too many piggies, and consume too many veggies.</p>
+<p>Our actual pig pen is almost square, so I’ll go compare what my model predicts against what the game believes.</p>
+<p>Energy willing, this is part 1.</p>
+</div>
