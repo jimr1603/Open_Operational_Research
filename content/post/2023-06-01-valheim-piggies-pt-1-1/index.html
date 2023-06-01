@@ -1,0 +1,32 @@
+---
+title: Valheim Piggies pt 1.1
+author: James Riley
+date: '2023-06-01'
+slug: valheim-piggies-pt-1-1
+categories:
+  - Python
+  - R
+tags:
+  - agent-based modelling
+---
+
+
+
+<p><a href="https://openor.blog/2023/05/21/valheim-piggies/">In my previous post</a> I forgot to <a href="https://github.com/jimr1603/Open_Operational_Research/tree/master/content/post/2023-05-19-valheim-piggies/piggie%20model">link to the Python code for the piggie model</a>.</p>
+<p>Since I’m posting a correction, I measured our pig pen as 16m x 20m. So I ran the model 100 times for this rectangle.</p>
+<pre class="r"><code>data = read_csv(&quot;data/2023-06-01.csv&quot;)</code></pre>
+<p>100 sims is too many to do all at once, so I’ve done the middle quartiles of each step.</p>
+<pre class="r"><code>data %&gt;% 
+  group_by(Step) %&gt;% 
+  summarise(  n = list(quantile(n))) %&gt;% 
+  mutate( group = list(c(&quot;0%&quot;, &quot;25%&quot;, &quot;50%&quot;, &quot;75%&quot;, &quot;100%&quot;))) %&gt;% 
+  unnest() %&gt;% 
+  ungroup() %&gt;%
+  filter(group != &quot;0%&quot;) %&gt;% 
+  filter(group != &quot;100%&quot;) %&gt;% 
+  ggplot(aes(x=Step, y=n, colour=group)) +
+    geom_line() +
+    ggthemes::scale_colour_few()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>We get something approximating exponential growth until about 50 piggies in 250 ticks, followed by another 50 piggies in 750 ticks.</p>
+<p>250 ticks in this setup is 2500 minutes, or about 42 hours. I’ll see if I can persuade the other players on our server to only feed the piggies until we have about 50.</p>
