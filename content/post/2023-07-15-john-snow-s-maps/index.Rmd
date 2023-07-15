@@ -1,0 +1,76 @@
+---
+title: John Snow's Maps
+author: James Riley
+date: '2023-07-15'
+slug: john-snow-s-maps
+categories:
+  - R
+tags:
+  - geospatial
+  - history
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+
+library("tidyverse")
+library("sf")
+library("tmap")
+library("HistData")
+library("cholera")
+
+tmap_mode("view")
+theme_set(ggthemes::theme_few())
+
+```
+
+[Coding The Past](https://www.codingthepast.com/2023/07/12/HistData.html) introduced me to[ {HistData}](https://cran.r-project.org/web/packages/HistData/). 
+
+This is important data preservation. It's also good advertising - these datasets are [attached to a book](https://friendly.github.io/HistDataVis/) which I might not otherwise have heard of.
+
+Historical examples can be fun to go back and work out what you might do differently. Especially with newer tech. Coding the Past gave Nightingale's famous plot as a 3-colour line graph. 
+
+When I was a wee tyke we went on a school trip to [Thackray museum of medicine](https://thackraymuseum.co.uk/). One of the posters is John Snow's Cholera map. 
+
+
+```{r}
+SnowMap(axis.labels = TRUE)
+
+```
+
+Something I've wanted to do for a while with this data is put it on a modern map. 
+
+Discussing this in the [Geocomputation with R](https://r.geocompx.org) [Discord](https://discord.gg/PMztXYgNxp) I was pointed 1 package upstream to {cholera}. This package has calculated lat-lon coords for the diagram.
+
+
+```{r}
+
+deaths = fatalities %>%
+  st_as_sf(coords = c("lon", "lat"), crs=4326)
+
+roads_and_border = roads %>%
+  st_as_sf(coords = c("lon", "lat"), crs=4326) %>%
+  group_by(street) %>%
+  summarise(do_union=FALSE)%>%
+  st_cast("LINESTRING") %>%
+  st_set_crs(4326) 
+
+
+tm_shape(deaths) + tm_dots() +
+  tm_shape(roads_and_border) + tm_lines( )
+```
+
+It's quite amazing how few of the roads have changed in 170 years. 
+
+Snow's map gets a bit more credit than it is due - it's likely that this wave of cholera was already going down. More significant was his analysis that people supplied by certain water companies were more likely to be hit by a wave of cholera, then noting that these companies collected drinking water downstream of other companies sewer water. 
+
+In this he collected water samples and tried looking at them under microscopes. He doesn't seem to have seen germs, this work overall is key in the shift from miasma theory to germ theory. 
+
+He's also a hero for me in not just being a good scientist, but influencing the right people. Anaesthesia was seen by his peers as cheating. As a result, surgery was limited to removing things quickly. 
+
+Snow knew that Queen Victoria hated childbirth. We have Christmas trees and white wedding dresses because she was such an influencer for the time. Snow gave her anaesthesia for childbirth, she approved, the Church of England dropped their moral opposition to pain relief in childbirth. 
