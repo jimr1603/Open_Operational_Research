@@ -1,0 +1,62 @@
+---
+title: Cholera in Victorian England
+author: James Riley
+date: '2023-07-27'
+slug: cholera-in-victorian-england
+categories:
+  - R
+tags:
+  - pandemics
+  - official statistics
+---
+
+
+
+<p>Reading <a href="https://friendly.github.io/HistDataVis/ch04-vital.html">History of Data Visualization</a> following finding some wonderful analysis of Snow’s Cholera map in {Cholera} and {HistData} I saw Farr’s <a href="https://friendly.github.io/HistDataVis/figs-web/04_1-cholera-diarrhea.png">timeseries of Cholera deaths in England, 1849</a>.</p>
+<p>The blue and yellow timeseries will be familiar to anyone, anywhere from covid.</p>
+<p>Cholera 1849 has special significance - it is likely to be one of few modern pandemics that was completely unmitigated.</p>
+<pre class="r"><code>data &lt;- read_csv(&quot;https://raw.githubusercontent.com/jimr1603/1849-cholera/main/1849%20cholera%20deaths%20England.csv&quot;, na = c(&quot;-&quot;, &quot;&quot;)) %&gt;%
+  rename(&quot;month&quot; = 1) %&gt;%
+  rename(&quot;cause_of_death&quot; = 3) %&gt;%
+  select(month, cause_of_death, `1`:`31`) %&gt;%
+  filter(!is.na(cause_of_death)) %&gt;%
+  mutate(month = if_else(is.na(month), lag(month), month)) %&gt;%
+  pivot_longer(`1`:`31`) %&gt;%
+  rename(day_of_month = name) %&gt;%
+  mutate(date = str_glue(&quot;1849-{month}-{day_of_month}&quot;)) %&gt;%
+  mutate(date = ymd(date)) %&gt;%
+  filter(!is.na(date)) %&gt;%
+  rename(deaths = value) %&gt;%
+  mutate(day_of_week = wday(date, label = TRUE, week_start = 1))</code></pre>
+<p>Straight away, we can replicate the graph:</p>
+<pre class="r"><code>data %&gt;%
+  ggplot(aes(x = date, y = deaths, colour = cause_of_death)) +
+  geom_line() +
+  ggthemes::scale_colour_few()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Idea: adjust Cholera deaths to account for Diarrh. deaths. Something like Jan-Apr represents a constant number of daily deaths, and daily deaths above that might be mis-labelled Cholera deaths.</p>
+<p>I see the sharp peaks and troughs in the Cholera data, and wonder if there is a day-of-week bias in the data.</p>
+<pre class="r"><code>data %&gt;%
+  mutate(week = week(date)) %&gt;%
+  group_by(week, cause_of_death) %&gt;%
+  mutate(avg = mean(deaths)) %&gt;%
+  ungroup() %&gt;%
+  mutate(variance = deaths - avg) %&gt;%
+  group_by(day_of_week, cause_of_death) %&gt;%
+  summarise(variance = mean(variance)) %&gt;%
+  ggplot(aes(x = day_of_week, fill = cause_of_death, y = variance)) +
+  geom_col(position = &quot;dodge&quot;) +
+  ggthemes::scale_fill_few()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>There is, but it appears to be anti-Friday. I would have guessed anti-Sunday.</p>
+<p>Finally, a rolling average reveals something closer to the differential SIR model:</p>
+<pre class="r"><code>data %&gt;%
+  arrange(date) %&gt;%
+  group_by(cause_of_death) %&gt;%
+  mutate(smoothed = zoo::rollmean(deaths, k = 20, fill = NA)) %&gt;%
+  ungroup() %&gt;%
+  ggplot(aes(x = date, y = smoothed, colour = cause_of_death, align = &quot;center&quot;)) +
+  geom_line() +
+  ggthemes::scale_colour_few()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Something like this could be used to fit a SIR model to the data.</p>
