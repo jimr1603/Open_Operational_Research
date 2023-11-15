@@ -1,0 +1,158 @@
+---
+title: Open Coffee Map VI
+author: James Riley
+date: '2023-11-15'
+slug: open-coffee-map-vi
+categories:
+  - R
+tags:
+  - geospatial
+  - coffee
+  - Graph Theory
+---
+
+
+
+<p>All map projections are lossy, so there’s always a choice in what you preserve.</p>
+<p>Or to reframe it, what features you draw attention to.</p>
+<p>Mercator projection preserves angles, which is really handy if you’re trying
+to sail in a straight line across the Atlantic and reach your port.</p>
+<p>I see the handy “you are here” maps around Leeds, with their neat circles
+showing “approx 5 minutes walk” and know that isochrones are not neat circles.</p>
+<p>But what if they were?</p>
+<p>I had to go under the hood of the {valhallr} package again. I might need
+to offer to take over maintenance of the package.</p>
+<p>Valhalla server can return the tree it calculated in making an isochrone, so
+I tweaked the isochrone function to go to that API endpoint instead. <a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></p>
+<pre class="r"><code>
+val_expand_iso = function (from, costing = &quot;pedestrian&quot;, contours = c(5, 10, 
+                                                     15), metric = &quot;min&quot;, min_road_class = &quot;residential&quot;, minimum_reachability = 500, 
+          hostname = &quot;localhost&quot;, port = 8002) 
+{
+  if (nrow(from) &gt; 1) 
+    stop(&quot;More than one location supplied. Please supply a one-row input tibble with `lat` and `lon` columns.&quot;)
+  if (!((&quot;lat&quot; %in% names(from)) &amp; (&quot;lon&quot; %in% names(from)))) 
+    stop(&quot;From tibble must inclide one column named `lat` and one named `lon`.&quot;)
+  if (!metric %in% c(&quot;min&quot;, &quot;km&quot;)) 
+    stop(&quot;Invalid metric. Please use `min` for time in minutes or `km` for distance in kilometres.&quot;)
+  post_data &lt;- list()
+  post_data$locations &lt;- dplyr::select(from, &quot;lat&quot;, &quot;lon&quot;)
+  post_data$costing &lt;- costing
+  if (metric == &quot;min&quot;) 
+    post_data$contours &lt;- tibble::tibble(time = contours)
+  if (metric == &quot;km&quot;) 
+    post_data$contours &lt;- tibble::tibble(distance = contours)
+  
+  post_data$action = &quot;isochrone&quot;
+  post_data$skip_opposites = TRUE
+  post_data$expansion_properties = c( &quot;durations&quot;)
+  post_json &lt;- jsonlite::toJSON(post_data, auto_unbox = TRUE)
+  post_json = str_replace(post_json, &#39;&quot;durations&quot;&#39;, &#39;[&quot;durations&quot;]&#39;)
+  url &lt;- paste0(&quot;http://&quot;, hostname, &quot;:&quot;, port, &quot;/expansion&quot;)
+  resp &lt;- httr::POST(url = url, body = post_json, httr::user_agent(&quot;https://github.com/chris31415926535/valhallr&quot;))
+  if (httr::http_type(resp) != &quot;application/json&quot;) 
+    stop(&quot;API did not return json.&quot;, call. = FALSE)
+  if (httr::http_error(resp)) {
+    message(&quot;Error: API call returned error. Returning API response for debugging.&quot;)
+    return(resp)
+  }
+  resp_data &lt;-
+  httr::content(resp, type = &quot;text&quot;, encoding = &quot;UTF-8&quot;) %&gt;% 
+    geojsonsf::geojson_sf() %&gt;% tibble::as_tibble() %&gt;% 
+    sf::st_as_sf()# %&gt;%
+  resp_data$costing &lt;- costing
+  return(resp_data)
+}
+</code></pre>
+<pre class="r"><code>
+tmap_mode(&quot;plot&quot;)
+
+limit = 30
+
+origin = tibble(lat = 53.79806, #t&#39;office
+                lon = -1.53158)
+
+# yes, my home server is a homage to Gibson &amp; Wargames movie
+data = val_expand_iso(origin, contours = limit, hostname = &quot;gibson.local&quot;) %&gt;%
+  st_cast(&quot;LINESTRING&quot;)</code></pre>
+<p>The unmodified/use GB grid like a normal person version of the map follows:</p>
+<pre class="r"><code>data$durations = jsonlite::fromJSON(data$durations[1])
+
+data = data %&gt;%  
+  mutate(durations = durations/60) %&gt;%
+  filter(durations &lt; limit) 
+
+data = origin %&gt;% 
+  st_as_sf(coords = c(&quot;lon&quot;, &quot;lat&quot;), crs=&quot;EPSG:4326&quot;) %&gt;% 
+  st_cast(&quot;LINESTRING&quot;) %&gt;% 
+  mutate(durations=0) %&gt;% 
+  bind_rows(data) %&gt;% 
+  st_transform(&quot;EPSG:27700&quot;) 
+
+data %&gt;% 
+  filter(durations&gt;0) %&gt;% 
+  tm_shape() + tm_lines(col=&quot;durations&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>And ‘reprojected’ so that points that are equal time from the origin are equally far from the origin.</p>
+<pre class="r"><code>
+origin = st_as_sf( tibble(lat = 53.79806,
+                          lon = -1.53158), coords=c(&quot;lon&quot;, &quot;lat&quot;), crs=&quot;EPSG:4326&quot;) %&gt;%
+  st_transform(&quot;EPSG:27700&quot;)
+  
+
+to = data %&gt;% 
+  filter(durations&gt;0) %&gt;% 
+  mutate(id=row_number()) %&gt;% 
+  st_cast(&quot;POINT&quot;) %&gt;% 
+  distinct() %&gt;% 
+  mutate(n=n(), .by=id) %&gt;% 
+  filter(n&gt;=2) %&gt;%
+  mutate(p = row_number())
+
+#make repeated points have the same durations/r
+to = st_coordinates(to) %&gt;%
+  as_tibble() %&gt;% 
+  mutate(p = row_number()) %&gt;% 
+  left_join(to, by=&quot;p&quot;) %&gt;% 
+  group_by(X,Y) %&gt;% 
+  mutate(durations=mean(durations)) %&gt;%
+  ungroup() %&gt;% 
+  st_as_sf()
+
+geom = st_geometry(to)
+origin = st_geometry(origin)
+
+r = st_distance(st_set_crs(geom - origin, &quot;EPSG:27700&quot;), origin) %&gt;%
+  as.vector()
+
+
+to = 
+  st_set_geometry(to, (geom-origin)*to$durations + origin) %&gt;%
+  group_by(id) %&gt;% 
+  summarise(durations=first(durations), do_union=TRUE) %&gt;% 
+  st_set_crs(&quot;EPSG:27700&quot;) %&gt;%
+  st_cast(&quot;LINESTRING&quot;)
+
+
+
+tm_shape(to) + tm_lines(col=&quot;durations&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>This has already taken long enough. I was going to add the coffee shops from OSM
+into both maps, but I have a lot going on right now. Consider this a part 1, but
+I’m not obliging myself to finish part 2.</p>
+<p>There’s a minor kludge in there - it’s not clear if duration applies to the start
+or end of a road segment. So roads kept ending up disjointed.</p>
+<p>To keep roads connected points that have the same coordinates before transformation
+need to have the same coordinates post-transformation, so I:</p>
+<ul>
+<li>split roads into their start and end points;</li>
+<li>initially give both points the duration attached to the road segment;</li>
+<li>gave each point the average duration across all its instances;</li>
+<li>merged them back into lines.</li>
+</ul>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>Editing code that almost does what you want is so much easier than writing from scratch.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+</ol>
+</div>
