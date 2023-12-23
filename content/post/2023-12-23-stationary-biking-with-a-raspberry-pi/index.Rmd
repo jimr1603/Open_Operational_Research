@@ -1,0 +1,165 @@
+---
+title: stationary biking with a raspberry pi
+author: James Riley
+date: '2023-12-23'
+slug: stationary-biking-with-a-raspberry-pi
+categories:
+  - Python
+  - R
+tags:
+  - cycling
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	collapse = TRUE
+)
+
+library("tidyverse")
+library("units")
+theme_set(ggthemes::theme_few())
+
+```
+
+As well as lifting heavy weights, I cycle for my health. When it's this cold,
+wet and windy I slot my bike into a stationary setup. 
+
+I'll do some proper project photos and cross-link to a hardware hacking space, 
+but I've connected a cheap bike computer (magnet + reed switch) to a Raspberry Pi,
+which has been told to log when this switch closes, once per revolution.
+
+[Github for the code for the bike](https://github.com/jimr1603/stationary-bike)
+
+Anyway, I'm iterating this - test, refine, test.
+
+Let's load the last two rides and fix the current issues.
+
+```{r}
+ride_2 = read_csv("https://github.com/jimr1603/stationary-bike/raw/main/2023-12-22%2020_18", col_names="time" ) %>% 
+  mutate(time = as.POSIXct(time))
+ride_1 = read_csv("https://github.com/jimr1603/stationary-bike/raw/main/2023-12-20%2017_01", col_names = "time") %>% 
+  mutate(time = as.POSIXct(time))
+
+```
+
+```{r}
+circumference = 2.21 # wheel circumference, in meters.
+
+ride_1 %>% 
+  mutate(dt = as.numeric(time-lag(time))) %>% 
+  mutate(dx = as_units(circumference, "m")) %>% 
+  mutate(dt =as_units(dt, "seconds")) %>% 
+  mutate(speed = dx/dt) %>% 
+  mutate(speed = set_units(speed, "miles/hour")) %>% 
+  ggplot(aes(x=time,y=speed)) + geom_point()
+```
+
+Negative speed?! Let's remove that first.
+
+```{r}
+
+ride_1 %>% 
+  mutate(dt = as.numeric(time-lag(time))) %>% 
+  mutate(dx = as_units(circumference, "m")) %>% 
+  mutate(dt =as_units(dt, "seconds")) %>% 
+  mutate(speed = dx/dt) %>% 
+  filter(as.numeric(speed)>0) %>% 
+  mutate(speed = set_units(speed, "miles/hour")) %>% 
+  ggplot(aes(x=time,y=speed)) + geom_point()
+```
+
+2000 miles per hour is so obviously bad, I'm going to try to zoom in. (Skipping several trial-and-error steps in where I choose my cutoff :D )
+
+```{r}
+ride_1 %>% 
+  mutate(dt = as.numeric(time-lag(time))) %>% 
+  mutate(dx = as_units(circumference, "m")) %>% 
+  mutate(dt =as_units(dt, "seconds")) %>% 
+  mutate(speed = dx/dt) %>% 
+  filter(as.numeric(speed)>0) %>% 
+  mutate(speed = set_units(speed, "miles/hour")) %>% 
+  filter(speed <= as_units(100, "miles/hour")) %>% 
+  ggplot(aes(x=time,y=speed)) + geom_point()
+```
+
+So there's a nice gap - under "100 miles/hour" the readings look sensible (except for negative time), and all readings over 100 miles per hour are sensor barf.
+
+```{r}
+ride_1 %>% 
+  mutate(dt = as.numeric(time-lag(time))) %>% 
+  mutate(dx = as_units(circumference, "m")) %>% 
+  mutate(dt =as_units(dt, "seconds")) %>% 
+  mutate(speed = dx/dt) %>% 
+  filter(as.numeric(speed)>0) %>% 
+  mutate(speed = set_units(speed, "miles/hour")) %>% 
+  filter(speed >= as_units(100, "miles/hour")) %>% 
+  slice_min(speed)
+```
+
+It looks like the debounce time of 0.01 seconds is too small, I'll try a debounce time of 0.03 for the next run.
+
+If I manually throw out readings that are less than 0.03 secs from the last reading [^1] do the data look sensible?
+
+[^1]: incidentally fixing negative readings
+
+```{r}
+ride_2 = read_csv("https://github.com/jimr1603/stationary-bike/raw/main/2023-12-22%2020_18", col_names="time" ) %>% 
+  mutate(dt = time-lag(time)) %>%
+  filter(dt > 0.03) %>% 
+  mutate(dt = time-lag(time)) %>% 
+  mutate(time = as.POSIXct(time))
+ride_1 = read_csv("https://github.com/jimr1603/stationary-bike/raw/main/2023-12-20%2017_01", col_names = "time") %>% 
+  mutate(dt = time-lag(time)) %>% 
+  filter(dt > 0.03) %>% 
+  mutate(dt = time-lag(time)) %>% 
+  mutate(time = as.POSIXct(time))
+```
+
+```{r}
+ride_1 %>% 
+  mutate(dt = as_units(dt, "seconds")) %>% 
+  mutate(dx = as_units(circumference, "m")) %>% 
+  mutate(speed = dx/dt) %>% 
+  mutate(speed = set_units(speed, "miles/hour")) %>% 
+  ggplot(aes(x=time,y=speed)) + geom_point()
+
+```
+
+[^2]
+
+
+[^2]: I was listening to [The Witching Hour](https://lesbianbeddeathband.bandcamp.com/album/the-witching-hour) during this ride. I might align speed, heart rate, and track listing later. 
+
+
+```{r}
+ride_2 %>% 
+  mutate(dt = as_units(dt, "seconds")) %>% 
+  mutate(dx = as_units(circumference, "m")) %>% 
+  mutate(speed = dx/dt) %>% 
+  mutate(speed = set_units(speed, "miles/hour")) %>% 
+  ggplot(aes(x=time,y=speed)) + geom_point()
+
+```
+
+Even the ride I held back from the first analysis looks good :D
+
+```{r}
+bind_rows(
+  mutate(ride_1, id=1),
+  mutate(ride_2, id=2)
+) %>% 
+  summarise(distance = circumference*n(), 
+            duration = as.numeric(last(time)-first(time)),
+            .by="id") %>% 
+  mutate(distance = as_units(distance, "m"),
+         duration = as_units(duration, "minutes")) %>% 
+  mutate(avg_speed = set_units(distance/duration,"miles/hour")) %>% 
+  knitr::kable()
+```
+
+Eyeballing recent rides, 10 or 11 miles per hour looks about right, give or take some hills. 
+I'll keep the wheel circumference of 2.21 m, push a debounce on the switch of 0.03 seconds, and have another ride.
+
+
