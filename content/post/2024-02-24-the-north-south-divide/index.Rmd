@@ -1,0 +1,73 @@
+---
+title: The North/South Divide
+author: James Riley
+date: '2024-02-24'
+slug: the-north-south-divide
+categories:
+  - R
+tags:
+  - geospatial
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  collapse = TRUE
+)
+
+library("tidyverse")
+
+library("tidyverse")
+library("sf")
+
+library("tmap")
+tmap_mode("view")
+theme_set(ggthemes::theme_few())
+```
+
+Various Facebook memes were joking about what parts of England count as "The North" so I decided to grab a shapefile for England and GB, and slap a dot on the map.
+
+I *don't* believe that this defines the North/South in England. I think that issue belongs to social geography and history - in place names and some social geostats you can still see the Danelaw/Anglo-Saxon divide. 
+
+Anyway, the centroid of GB is:
+
+```{r}
+
+gb = rnaturalearth::ne_countries(scale = 50) %>% 
+  st_as_sf() %>% 
+  filter(name == "United Kingdom") %>% 
+  st_transform(27700)
+
+ 
+  
+gb %>% 
+  st_centroid(of_largest_polygon = TRUE) %>% 
+  #largest polygon is GB in this case.
+  tm_shape() + tm_dots()
+```
+
+Or for England:
+
+```{r}
+pt = rnaturalearth::ne_states(geounit = "england") %>% 
+  st_union() %>% 
+  st_centroid()
+
+pt %>%  
+  
+  tm_shape() + 
+  tm_dots()
+
+```
+
+There's a charming part of Gaiman's American Gods where the central point of the USA was estimated by means of a cardboard cutout and finding the balancing point, and this place ends up as the opposite as a place of power. 
+
+The brevity of this post disguises how long I spent looking for a good outline of GB and England. The Open Geography Portal wanted to test a new design, it returned no results so I went back to old design.
+
+I kept getting really heavy files from OGP - it is far easier to find all English LSOAs with a bunch of social stats attached than it is to just get the damn coastline. Or to get individual nations but not GB. 
+
+I remembered that there was an illustration of projection of the GB coastline in [The Book](https://r.geocompx.org/spatial-class#vector-data) and found the {rnaturalearth} libraries for grabbing political/coastal borders. 
+
+So ultimately, this turns from a vent about gov open data being hampered by the search function to a love-letter to free/open-source publishing, because I had seen someone else do something like what I wanted, and I could look under the hood for how they did it. 
+
+At the end of the day, this is why I keep this up as a Free/Open Source blog. Even the early, gnarly posts have stuff that someone can learn from, even if it's "this person used to be worse than me!". 
