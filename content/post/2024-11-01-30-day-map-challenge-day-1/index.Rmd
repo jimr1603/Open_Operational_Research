@@ -1,0 +1,52 @@
+---
+title: 30 day map challenge - day 1
+author: James Riley
+date: '2024-11-01'
+slug: 30-day-map-challenge-day-1
+categories:
+  - R
+tags:
+  - geospatial
+  - 30 day map challenge
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  collapse = TRUE
+)
+
+library("tidyverse")
+library(sf)
+library(tmap)
+library(stats19)
+
+theme_set(ggthemes::theme_few())
+```
+
+I'm going to try to do the [30 day map challenge](https://30daymapchallenge.com/). Think Inktober, but for geospatial. To keep the flow I'm likely to do minimal commentary, and a couple of days might land at once when I play catch-up.
+
+Anyway,
+
+#Day 1: Points
+
+```{r}
+
+tmap_mode("view")
+
+
+data_pipe = function(year_index){
+  
+  data = stats19::get_stats19(year=year_index) %>% 
+    filter(police_force == "West Yorkshire") %>% 
+    filter(!is.na(longitude), !is.na(latitude)) %>% 
+    select(date, accident_severity, longitude, latitude) %>% 
+    st_as_sf(coords = c("longitude", "latitude"), crs = "WGS84")
+  
+}
+
+map_dfr(2022:2019, data_pipe) %>% 
+  tm_shape() + tm_dots(col = "accident_severity")
+
+
+```
