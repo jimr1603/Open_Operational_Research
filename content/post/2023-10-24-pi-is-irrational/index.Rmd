@@ -1,0 +1,30 @@
+---
+title: Pi is irrational
+author: James Riley
+date: '2023-10-24'
+slug: pi-is-irrational
+categories:
+  - R
+tags: []
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  collapse = TRUE
+)
+
+library("tidyverse")
+library("plotly")
+theme_set(ggthemes::theme_few())
+```
+
+```{r}
+tibble(t = seq(0, 10*pi, length.out=1000),
+       x = cos(t) + cospi(t),
+       y = sin(t) + sinpi(t)) %>%
+  mutate(t = t/100) %>% 
+  plot_ly(x=~x,y=~y, frame=~t) %>%
+  add_paths()
+```
